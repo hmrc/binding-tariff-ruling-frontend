@@ -16,20 +16,35 @@
 
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 @import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+@import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
+@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.input_search
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
-@()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.error_summary
+@import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
+@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.search_results
+@(form: Form[SimpleSearch], results: Seq[Ruling])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @main_template(title = "Binding Tariff Rulings", bodyClasses = None) {
 
- <h1>@messages("index.heading")</h1>
+ @error_summary(form.errors)
 
- <p>@messages("index.content1")</p>
+ <h1>@messages("search.heading")</h1>
 
- <p>@messages("index.content2")</p>
+ <p>@messages("search.content1")</p>
 
- <ul class="list list-bullet">
-  <li>@messages("index.content3")</li>
- </ul>
+ @helper.form(action = routes.SearchController.post()) {
 
- <a class="button button-start" href="@routes.SearchController.get()" role="button">Start now</a>
+  @helper.CSRF.formField
+
+  @input_search(
+   field = form("query"),
+   label = messages("search.form.search")
+  )
+
+ }
+
+ @if(results.nonEmpty) {
+  @search_results(results)
+ }
+
 }

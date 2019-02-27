@@ -1,0 +1,12 @@
+index.heading = UK published BTI rulings
+index.content1 = This service publishes all the new and current legally binding tariff information rulings.
+index.content2 = Use this service for
+index.content3 = Searching and viewing current BTI rulings
+
+search.heading = UK published BTI rulings
+search.content1 = You can search by reference number, keyword, date and description
+search.advanced_search = Advanced search
+search.form.search = Search
+search.form.search.required = Search query is required
+
+error.summary.title = There''s a problem

@@ -1,0 +1,54 @@
+@import 'search';
+@import 'variables';
+
+.display-inline {
+  display: inline-block;
+}
+
+.mt-1 {
+  margin-top: ($spacer * .25);
+}
+
+.mt-2 {
+  margin-top: ($spacer * .5);
+}
+
+.mt-3 {
+  margin-top: ($spacer * .75);
+}
+
+.mt-4 {
+  margin-top: $spacer;
+}
+
+.mb-1 {
+  margin-bottom: ($spacer * .25);
+}
+
+.mb-2 {
+  margin-bottom: ($spacer * .5);
+}
+
+.mb-3 {
+  margin-bottom: ($spacer * .75);
+}
+
+.mb-4 {
+  margin-bottom: $spacer;
+}
+
+.ml-1 {
+  margin-left: ($spacer * .25);
+}
+
+.ml-2 {
+  margin-left: ($spacer * .5);
+}
+
+.ml-3 {
+  margin-left: ($spacer * .75);
+}
+
+.ml-4 {
+  margin-left: $spacer;
+}
