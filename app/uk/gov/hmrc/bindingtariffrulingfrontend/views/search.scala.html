@@ -22,13 +22,16 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.error_summary
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.search_results
-@(form: Form[SimpleSearch], results: Seq[Ruling])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
+@(form: Form[SimpleSearch], results: Paged[Ruling])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @main_template(title = "Binding Tariff Rulings", bodyClasses = None) {
 
  @error_summary(form.errors)
 
- <h1>@messages("search.heading")</h1>
+ <a id="search-back" href="@routes.IndexController.get()" class="link-back">@messages("site.back")</a>
+
+ <h1 id="search-heading">@messages("search.heading")</h1>
 
  <p>@messages("search.content1")</p>
 

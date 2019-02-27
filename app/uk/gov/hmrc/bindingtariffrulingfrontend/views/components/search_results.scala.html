@@ -18,7 +18,9 @@
 @import java.time.Instant
 @import java.time.ZoneOffset
 @import uk.gov.hmrc.bindingtariffrulingfrontend.utils.Dates
-@(results: Seq[Ruling])(implicit messages: Messages)
+@import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
+@import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
+@(results: Paged[Ruling])(implicit messages: Messages)
 
 <table id="search_results-table">
     <thead>
@@ -31,9 +33,11 @@
         </tr>
     </thead>
     <tbody>
-        @for((result: Ruling, index: Int) <- results.zipWithIndex) {
+        @for((result: Ruling, index: Int) <- results.results.zipWithIndex) {
             <tr id="search_results-table-row_@index">
-                <td id="search_results-table-row_@index-index">@result.reference</td>
+                <td id="search_results-table-row_@index-index">
+                    <a href="@routes.RulingController.get(result.reference)">@result.reference</a>
+                </td>
                 <td id="search_results-table-row_@index-description">@result.goodsDescription</td>
                 <td id="search_results-table-row_@index-start_date">@Dates.format(result.effectiveStartDate)</td>
                 <td id="search_results-table-row_@index-end_date">@Dates.format(result.effectiveEndDate)</td>

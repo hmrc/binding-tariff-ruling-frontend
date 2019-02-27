@@ -5,3 +5,4 @@ GET        /assets/*file                        controllers.Assets.versioned(pat
 GET        /                                    @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.IndexController.get()
 GET        /search                              @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.SearchController.get()
 POST       /search                              @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.SearchController.post()
+GET        /ruling/:id                          @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.RulingController.get(id: String)

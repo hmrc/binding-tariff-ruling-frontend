@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
+import java.time.Instant
+
 import akka.stream.Materializer
 import org.mockito.BDDMockito._
 import play.api.http.Status
@@ -23,14 +25,13 @@ import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 
 import scala.concurrent.Future
 
 
-class SearchControllerSpec extends ControllerSpec {
-
+class RulingControllerSpec extends ControllerSpec {
   private val env = Environment.simple()
   private val configuration = Configuration.load(env)
 
@@ -39,29 +40,28 @@ class SearchControllerSpec extends ControllerSpec {
   private implicit val mat: Materializer = fakeApplication.materializer
   private val rulingService = mock[RulingService]
 
-  private val controller = new SearchController(rulingService, messageApi, appConfig)
+  private val controller = new RulingController(rulingService, messageApi, appConfig)
 
   "GET /" should {
     "return 200" in {
-      val result = await(controller.get(getRequestWithCSRF))
+      given(rulingService.get("id")) willReturn Future.successful(Some(Ruling("ref", "code", Instant.now, Instant.now, "justification", "goods description")))
 
+      val result = await(controller.get("id")(getRequestWithCSRF))
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
-      bodyOf(result) should include("search-heading")
+      bodyOf(result) should include("ruling-heading")
     }
-  }
 
-  "POST /" should {
-    "return 200" in {
-      given(rulingService.search("xyz")) willReturn Future.successful(Paged.empty[Ruling])
+    "return 200 - when not found" in {
+      given(rulingService.get("id")) willReturn Future.successful(None)
 
-      val result = await(controller.get(getRequestWithCSRF.withFormUrlEncodedBody("query" -> "xyz")))
-
+      val result = await(controller.get("id")(getRequestWithCSRF))
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
-      bodyOf(result) should include("search-heading")
+      bodyOf(result) should include("ruling_not_found-heading")
     }
+
   }
 }

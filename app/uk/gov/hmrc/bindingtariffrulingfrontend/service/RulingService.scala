@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.utils
+package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
-import java.time.{LocalDate, ZoneOffset}
+import java.time.Instant
 
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 
-class DatesSpec extends UnitSpec {
+import scala.concurrent.Future
 
-  "Format" should {
+class RulingService {
 
-    "convert instant to string" in {
-      val date = LocalDate.of(2018,1,1).atStartOfDay(ZoneOffset.UTC).toInstant
-      val output = Dates.format(date)
+  private val ruling = Ruling("ref", "code", Instant.now(), Instant.now(), "justification", "description", Seq.empty)
 
-      output shouldBe "01 Jan 2018"
-    }
+  def get(id: String): Future[Option[Ruling]] = {
+    Future.successful(Some(ruling))
+  }
 
+  def search(query: String): Future[Paged[Ruling]] = {
+    Future.successful(Paged(Seq(ruling), 1, 1))
   }
 
 }

@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.utils
+package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
-import java.time.{LocalDate, ZoneOffset}
+case class Paged[T](results: Seq[T], currentPage: Int, resultCount: Int) {
+  def nonEmpty: Boolean = resultCount > 0
+}
 
-import uk.gov.hmrc.play.test.UnitSpec
-
-class DatesSpec extends UnitSpec {
-
-  "Format" should {
-
-    "convert instant to string" in {
-      val date = LocalDate.of(2018,1,1).atStartOfDay(ZoneOffset.UTC).toInstant
-      val output = Dates.format(date)
-
-      output shouldBe "01 Jan 2018"
-    }
-
-  }
-
+object Paged {
+  def empty[T]: Paged[T] = Paged[T](Seq.empty, 1, 0)
 }

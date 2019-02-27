@@ -9,4 +9,15 @@ search.advanced_search = Advanced search
 search.form.search = Search
 search.form.search.required = Search query is required
 
+ruling.heading = UK published BTI rulings
+ruling.reference = BTI reference
+ruling.commodity_code = Commodity code
+ruling.start_date = Start date
+ruling.end_date = End date
+ruling.justification = Justification
+ruling.description = Description
+
+ruling_not_found.heading = Ruling with reference {0} was not found
+
 error.summary.title = There''s a problem
+site.back = back
