@@ -1,3 +1,5 @@
 # microservice specific routes
 
-GET        /hello-world             uk.gov.hmrc.bindingtariffrulingfrontend.controllers.HelloWorld.helloWorld
+GET        /assets/*file                        controllers.Assets.versioned(path="/public", file: Asset)
+
+GET        /                                    @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.IndexController.get()

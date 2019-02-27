@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.config
+package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
+import play.api.mvc._
 
-import play.api.i18n.MessagesApi
-import play.api.mvc.Request
-import play.twirl.api.Html
-import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
+import scala.concurrent.Future
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
 @Singleton
-class ErrorHandler @Inject()(val messagesApi: MessagesApi, implicit val appConfig: AppConfig) extends FrontendErrorHandler {
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]): Html =
-    views.html.error_template(pageTitle, heading, message)
+class IndexController @Inject()(val messagesApi: MessagesApi, implicit val appConfig: AppConfig) extends FrontendController with I18nSupport {
+
+  def get: Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok(views.html.index()))
+  }
+
 }

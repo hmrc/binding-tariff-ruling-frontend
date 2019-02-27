@@ -1,6 +1,6 @@
 # Add all the application routes to the app.routes file
-->         /binding-tariff-ruling-frontend              app.Routes
+->         /binding-tariff-ruling     app.Routes
 ->         /                          health.Routes
 ->     	   /template                  template.Routes
 
-GET        /admin/metrics             com.kenshoo.play.metrics.MetricsController.metrics
+#GET        /admin/metrics             com.kenshoo.play.metrics.MetricsController.metrics
