@@ -31,14 +31,14 @@
   <div class="column-one-half">
    <div class="grid-row">
     <p class="column-one-half font-bold">@messages("ruling.reference")</p>
-    <p class="column-one-half">@ruling.reference</p>
+    <p id="ruling-reference" class="column-one-half">@ruling.reference</p>
    </div>
   </div>
 
   <div class="column-one-half">
    <div class="grid-row">
     <p class="column-one-half font-bold">@messages("ruling.start_date")</p>
-    <p class="column-one-half">@Dates.format(ruling.effectiveStartDate)</p>
+    <p id="ruling-start_date" class="column-one-half">@Dates.format(ruling.effectiveStartDate)</p>
    </div>
   </div>
  </div>
@@ -47,23 +47,23 @@
   <div class="column-one-half">
    <div class="grid-row">
     <p class="column-one-half font-bold">@messages("ruling.commodity_code")</p>
-    <p class="column-one-half">@ruling.reference</p>
+    <p id="ruling-commodity_code" class="column-one-half">@ruling.bindingCommodityCode</p>
    </div>
   </div>
 
   <div class="column-one-half">
    <div class="grid-row">
     <p class="column-one-half font-bold">@messages("ruling.end_date")</p>
-    <p class="column-one-half">@Dates.format(ruling.effectiveEndDate)</p>
+    <p id="ruling-end_date" class="column-one-half">@Dates.format(ruling.effectiveEndDate)</p>
    </div>
   </div>
  </div>
 
  <h3>@messages("ruling.justification")</h3>
- <p>@ruling.justification</p>
+ <p id="ruling-justification">@ruling.justification</p>
 
  <h3 class="mt-4">@messages("ruling.description")</h3>
- <p>@ruling.goodsDescription</p>
+ <p id="ruling-description">@ruling.goodsDescription</p>
 
- <a class="button mt-2" href="@routes.SearchController.get()" role="button">Exit</a>
+ <a id="ruling-exit" class="button mt-2" href="@routes.SearchController.get()" role="button">Exit</a>
 }

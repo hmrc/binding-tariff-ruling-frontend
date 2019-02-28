@@ -17,12 +17,14 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import akka.stream.Materializer
+import org.mockito.ArgumentMatchers.any
 import org.mockito.BDDMockito._
 import play.api.http.Status
 import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 
@@ -54,9 +56,18 @@ class SearchControllerSpec extends ControllerSpec {
 
   "POST /" should {
     "return 200" in {
-      given(rulingService.search("xyz")) willReturn Future.successful(Paged.empty[Ruling])
+      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
 
-      val result = await(controller.get(getRequestWithCSRF.withFormUrlEncodedBody("query" -> "xyz")))
+      val result = await(controller.post(getRequestWithCSRF.withFormUrlEncodedBody("query" -> "xyz")))
+
+      status(result) shouldBe Status.OK
+      contentType(result) shouldBe Some("text/html")
+      charset(result) shouldBe Some("utf-8")
+      bodyOf(result) should include("search-heading")
+    }
+
+    "return 200 with form-errors" in {
+      val result = await(controller.post(getRequestWithCSRF.withFormUrlEncodedBody()))
 
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")

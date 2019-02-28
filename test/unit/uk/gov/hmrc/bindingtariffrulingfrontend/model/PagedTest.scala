@@ -25,6 +25,15 @@ class PagedTest extends UnitSpec {
       Paged.empty.nonEmpty shouldBe false
       Paged(Seq(""), 1, 1).nonEmpty shouldBe true
     }
+
+    "calculate page count" in {
+      Paged.empty.pageCount shouldBe 1
+      Paged(Seq(""), 1, 1).pageCount shouldBe 1
+      Paged(Seq(""), 1, 2).pageCount shouldBe 2
+      Paged(Seq(""), 2, 2).pageCount shouldBe 2
+      Paged(Seq(""), 2, 3).pageCount shouldBe 3
+      Paged(Seq("", ""), 2, 4).pageCount shouldBe 2
+    }
   }
 
 }

@@ -16,21 +16,36 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
-import javax.inject.Inject
+import org.mockito.BDDMockito.given
+import org.scalatest.mockito.MockitoSugar
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
+import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future
 
-class RulingService @Inject()(repository: RulingRepository) {
+class RulingServiceTest extends UnitSpec with MockitoSugar {
 
-  def get(id: String): Future[Option[Ruling]] = {
-    repository.get(id)
+  private val repository = mock[RulingRepository]
+
+  private val service = new RulingService(repository)
+
+  "Service GET by reference" should {
+
+    "delegate to repository" in {
+      given(repository.get("id")) willReturn Future.successful(None)
+      await(service.get("id")) shouldBe None
+    }
   }
 
-  def get(query: SimpleSearch): Future[Paged[Ruling]] = {
-    repository.get(query)
+  "Service GET by search" should {
+    val search = SimpleSearch("query", 1, 1)
+
+    "delegate to repository" in {
+      given(repository.get(search)) willReturn Future.successful(Paged.empty[Ruling])
+      await(service.get(search)) shouldBe Paged.empty[Ruling]
+    }
   }
 
 }

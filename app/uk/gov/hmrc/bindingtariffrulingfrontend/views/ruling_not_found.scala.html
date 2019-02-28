@@ -23,7 +23,8 @@
 
 @main_template(title = "Binding Tariff Rulings", bodyClasses = None) {
 
+ <a id="ruling_not_found-back" href="@routes.SearchController.get()" class="link-back">@messages("site.back")</a>
+
  <h1 id="ruling_not_found-heading">@messages("ruling_not_found.heading", id)</h1>
 
- <a id="ruling_not_found-back" href="@routes.SearchController.get()" class="link-back">@messages("site.back")</a>
 }

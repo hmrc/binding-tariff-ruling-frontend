@@ -42,7 +42,7 @@ class SearchController @Inject()(rulingService: RulingService,
       errors =>
         Future.successful(Ok(views.html.search(errors, Paged.empty[Ruling]))),
       query =>
-        rulingService.search(query.query).map { results =>
+        rulingService.get(query).map { results =>
           Ok(views.html.search(SimpleSearch.form, results))
         }
     )

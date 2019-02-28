@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.service
+package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
-import javax.inject.Inject
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
-import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
+import reactivemongo.api.indexes.Index
+import reactivemongo.play.json.collection.JSONCollection
+import uk.gov.hmrc.play.test.UnitSpec
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class RulingService @Inject()(repository: RulingRepository) {
+trait MongoUnitSpec extends UnitSpec {
 
-  def get(id: String): Future[Option[Ruling]] = {
-    repository.get(id)
+  protected implicit val ordering: Ordering[Index] = Ordering.by { i: Index => i.name }
+
+  protected def collection: JSONCollection
+
+  protected def getIndexes: List[Index] = {
+    await(collection.indexesManager.list())
   }
 
-  def get(query: SimpleSearch): Future[Paged[Ruling]] = {
-    repository.get(query)
+  protected def getIndex(name: String): Option[Index] = {
+    getIndexes.find(_.name.contains(name))
   }
 
 }

@@ -14,12 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
-@import java.time.Instant
-@import java.time.ZoneOffset
-@import uk.gov.hmrc.bindingtariffrulingfrontend.utils.Dates
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
-@import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
+@import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
+@import uk.gov.hmrc.bindingtariffrulingfrontend.utils.Dates
 @(results: Paged[Ruling])(implicit messages: Messages)
 
 <table id="search_results-table">
@@ -46,6 +43,4 @@
         }
     </tbody>
 </table>
-
-
 

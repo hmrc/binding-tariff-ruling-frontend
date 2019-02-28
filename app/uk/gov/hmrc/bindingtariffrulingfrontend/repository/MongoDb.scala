@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms
+package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
-import play.api.data.Form
-import play.api.data.Forms._
+import com.google.inject.ImplementedBy
+import javax.inject.{Inject, Singleton}
+import play.modules.reactivemongo.ReactiveMongoComponent
+import reactivemongo.api.DB
 
-case class SimpleSearch(query: String, currentPage: Int, pageSize: Int)
+@ImplementedBy(classOf[MongoDb])
+trait MongoDbProvider {
+  def mongo: () => DB
+}
 
-object SimpleSearch {
-
-  val form: Form[SimpleSearch] = Form(
-    mapping(
-      "query" -> nonEmptyText,
-      "page" -> optional(number).transform(_.getOrElse(1), (page: Int) => Some(page)),
-      "page-size" -> optional(number).transform(_.getOrElse(20), (page: Int) => Some(page))
-    )(SimpleSearch.apply)(SimpleSearch.unapply)
-  )
-
+@Singleton
+class MongoDb @Inject()(component: ReactiveMongoComponent)  extends MongoDbProvider {
+  override val mongo: () => DB = component.mongoConnector.db
 }

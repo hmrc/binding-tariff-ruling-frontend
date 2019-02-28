@@ -21,7 +21,7 @@
 
 @main_template(title = "Binding Tariff Rulings", bodyClasses = None) {
 
- <h1>@messages("index.heading")</h1>
+ <h1 id="index-heading">@messages("index.heading")</h1>
 
  <p>@messages("index.content1")</p>
 
@@ -31,5 +31,5 @@
   <li>@messages("index.content3")</li>
  </ul>
 
- <a class="button button-start" href="@routes.SearchController.get()" role="button">Start now</a>
+ <a id="index-button" class="button button-start" href="@routes.SearchController.get()" role="button">Start now</a>
 }

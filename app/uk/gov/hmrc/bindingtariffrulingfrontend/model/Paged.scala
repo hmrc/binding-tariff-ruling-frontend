@@ -18,6 +18,14 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
 case class Paged[T](results: Seq[T], currentPage: Int, resultCount: Int) {
   def nonEmpty: Boolean = resultCount > 0
+  def pageCount: Int = {
+    if(results.size * currentPage < resultCount) {
+      val pageSize = results.size
+      Math.floor(resultCount.toDouble / pageSize).toInt
+    } else {
+      currentPage
+    }
+  }
 }
 
 object Paged {
