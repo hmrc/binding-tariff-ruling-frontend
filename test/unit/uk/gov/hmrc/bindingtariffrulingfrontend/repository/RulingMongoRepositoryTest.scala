@@ -25,7 +25,7 @@ import reactivemongo.api.DB
 import reactivemongo.play.json.collection.JSONCollection
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.mongo.MongoSpecSupport
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -96,7 +96,7 @@ class RulingMongoRepositoryTest extends MongoUnitSpec
 
   "Get by SimpleSearch" should {
     "Retrieve None" in {
-      await(repository.get(SimpleSearch("ref", 1, 100))) shouldBe Paged.empty[Ruling]
+      await(repository.get(SimpleSearch("ref", 1, 100))).results shouldBe Seq.empty
     }
 
     "Retrieve One - by Reference - exact match" in {
@@ -106,7 +106,7 @@ class RulingMongoRepositoryTest extends MongoUnitSpec
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
 
-      await(repository.get(SimpleSearch("ref1", 1, 100))) shouldBe Paged(Seq(document1), 1, 1)
+      await(repository.get(SimpleSearch("ref1", 1, 100))).results shouldBe Seq(document1)
     }
 
     "Retrieve One - by Commodity Code - stars with" in {
@@ -116,7 +116,7 @@ class RulingMongoRepositoryTest extends MongoUnitSpec
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
 
-      await(repository.get(SimpleSearch("0", 1, 100))) shouldBe Paged(Seq(document1), 1, 1)
+      await(repository.get(SimpleSearch("0", 1, 100))).results shouldBe Seq(document1)
     }
 
     "Retrieve One - by Goods Description - case insensitive conains" in {
@@ -126,7 +126,7 @@ class RulingMongoRepositoryTest extends MongoUnitSpec
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
 
-      await(repository.get(SimpleSearch("Tain", 1, 100))) shouldBe Paged(Seq(document1), 1, 1)
+      await(repository.get(SimpleSearch("Tain", 1, 100))).results shouldBe Seq(document1)
     }
   }
 

@@ -14,28 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms
+package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
-import play.api.data.Form
-import play.api.data.Forms._
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.Pagination
-
-
-case class SimpleSearch
-(
-  query: String,
-  override val pageIndex: Int,
-  override val pageSize: Int
-) extends Pagination
-
-object SimpleSearch {
-
-  val form: Form[SimpleSearch] = Form(
-    mapping(
-      "query" -> nonEmptyText,
-      "page" -> optional(number).transform(_.getOrElse(1), (page: Int) => Some(page)),
-      "page-size" -> optional(number).transform(_.getOrElse(20), (page: Int) => Some(page))
-    )(SimpleSearch.apply)(SimpleSearch.unapply)
-  )
-
+trait Pagination {
+  val pageIndex: Int
+  val pageSize: Int
 }
+
+case class SimplePagination
+(
+  override val pageIndex: Int = 1,
+ override val pageSize: Int = 100
+) extends Pagination

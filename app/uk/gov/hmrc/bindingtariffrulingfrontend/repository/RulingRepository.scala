@@ -84,11 +84,11 @@ class RulingMongoRepository @Inject()(config: AppConfig,
     )
     for {
       results <- collection.find[JsObject, Ruling](filter)
-        .options(QueryOpts(skipN = (search.currentPage - 1) * search.pageSize, batchSizeN = search.pageSize))
+        .options(QueryOpts(skipN = (search.pageIndex - 1) * search.pageSize, batchSizeN = search.pageSize))
         .cursor[Ruling]()
         .collect[List](search.pageSize, Cursor.FailOnError[List[Ruling]]())
       count <- collection.count(Some(filter))
-    } yield Paged(results, search.currentPage, count)
+    } yield Paged(results, search.pageIndex, search.pageSize, count)
   }
 
   private def eq(string: String): JsValue = JsString(string)
