@@ -20,12 +20,14 @@ import javax.inject.{Inject, Singleton}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AuthenticatedAction
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 @Singleton
 class RulingController @Inject()(rulingService: RulingService,
+                                 authenticate: AuthenticatedAction,
                                  val messagesApi: MessagesApi,
                                  implicit val appConfig: AppConfig) extends FrontendController with I18nSupport {
 
@@ -34,6 +36,10 @@ class RulingController @Inject()(rulingService: RulingService,
       case Some(ruling) => Ok(views.html.ruling(ruling))
       case None => Ok(views.html.ruling_not_found(id))
     }
+  }
+
+  def post(id: String): Action[AnyContent] = (Action andThen authenticate).async { implicit request =>
+    rulingService.refresh(id).map(_ => Accepted)
   }
 
 }

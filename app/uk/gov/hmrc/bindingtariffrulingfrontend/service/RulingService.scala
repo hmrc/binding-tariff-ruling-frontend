@@ -33,4 +33,8 @@ class RulingService @Inject()(repository: RulingRepository) {
     repository.get(query)
   }
 
+  def refresh(id: String): Future[Unit] = {
+    Future.successful(())
+  }
+
 }

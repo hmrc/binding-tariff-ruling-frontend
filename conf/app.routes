@@ -6,3 +6,4 @@ GET        /                                    @uk.gov.hmrc.bindingtariffruling
 GET        /search                              @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.SearchController.get()
 POST       /search                              @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.SearchController.post()
 GET        /ruling/:id                          @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.RulingController.get(id: String)
+POST       /ruling/:id                          @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.RulingController.post(id: String)

@@ -25,6 +25,7 @@ import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AuthenticatedAction, FailedAuth, SuccessfulAuth}
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 
@@ -40,13 +41,13 @@ class RulingControllerSpec extends ControllerSpec {
   private implicit val mat: Materializer = fakeApplication.materializer
   private val rulingService = mock[RulingService]
 
-  private val controller = new RulingController(rulingService, messageApi, appConfig)
+  private def controller(auth: AuthenticatedAction = SuccessfulAuth()) = new RulingController(rulingService, auth, messageApi, appConfig)
 
   "GET /" should {
     "return 200" in {
       given(rulingService.get("id")) willReturn Future.successful(Some(Ruling("ref", "code", Instant.now, Instant.now, "justification", "goods description")))
 
-      val result = await(controller.get("id")(getRequestWithCSRF))
+      val result = await(controller().get("id")(getRequestWithCSRF))
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
@@ -56,11 +57,28 @@ class RulingControllerSpec extends ControllerSpec {
     "return 200 - when not found" in {
       given(rulingService.get("id")) willReturn Future.successful(None)
 
-      val result = await(controller.get("id")(getRequestWithCSRF))
+      val result = await(controller().get("id")(getRequestWithCSRF))
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
       bodyOf(result) should include("ruling_not_found-heading")
+    }
+
+  }
+
+  "POST /" should {
+    "return 202 when authenticated" in {
+      given(rulingService.refresh("id")) willReturn Future.successful(())
+
+      val result = await(controller(SuccessfulAuth()).post("id")(postRequestWithCSRF))
+      status(result) shouldBe Status.ACCEPTED
+    }
+
+    "return 403 when unauthenticated" in {
+      given(rulingService.refresh("id")) willReturn Future.successful(())
+
+      val result = await(controller(FailedAuth()).post("id")(postRequestWithCSRF))
+      status(result) shouldBe Status.FORBIDDEN
     }
 
   }
