@@ -25,6 +25,8 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 @Singleton
 class RulingController @Inject()(rulingService: RulingService,
                                  authenticate: AuthenticatedAction,
