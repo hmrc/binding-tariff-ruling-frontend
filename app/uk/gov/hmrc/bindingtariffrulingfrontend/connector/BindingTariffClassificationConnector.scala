@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
+package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import javax.inject.Inject
-import play.api.mvc._
+import com.google.inject.Inject
+import javax.inject.Singleton
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.Case
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AuthenticatedAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request, Request] {
+@Singleton
+class BindingTariffClassificationConnector @Inject()(appConfig: AppConfig, client: HttpClient) {
 
-  override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
-    if(request.headers.get("Authorization").contains(appConfig.authorization)) {
-      Future.successful(Right(request))
-    } else {
-      Future.successful(Left(Results.Forbidden))
-    }
+
+  def get(reference: String)(implicit hc: HeaderCarrier): Future[Option[Case]] = {
+    val url = s"${appConfig.bindingTariffClassificationUrl}/cases/$reference"
+    client.GET[Option[Case]](url)
   }
 
 }

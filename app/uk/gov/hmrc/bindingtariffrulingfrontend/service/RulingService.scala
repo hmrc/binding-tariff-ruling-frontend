@@ -17,24 +17,62 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
 import javax.inject.Inject
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{Case, CaseStatus, Decision}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
+import uk.gov.hmrc.http.HeaderCarrier
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RulingService @Inject()(repository: RulingRepository) {
+class RulingService @Inject()(repository: RulingRepository, bindingTariffClassificationConnector: BindingTariffClassificationConnector) {
 
-  def get(id: String): Future[Option[Ruling]] = {
-    repository.get(id)
+  def get(reference: String): Future[Option[Ruling]] = {
+    repository.get(reference)
   }
 
   def get(query: SimpleSearch): Future[Paged[Ruling]] = {
     repository.get(query)
   }
 
-  def refresh(id: String): Future[Unit] = {
-    Future.successful(())
+  def refresh(reference: String)(implicit hc: HeaderCarrier): Future[Unit] = {
+    val rulingPair: Future[(Option[Ruling], Option[Ruling])] = for {
+      existingRuling <- repository.get(reference)
+      updatedCase: Option[Case] <- bindingTariffClassificationConnector.get(reference)
+      updatedRuling: Option[Ruling] = updatedCase
+        .filter(c => c.status == CaseStatus.COMPLETED)
+        .filter(c => c.decision.isDefined)
+        .filter(c => c.decision.flatMap(_.effectiveStartDate).isDefined)
+        .filter(c => c.decision.flatMap(_.effectiveEndDate).isDefined)
+        .map(toRuling)
+    } yield (existingRuling, updatedRuling)
+
+    rulingPair flatMap {
+      case (Some(_), Some(u)) => repository.update(u, upsert = false).map(_ => ())
+      case (Some(_), None) => repository.delete(reference)
+      case (None, Some(u)) => repository.update(u, upsert = true).map(_ => ())
+      case _ => Future.successful(())
+    }
+  }
+
+  private def toRuling(c: Case): Ruling = {
+    val keywords: Set[String] = c.keywords
+    val attachments: Seq[String] = c.attachments.filter(_.public).map(_.id)
+    val reference: String = c.reference
+    val decision: Decision = c.decision.get
+
+    Ruling(
+      reference = reference,
+      bindingCommodityCode = decision.bindingCommodityCode,
+      effectiveStartDate = decision.effectiveStartDate.get,
+      effectiveEndDate = decision.effectiveEndDate.get,
+      justification = decision.justification,
+      goodsDescription = decision.goodsDescription,
+      keywords = keywords,
+      attachments = attachments
+    )
   }
 
 }

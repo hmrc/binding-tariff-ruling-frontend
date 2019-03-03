@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
+package uk.gov.hmrc.bindingtariffrulingfrontend.connector.model
 
-import org.mockito.Mockito
-import play.api.mvc.{Request, Result, Results}
-import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import java.time.Instant
 
-import scala.concurrent.Future
+import play.api.libs.json.{Json, OFormat}
 
-class FailedAuth extends AuthenticatedAction(Mockito.mock(classOf[AppConfig])) {
-  protected override def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = Future.successful(Left(Results.Forbidden))
+case class Decision
+(
+  bindingCommodityCode: String,
+  effectiveStartDate: Option[Instant],
+  effectiveEndDate: Option[Instant],
+  justification: String,
+  goodsDescription: String
+)
+
+object Decision {
+  implicit val outboundFormat: OFormat[Decision] = Json.format[Decision]
 }
-
-object FailedAuth {
-  def apply(): FailedAuth = new FailedAuth()
-}
-
-

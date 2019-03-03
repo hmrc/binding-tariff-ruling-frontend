@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
+package uk.gov.hmrc.bindingtariffrulingfrontend.utils
 
-import javax.inject.Inject
-import play.api.mvc._
-import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import play.api.libs.json._
 
-import scala.concurrent.Future
+object EnumJson {
 
-class AuthenticatedAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request, Request] {
-
-  override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
-    if(request.headers.get("Authorization").contains(appConfig.authorization)) {
-      Future.successful(Right(request))
-    } else {
-      Future.successful(Left(Results.Forbidden))
-    }
+  implicit def format[E <: Enumeration](enum: E): Format[E#Value] = {
+    Format(Reads.enumNameReads(enum), Writes.enumNameWrites)
   }
 
 }

@@ -19,6 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 import java.time.Instant
 
 import akka.stream.Materializer
+import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
 import play.api.http.Status
 import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
@@ -28,11 +29,14 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AuthenticatedAction, FailedAuth, SuccessfulAuth}
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
 
 class RulingControllerSpec extends ControllerSpec {
+
+  private implicit val hc: HeaderCarrier = HeaderCarrier()
   private val env = Environment.simple()
   private val configuration = Configuration.load(env)
 
@@ -68,15 +72,12 @@ class RulingControllerSpec extends ControllerSpec {
 
   "POST /" should {
     "return 202 when authenticated" in {
-      given(rulingService.refresh("id")) willReturn Future.successful(())
-
+      given(rulingService.refresh(refEq("id"))(any[HeaderCarrier])) willReturn Future.successful(())
       val result = await(controller(SuccessfulAuth()).post("id")(postRequestWithCSRF))
       status(result) shouldBe Status.ACCEPTED
     }
 
     "return 403 when unauthenticated" in {
-      given(rulingService.refresh("id")) willReturn Future.successful(())
-
       val result = await(controller(FailedAuth()).post("id")(postRequestWithCSRF))
       status(result) shouldBe Status.FORBIDDEN
     }

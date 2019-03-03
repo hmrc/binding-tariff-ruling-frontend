@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
+package uk.gov.hmrc.bindingtariffrulingfrontend.connector.model
 
-import javax.inject.Inject
-import play.api.mvc._
-import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import play.api.libs.json.{Json, OFormat}
 
-import scala.concurrent.Future
+case class Attachment
+(
+  id: String,
+  public: Boolean
+)
 
-class AuthenticatedAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request, Request] {
-
-  override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
-    if(request.headers.get("Authorization").contains(appConfig.authorization)) {
-      Future.successful(Right(request))
-    } else {
-      Future.successful(Left(Results.Forbidden))
-    }
-  }
-
+object Attachment {
+  implicit val outboundFormat: OFormat[Attachment] = Json.format[Attachment]
 }

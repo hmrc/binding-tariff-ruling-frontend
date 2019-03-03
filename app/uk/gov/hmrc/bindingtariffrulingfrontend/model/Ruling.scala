@@ -28,6 +28,7 @@ case class Ruling
   effectiveEndDate: Instant,
   justification: String,
   goodsDescription: String,
+  keywords: Set[String] = Set.empty,
   attachments: Seq[String] = Seq.empty
 )
 
