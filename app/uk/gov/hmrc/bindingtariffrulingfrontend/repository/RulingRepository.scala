@@ -43,6 +43,8 @@ trait RulingRepository {
 
   def delete(id: String): Future[Unit]
 
+  def delete(): Future[Unit]
+
 }
 
 @Singleton
@@ -72,8 +74,8 @@ class RulingMongoRepository @Inject()(config: AppConfig,
 
   override def delete(reference: String): Future[Unit] = collection.findAndRemove(byReference(reference)).map(_ => ())
 
-  private def byReference(reference: String): JsObject = {
-    Json.obj("reference" -> reference)
+  override def delete(): Future[Unit] = {
+    removeAll().map(_ => ())
   }
 
   override def get(search: SimpleSearch): Future[Paged[Ruling]] = {
@@ -89,6 +91,10 @@ class RulingMongoRepository @Inject()(config: AppConfig,
         .collect[List](search.pageSize, Cursor.FailOnError[List[Ruling]]())
       count <- collection.count(Some(filter))
     } yield Paged(results, search.pageIndex, search.pageSize, count)
+  }
+
+  private def byReference(reference: String): JsObject = {
+    Json.obj("reference" -> reference)
   }
 
   private def eq(string: String): JsValue = JsString(string)

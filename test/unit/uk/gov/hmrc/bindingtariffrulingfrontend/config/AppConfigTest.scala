@@ -48,4 +48,17 @@ class AppConfigTest extends UnitSpec with GuiceOneAppPerSuite {
   "Build report non-json url" in {
     appConfig("contact-frontend.host" -> "host").reportAProblemNonJSUrl shouldBe "host/contact/problem_reports_nonjs?service=BindingTariffRulings"
   }
+
+  "Build admin enabled" in {
+    appConfig("admin-mode" -> "false").adminEnabled shouldBe false
+    appConfig("admin-mode" -> "true").adminEnabled shouldBe true
+  }
+
+  "Build Classification Backend URL" in {
+    appConfig(
+      "microservice.services.binding-tariff-classification.port" -> "8080",
+      "microservice.services.binding-tariff-classification.host" -> "localhost",
+      "microservice.services.binding-tariff-classification.protocol" -> "http"
+    ).bindingTariffClassificationUrl shouldBe "http://localhost:8080"
+  }
 }

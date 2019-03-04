@@ -69,7 +69,7 @@ class RulingMongoRepositoryTest extends MongoUnitSpec
     }
   }
 
-  "Delete" should {
+  "Delete by Reference" should {
     "Delete One" in {
       givenAnExistingDocument(Ruling(reference = "ref1", "code", Instant.now, Instant.now, "justification", "description"))
       givenAnExistingDocument(Ruling(reference = "ref2", "code", Instant.now, Instant.now, "justification", "description"))
@@ -77,6 +77,17 @@ class RulingMongoRepositoryTest extends MongoUnitSpec
       await(repository.delete("ref1"))
 
       thenTheDocumentCountShouldBe(1)
+    }
+  }
+
+  "Delete Many" should {
+    "Delete All" in {
+      givenAnExistingDocument(Ruling(reference = "ref1", "code", Instant.now, Instant.now, "justification", "description"))
+      givenAnExistingDocument(Ruling(reference = "ref2", "code", Instant.now, Instant.now, "justification", "description"))
+
+      await(repository.delete())
+
+      thenTheDocumentCountShouldBe(0)
     }
   }
 

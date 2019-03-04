@@ -26,7 +26,7 @@ import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AuthenticatedAction, FailedAuth, SuccessfulAuth}
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action._
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -45,7 +45,7 @@ class RulingControllerSpec extends ControllerSpec {
   private implicit val mat: Materializer = fakeApplication.materializer
   private val rulingService = mock[RulingService]
 
-  private def controller(auth: AuthenticatedAction = SuccessfulAuth()) = new RulingController(rulingService, auth, messageApi, appConfig)
+  private def controller(auth: AuthenticatedAction = SuccessfulAuth(), admin: AdminAction = AdminEnabled()) = new RulingController(rulingService, auth, admin,  messageApi, appConfig)
 
   "GET /" should {
     "return 200" in {
@@ -79,6 +79,25 @@ class RulingControllerSpec extends ControllerSpec {
 
     "return 403 when unauthenticated" in {
       val result = await(controller(FailedAuth()).post("id")(postRequestWithCSRF))
+      status(result) shouldBe Status.FORBIDDEN
+    }
+
+  }
+
+  "DELETE /" should {
+    "return 204 when authenticated" in {
+      given(rulingService.delete()) willReturn Future.successful(())
+      val result = await(controller(SuccessfulAuth(), AdminEnabled()).delete()(postRequestWithCSRF))
+      status(result) shouldBe Status.NO_CONTENT
+    }
+
+    "return 403 when unauthenticated" in {
+      val result = await(controller(FailedAuth(), AdminEnabled()).delete()(postRequestWithCSRF))
+      status(result) shouldBe Status.FORBIDDEN
+    }
+
+    "return 403 when admin disabled" in {
+      val result = await(controller(SuccessfulAuth(), AdminDisabled()).delete()(postRequestWithCSRF))
       status(result) shouldBe Status.FORBIDDEN
     }
 

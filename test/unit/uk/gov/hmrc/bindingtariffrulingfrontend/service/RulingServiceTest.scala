@@ -45,6 +45,13 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
 
   private val service = new RulingService(repository, connector)
 
+  "Service DELETE" should {
+
+    "delegate to repository" in {
+      given(repository.delete()) willReturn Future.successful(())
+      await(service.delete()) shouldBe ()
+    }
+  }
 
   "Service GET by reference" should {
 

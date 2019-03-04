@@ -29,6 +29,10 @@ import scala.concurrent.Future
 
 class RulingService @Inject()(repository: RulingRepository, bindingTariffClassificationConnector: BindingTariffClassificationConnector) {
 
+  def delete(): Future[Unit] = {
+    repository.delete()
+  }
+
   def get(reference: String): Future[Option[Ruling]] = {
     repository.get(reference)
   }
