@@ -14,11 +14,11 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 @import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 @import uk.gov.hmrc.bindingtariffrulingfrontend.utils.Dates
+@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 @(ruling: Ruling)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @main_template(title = "Binding Tariff Rulings", bodyClasses = None) {
@@ -30,15 +30,15 @@
  <div class="grid-row">
   <div class="column-one-half">
    <div class="grid-row">
-    <p class="column-one-half font-bold">@messages("ruling.reference")</p>
-    <p id="ruling-reference" class="column-one-half">@ruling.reference</p>
+    <p class="column-one-third font-bold">@messages("ruling.reference")</p>
+    <p id="ruling-reference" class="column-two-thirds">@ruling.reference</p>
    </div>
   </div>
 
   <div class="column-one-half">
    <div class="grid-row">
-    <p class="column-one-half font-bold">@messages("ruling.start_date")</p>
-    <p id="ruling-start_date" class="column-one-half">@Dates.format(ruling.effectiveStartDate)</p>
+    <p class="column-one-third font-bold">@messages("ruling.start_date")</p>
+    <p id="ruling-start_date" class="column-two-thirds">@Dates.format(ruling.effectiveStartDate)</p>
    </div>
   </div>
  </div>
@@ -46,15 +46,15 @@
  <div class="grid-row">
   <div class="column-one-half">
    <div class="grid-row">
-    <p class="column-one-half font-bold">@messages("ruling.commodity_code")</p>
-    <p id="ruling-commodity_code" class="column-one-half">@ruling.bindingCommodityCode</p>
+    <p class="column-one-third font-bold">@messages("ruling.commodity_code")</p>
+    <p id="ruling-commodity_code" class="column-two-thirds">@ruling.bindingCommodityCode</p>
    </div>
   </div>
 
   <div class="column-one-half">
    <div class="grid-row">
-    <p class="column-one-half font-bold">@messages("ruling.end_date")</p>
-    <p id="ruling-end_date" class="column-one-half">@Dates.format(ruling.effectiveEndDate)</p>
+    <p class="column-one-third font-bold">@messages("ruling.end_date")</p>
+    <p id="ruling-end_date" class="column-two-thirds">@Dates.format(ruling.effectiveEndDate)</p>
    </div>
   </div>
  </div>
