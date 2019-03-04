@@ -7,4 +7,4 @@ GET        /search                              @uk.gov.hmrc.bindingtariffruling
 POST       /search                              @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.SearchController.post()
 GET        /ruling/:id                          @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.RulingController.get(id: String)
 POST       /ruling/:id                          @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.RulingController.post(id: String)
-DELETE     /ruling/                             @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.RulingController.delete()
+DELETE     /ruling                              @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.RulingController.delete()

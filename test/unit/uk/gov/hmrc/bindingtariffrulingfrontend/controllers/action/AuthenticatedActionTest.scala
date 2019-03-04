@@ -44,7 +44,7 @@ class AuthenticatedActionTest extends UnitSpec with MockitoSugar {
       given(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
       given(config.authorization) willReturn "password"
 
-      await(action.invokeBlock(FakeRequest().withHeaders("Authorization" -> "password"), block)) shouldBe Results.Ok
+      await(action.invokeBlock(FakeRequest().withHeaders("X-Api-Token" -> "password"), block)) shouldBe Results.Ok
     }
   }
 
