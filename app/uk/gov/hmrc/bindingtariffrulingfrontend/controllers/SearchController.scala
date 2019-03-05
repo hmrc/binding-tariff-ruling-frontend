@@ -43,7 +43,7 @@ class SearchController @Inject()(rulingService: RulingService,
         Future.successful(Ok(views.html.search(errors, Paged.empty[Ruling]))),
       query =>
         rulingService.get(query).map { results =>
-          Ok(views.html.search(SimpleSearch.form, results))
+          Ok(views.html.search(SimpleSearch.form.fill(query), results))
         }
     )
 
