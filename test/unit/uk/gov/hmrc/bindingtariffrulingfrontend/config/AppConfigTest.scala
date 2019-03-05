@@ -54,6 +54,15 @@ class AppConfigTest extends UnitSpec with GuiceOneAppPerSuite {
     appConfig("admin-mode" -> "true").adminEnabled shouldBe true
   }
 
+  "Build whitelist" in {
+    appConfig(
+      "filters.whitelist.enabled" -> "true",
+      "filters.whitelist.ips" -> "ip1, ip2"
+    ).whitelist shouldBe Some(Set("ip1", "ip2"))
+
+    appConfig("filters.whitelist.enabled" -> "false").whitelist shouldBe None
+  }
+
   "Build Classification Backend URL" in {
     appConfig(
       "microservice.services.binding-tariff-classification.port" -> "8080",

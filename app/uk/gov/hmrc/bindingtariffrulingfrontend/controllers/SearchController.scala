@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.WhitelistedAction
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
@@ -30,14 +31,15 @@ import scala.concurrent.Future
 
 @Singleton
 class SearchController @Inject()(rulingService: RulingService,
+                                 whitelist: WhitelistedAction,
                                  val messagesApi: MessagesApi,
                                  implicit val appConfig: AppConfig) extends FrontendController with I18nSupport {
 
-  def get: Action[AnyContent] = Action.async { implicit request =>
+  def get: Action[AnyContent] = (Action andThen whitelist).async { implicit request =>
     Future.successful(Ok(views.html.search(SimpleSearch.form, Paged.empty[Ruling])))
   }
 
-  def post: Action[AnyContent] = Action.async { implicit request =>
+  def post: Action[AnyContent] = (Action andThen whitelist).async { implicit request =>
     SimpleSearch.form.bindFromRequest.fold(
       errors =>
         Future.successful(Ok(views.html.search(errors, Paged.empty[Ruling]))),

@@ -45,7 +45,10 @@ class RulingControllerSpec extends ControllerSpec {
   private implicit val mat: Materializer = fakeApplication.materializer
   private val rulingService = mock[RulingService]
 
-  private def controller(auth: AuthenticatedAction = SuccessfulAuth(), admin: AdminAction = AdminEnabled()) = new RulingController(rulingService, auth, admin,  messageApi, appConfig)
+  private def controller(whitelist: WhitelistedAction = WhitelistDisabled(),
+                         auth: AuthenticatedAction = SuccessfulAuth(),
+                         admin: AdminAction = AdminEnabled()
+                        ) = new RulingController(rulingService, whitelist, auth, admin, messageApi, appConfig)
 
   "GET /" should {
     "return 200" in {
@@ -68,17 +71,22 @@ class RulingControllerSpec extends ControllerSpec {
       bodyOf(result) should include("ruling_not_found-heading")
     }
 
+    "return 403 when not whitelisted" in {
+      val result = await(controller(whitelist = WhitelistEnabled()).get("id")(getRequestWithCSRF))
+      status(result) shouldBe Status.FORBIDDEN
+    }
+
   }
 
   "POST /" should {
     "return 202 when authenticated" in {
       given(rulingService.refresh(refEq("id"))(any[HeaderCarrier])) willReturn Future.successful(())
-      val result = await(controller(SuccessfulAuth()).post("id")(postRequestWithCSRF))
+      val result = await(controller(auth = SuccessfulAuth()).post("id")(postRequestWithCSRF))
       status(result) shouldBe Status.ACCEPTED
     }
 
     "return 403 when unauthenticated" in {
-      val result = await(controller(FailedAuth()).post("id")(postRequestWithCSRF))
+      val result = await(controller(auth = FailedAuth()).post("id")(postRequestWithCSRF))
       status(result) shouldBe Status.FORBIDDEN
     }
 
@@ -87,17 +95,17 @@ class RulingControllerSpec extends ControllerSpec {
   "DELETE /" should {
     "return 204 when authenticated" in {
       given(rulingService.delete()) willReturn Future.successful(())
-      val result = await(controller(SuccessfulAuth(), AdminEnabled()).delete()(postRequestWithCSRF))
+      val result = await(controller(auth = SuccessfulAuth(), admin = AdminEnabled()).delete()(postRequestWithCSRF))
       status(result) shouldBe Status.NO_CONTENT
     }
 
     "return 403 when unauthenticated" in {
-      val result = await(controller(FailedAuth(), AdminEnabled()).delete()(postRequestWithCSRF))
+      val result = await(controller(auth = FailedAuth(), admin = AdminEnabled()).delete()(postRequestWithCSRF))
       status(result) shouldBe Status.FORBIDDEN
     }
 
     "return 403 when admin disabled" in {
-      val result = await(controller(SuccessfulAuth(), AdminDisabled()).delete()(postRequestWithCSRF))
+      val result = await(controller(auth = SuccessfulAuth(), admin = AdminDisabled()).delete()(postRequestWithCSRF))
       status(result) shouldBe Status.FORBIDDEN
     }
 

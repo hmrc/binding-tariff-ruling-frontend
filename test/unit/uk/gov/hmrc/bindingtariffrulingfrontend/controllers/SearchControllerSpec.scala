@@ -24,6 +24,7 @@ import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{WhitelistDisabled, WhitelistEnabled, WhitelistedAction}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
@@ -41,16 +42,22 @@ class SearchControllerSpec extends ControllerSpec {
   private implicit val mat: Materializer = fakeApplication.materializer
   private val rulingService = mock[RulingService]
 
-  private val controller = new SearchController(rulingService, messageApi, appConfig)
+  private def controller(whitelist: WhitelistedAction = WhitelistDisabled()) = new SearchController(rulingService, whitelist, messageApi, appConfig)
 
   "GET /" should {
     "return 200" in {
-      val result = await(controller.get(getRequestWithCSRF))
+      val result = await(controller().get(getRequestWithCSRF))
 
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
       bodyOf(result) should include("search-heading")
+    }
+
+    "return 403 when whitelisted" in {
+      val result = await(controller(whitelist = WhitelistEnabled()).get(getRequestWithCSRF))
+
+      status(result) shouldBe Status.FORBIDDEN
     }
   }
 
@@ -58,7 +65,7 @@ class SearchControllerSpec extends ControllerSpec {
     "return 200" in {
       given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
 
-      val result = await(controller.post(getRequestWithCSRF.withFormUrlEncodedBody("query" -> "xyz")))
+      val result = await(controller().post(getRequestWithCSRF.withFormUrlEncodedBody("query" -> "xyz")))
 
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
@@ -67,12 +74,18 @@ class SearchControllerSpec extends ControllerSpec {
     }
 
     "return 200 with form-errors" in {
-      val result = await(controller.post(getRequestWithCSRF.withFormUrlEncodedBody()))
+      val result = await(controller().post(getRequestWithCSRF.withFormUrlEncodedBody()))
 
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
       bodyOf(result) should include("search-heading")
+    }
+
+    "return 403 when whitelisted" in {
+      val result = await(controller(whitelist = WhitelistEnabled()).post(postRequestWithCSRF))
+
+      status(result) shouldBe Status.FORBIDDEN
     }
   }
 }

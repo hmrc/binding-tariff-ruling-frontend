@@ -21,6 +21,7 @@ import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{WhitelistDisabled, WhitelistEnabled, WhitelistedAction}
 
 
 class IndexControllerSpec extends ControllerSpec {
@@ -31,14 +32,19 @@ class IndexControllerSpec extends ControllerSpec {
   private val messageApi = new DefaultMessagesApi(env, configuration, new DefaultLangs(configuration))
   private val appConfig = new AppConfig(configuration, env)
 
-  private val controller = new IndexController(messageApi, appConfig)
+  private def controller(whitelist: WhitelistedAction = WhitelistDisabled()) = new IndexController(whitelist, messageApi, appConfig)
 
   "GET /" should {
     "return 200" in {
-      val result = controller.get(getRequestWithCSRF)
+      val result = controller().get(getRequestWithCSRF)
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
+    }
+
+    "return 403 when whitelisted" in {
+      val result = controller(WhitelistEnabled()).get(getRequestWithCSRF)
+      status(result) shouldBe Status.FORBIDDEN
     }
 
   }

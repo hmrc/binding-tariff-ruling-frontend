@@ -8,8 +8,7 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "govuk-template"             % "5.29.0-play-25",
     "uk.gov.hmrc"             %% "play-ui"                    % "7.32.0-play-25",
     "uk.gov.hmrc"             %% "play-json-union-formatter"  % "1.5.0",
-    "uk.gov.hmrc"             %% "simple-reactivemongo"       % "7.14.0-play-25",
-    "uk.gov.hmrc"             %% "play-whitelist-filter"      % "2.0.0"
+    "uk.gov.hmrc"             %% "simple-reactivemongo"       % "7.14.0-play-25"
   )
 
   val scope = "test, it"

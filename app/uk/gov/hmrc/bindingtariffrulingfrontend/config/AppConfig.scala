@@ -38,4 +38,14 @@ class AppConfig @Inject()(val runModeConfiguration: Configuration, environment: 
   lazy val authorization: String = loadConfig("auth.api-token")
   lazy val bindingTariffClassificationUrl: String = baseUrl("binding-tariff-classification")
   lazy val adminEnabled: Boolean = getBoolean("admin-mode")
+  lazy val whitelist: Option[Set[String]] =
+    if(getBoolean("filters.whitelist.enabled")) {
+      Some[Set[String]](
+        getString("filters.whitelist.ips")
+          .split(",")
+          .map(_.trim)
+          .filter(_.nonEmpty)
+          .toSet
+      )
+    } else None
 }

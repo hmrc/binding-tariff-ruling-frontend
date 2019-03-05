@@ -14,12 +14,27 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.filters
+package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
 
-import javax.inject.Inject
-import play.api.http.DefaultHttpFilters
-import uk.gov.hmrc.play.bootstrap.filters.FrontendFilters
+import org.mockito.Mockito
+import play.api.mvc.{Request, Result, Results}
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
-class Filters @Inject()(frontendFilters: FrontendFilters,
-                        whitelistFilter: WhitelistFilter
-                       ) extends DefaultHttpFilters(frontendFilters.filters :+ whitelistFilter: _*)
+import scala.concurrent.Future
+
+class WhitelistEnabled extends WhitelistedAction(Mockito.mock(classOf[AppConfig])) {
+  protected override def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = Future.successful(Left(Results.Forbidden))
+}
+
+
+object WhitelistEnabled {
+  def apply(): WhitelistEnabled = new WhitelistEnabled()
+}
+
+
+
+
+
+
+
+
