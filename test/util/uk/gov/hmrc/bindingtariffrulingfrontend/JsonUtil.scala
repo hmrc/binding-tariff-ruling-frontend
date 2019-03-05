@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffadvicefrontend
+package uk.gov.hmrc.bindingtariffrulingfrontend
 
 import play.api.libs.json.{JsArray, JsObject, JsValue}
 

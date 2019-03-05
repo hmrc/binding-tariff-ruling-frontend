@@ -27,7 +27,7 @@ import org.scalatest.mockito.MockitoSugar
 import play.api.Environment
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import uk.gov.hmrc.bindingtariffadvicefrontend.WiremockTestServer
+import uk.gov.hmrc.bindingtariffrulingfrontend.WiremockTestServer
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{Attachment, Case, CaseStatus, Decision}
 import uk.gov.hmrc.http.HeaderCarrier

@@ -3,7 +3,6 @@ package uk.gov.hmrc.bindingtariffrulingfrontend
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.bindingtariffadvicefrontend.{ResourceFiles, WiremockFeatureTestServer}
 
 class ExampleIntegrationTest extends WiremockFeatureTestServer with ResourceFiles with BeforeAndAfterEach {
 

@@ -14,35 +14,32 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffadvicefrontend
+package uk.gov.hmrc.bindingtariffrulingfrontend
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.{MappingBuilder, WireMock}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import org.scalatest.BeforeAndAfterEach
-import uk.gov.hmrc.play.test.UnitSpec
+import org.scalatest.{BeforeAndAfterEach, FeatureSpec}
+import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 
-trait WiremockTestServer extends UnitSpec with BeforeAndAfterEach {
+trait WiremockFeatureTestServer extends FeatureSpec with BeforeAndAfterEach with GuiceOneServerPerSuite {
 
   private val wireHost = "localhost"
   protected val wirePort = 20001
   private val wireMockServer = new WireMockServer(wirePort)
 
-  lazy val wireMockUrl: String = s"http://$wireHost:$wirePort"
+  lazy val host: String = s"http://$wireHost:$wirePort"
 
   protected def stubFor(mappingBuilder: MappingBuilder): StubMapping = {
     wireMockServer.stubFor(mappingBuilder)
   }
 
   override protected def beforeEach(): Unit = {
-    super.beforeEach()
     wireMockServer.start()
     WireMock.configureFor(wireHost, wirePort)
   }
 
   override protected def afterEach(): Unit = {
-    super.afterEach()
-    wireMockServer.resetAll()
     wireMockServer.stop()
   }
 

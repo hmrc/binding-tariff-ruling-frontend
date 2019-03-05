@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffadvicefrontend
+package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.filters
 
-import scala.io.Source
+import javax.inject.Inject
+import play.api.http.DefaultHttpFilters
+import uk.gov.hmrc.play.bootstrap.filters.FrontendFilters
 
-trait ResourceFiles {
-
-  protected def fromResource(path: String): String = {
-    val url = getClass.getClassLoader.getResource(path)
-    Source.fromURL(url, "UTF-8").getLines().mkString
-  }
-
-}
+class Filters @Inject()(frontendFilters: FrontendFilters,
+                        whitelistFilter: WhitelistFilter
+                       ) extends DefaultHttpFilters(frontendFilters.filters :+ whitelistFilter: _*)
