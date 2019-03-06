@@ -37,7 +37,7 @@ class SearchController @Inject()(rulingService: RulingService,
 
   def get(query: Option[String], page: Int): Action[AnyContent] = (Action andThen whitelist).async { implicit request =>
     if (query.isDefined) {
-      SimpleSearch.form.fillAndValidate(SimpleSearch(query.getOrElse(""), page))
+      SimpleSearch.form.bindFromRequest
         .fold(
           errors =>
             Future.successful(Ok(views.html.search(errors, None))),

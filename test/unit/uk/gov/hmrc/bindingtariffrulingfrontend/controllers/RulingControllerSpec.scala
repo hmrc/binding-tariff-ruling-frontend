@@ -54,7 +54,7 @@ class RulingControllerSpec extends ControllerSpec {
     "return 200" in {
       given(rulingService.get("id")) willReturn Future.successful(Some(Ruling("ref", "code", Instant.now, Instant.now, "justification", "goods description")))
 
-      val result = await(controller().get("id")(getRequestWithCSRF))
+      val result = await(controller().get("id")(getRequestWithCSRF()))
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
@@ -64,7 +64,7 @@ class RulingControllerSpec extends ControllerSpec {
     "return 200 - when not found" in {
       given(rulingService.get("id")) willReturn Future.successful(None)
 
-      val result = await(controller().get("id")(getRequestWithCSRF))
+      val result = await(controller().get("id")(getRequestWithCSRF()))
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
@@ -72,7 +72,7 @@ class RulingControllerSpec extends ControllerSpec {
     }
 
     "return 403 when not whitelisted" in {
-      val result = await(controller(whitelist = WhitelistEnabled()).get("id")(getRequestWithCSRF))
+      val result = await(controller(whitelist = WhitelistEnabled()).get("id")(getRequestWithCSRF()))
       status(result) shouldBe Status.FORBIDDEN
     }
 

@@ -36,14 +36,14 @@ class IndexControllerSpec extends ControllerSpec {
 
   "GET /" should {
     "return 200" in {
-      val result = controller().get(getRequestWithCSRF)
+      val result = controller().get(getRequestWithCSRF())
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }
 
     "return 403 when whitelisted" in {
-      val result = controller(WhitelistEnabled()).get(getRequestWithCSRF)
+      val result = controller(WhitelistEnabled()).get(getRequestWithCSRF())
       status(result) shouldBe Status.FORBIDDEN
     }
 

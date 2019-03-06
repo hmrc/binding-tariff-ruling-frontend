@@ -49,7 +49,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   "GET /" should {
     "return 200 without form" in {
-      val result = await(controller().get(query = None, page = 1)(getRequestWithCSRF))
+      val result = await(controller().get(query = None, page = 1)(getRequestWithCSRF()))
 
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
@@ -62,7 +62,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     "return 200 with form" in {
       given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
 
-      val result = await(controller().get(query = Some("query"), page = 1)(getRequestWithCSRF))
+      val result = await(controller().get(query = Some("query"), page = 1)(getRequestWithCSRF("/?query=query&page=1")))
 
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
@@ -73,7 +73,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 200 with form errors" in {
-      val result = await(controller().get(query = Some(""), page = 1)(getRequestWithCSRF))
+      val result = await(controller().get(query = Some(""), page = 1)(getRequestWithCSRF()))
 
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
@@ -84,7 +84,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 403 when whitelisted" in {
-      val result = await(controller(whitelist = WhitelistEnabled()).get(query = None, page = 1)(getRequestWithCSRF))
+      val result = await(controller(whitelist = WhitelistEnabled()).get(query = None, page = 1)(getRequestWithCSRF()))
 
       status(result) shouldBe Status.FORBIDDEN
     }

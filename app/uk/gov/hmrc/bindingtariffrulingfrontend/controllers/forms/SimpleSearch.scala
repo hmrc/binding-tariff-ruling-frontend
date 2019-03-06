@@ -33,9 +33,8 @@ object SimpleSearch {
   val form: Form[SimpleSearch] = Form(
     mapping(
       "query" -> nonEmptyText,
-      "page" -> optional(number).transform(_.getOrElse(1), (page: Int) => Some(page)),
-      "page-size" -> optional(number).transform(_.getOrElse(20), (page: Int) => Some(page))
-    )(SimpleSearch.apply)(SimpleSearch.unapply)
+      "page" -> optional(number).transform(_.getOrElse(1), (page: Int) => Some(page))
+    )((q, p) => SimpleSearch(q,p))(s => Some(s.query, s.pageIndex))
   )
 
 }
