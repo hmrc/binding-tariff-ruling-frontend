@@ -48,7 +48,7 @@
    pluralName = "rulings",
    pager = results.get,
    containerClass = Some("mb-1"),
-   onChange = page => routes.SearchController.get(query = Some(form.get.query))
+   onChange = page => routes.SearchController.get(query = Some(form.get.query), page = page)
   )
 
   @search_results(results.get)
@@ -59,7 +59,7 @@
    pluralName = "rulings",
    pager = results.get,
    containerClass = Some("mt-3"),
-   onChange = page => routes.SearchController.get(query = Some(form.get.query))
+   onChange = page => routes.SearchController.get(query = Some(form.get.query), page = page)
   )
  }
 

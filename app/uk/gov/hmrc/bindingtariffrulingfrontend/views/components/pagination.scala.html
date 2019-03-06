@@ -35,7 +35,7 @@
      <span>Showing</span>
      <span id="@id-total" class="bold">@{pager.resultCount}</span>
      <span>
-     @if(pager.results.size == 1){
+     @if(pager.resultCount == 1){
       @singularName
      } else {
       @pluralName
@@ -51,7 +51,7 @@
      <span>of</span>
      <span id="@id-total" class="bold">@{pager.resultCount}</span>
      <span>
-     @if(pager.results.size == 1){
+     @if(pager.resultCount == 1){
       @singularName
      } else {
       @pluralName
@@ -73,21 +73,21 @@
   @defining(pager.pageCount) { pageCount: Int =>
    @* Previous Page *@
    @if(pager.pageIndex > 1) {
-    <a id="@id-page_back" class="mr-5" href="@onChange(pager.pageIndex - 1)">Previous</a>
+    <a id="@id-page_back" class="mr-0_5" href="@onChange(pager.pageIndex - 1)">Previous</a>
    }
 
    @* Surrounding 5 Pages *@
    @for(pageIndex <- PaginationUtil.surroundingPages(pager.pageIndex, pager.pageCount, 5)) {
     @if(pageIndex == pager.pageIndex) {
-     <span id="@id-page_current" class="mx-5">@pageIndex</span>
+     <span id="@id-page_current" class="mx-0_5">@pageIndex</span>
     } else {
-     <a id="@id-page_@pageIndex" class="mx-5" href="@onChange(pageIndex)">@pageIndex</a>
+     <a id="@id-page_@pageIndex" class="mx-0_5" href="@onChange(pageIndex)">@pageIndex</a>
     }
    }
 
    @* Next Page *@
    @if(pager.pageIndex < pageCount) {
-    <a id="@id-page_next" class="ml-5" href="@onChange(pager.pageIndex + 1)">Next</a>
+    <a id="@id-page_next" class="ml-0_5" href="@onChange(pager.pageIndex + 1)">Next</a>
    }
 
   }
