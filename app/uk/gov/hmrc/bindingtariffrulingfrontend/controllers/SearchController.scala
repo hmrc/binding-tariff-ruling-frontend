@@ -22,11 +22,11 @@ import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.WhitelistedAction
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
@@ -35,19 +35,20 @@ class SearchController @Inject()(rulingService: RulingService,
                                  val messagesApi: MessagesApi,
                                  implicit val appConfig: AppConfig) extends FrontendController with I18nSupport {
 
-  def get: Action[AnyContent] = (Action andThen whitelist).async { implicit request =>
-    Future.successful(Ok(views.html.search(SimpleSearch.form, Paged.empty[Ruling])))
-  }
+  def get(query: Option[String], page: Int): Action[AnyContent] = (Action andThen whitelist).async { implicit request =>
+    if (query.isDefined) {
+      SimpleSearch.form.fillAndValidate(SimpleSearch(query.getOrElse(""), page))
+        .fold(
+          errors =>
+            Future.successful(Ok(views.html.search(errors, None))),
 
-  def post: Action[AnyContent] = (Action andThen whitelist).async { implicit request =>
-    SimpleSearch.form.bindFromRequest.fold(
-      errors =>
-        Future.successful(Ok(views.html.search(errors, Paged.empty[Ruling]))),
-      query =>
-        rulingService.get(query).map { results =>
-          Ok(views.html.search(SimpleSearch.form.fill(query), results))
-        }
-    )
-
+          query =>
+            rulingService.get(query).map { results =>
+              Ok(views.html.search(SimpleSearch.form.fill(query), Some(results)))
+            }
+        )
+    } else {
+      Future.successful(Ok(views.html.search(SimpleSearch.form, None)))
+    }
   }
 }

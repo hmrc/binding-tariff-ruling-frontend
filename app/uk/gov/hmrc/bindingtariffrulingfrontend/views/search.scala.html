@@ -14,16 +14,13 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 @import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
-@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.input_search
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
-@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.error_summary
-@import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
-@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.search_results
-@import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
-@(form: Form[SimpleSearch], results: Paged[Ruling])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
+@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.{error_summary, input_search, pagination, search_results}
+@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
+@(form: Form[SimpleSearch], results: Option[Paged[Ruling]])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @main_template(title = "Binding Tariff Rulings", bodyClasses = None) {
 
@@ -35,9 +32,7 @@
 
  <p>@messages("search.content1")</p>
 
- @helper.form(action = routes.SearchController.post()) {
-
-  @helper.CSRF.formField
+ @helper.form(action = routes.SearchController.get()) {
 
   @input_search(
    field = form("query"),
@@ -46,8 +41,26 @@
 
  }
 
- @if(results.nonEmpty) {
-  @search_results(results)
+ @if(results.isDefined && !form.hasErrors) {
+  @pagination(
+   id = "search-pagination_top",
+   singularName = "ruling",
+   pluralName = "rulings",
+   pager = results.get,
+   containerClass = Some("mb-1"),
+   onChange = page => routes.SearchController.get(query = Some(form.get.query))
+  )
+
+  @search_results(results.get)
+
+  @pagination(
+   id = "search-pagination_top",
+   singularName = "ruling",
+   pluralName = "rulings",
+   pager = results.get,
+   containerClass = Some("mt-3"),
+   onChange = page => routes.SearchController.get(query = Some(form.get.query))
+  )
  }
 
 }

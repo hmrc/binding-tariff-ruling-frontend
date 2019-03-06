@@ -26,7 +26,7 @@
             <th>Description</th>
             <th>Start Date</th>
             <th>End Date</th>
-            <th>Image</th>
+            @*<th>Image</th>*@
         </tr>
     </thead>
     <tbody>
@@ -38,7 +38,7 @@
                 <td id="search_results-table-row_@index-description">@result.goodsDescription</td>
                 <td id="search_results-table-row_@index-start_date">@Dates.format(result.effectiveStartDate)</td>
                 <td id="search_results-table-row_@index-end_date">@Dates.format(result.effectiveEndDate)</td>
-                <td id="search_results-table-row_@index-images"></td>
+                @*<td id="search_results-table-row_@index-images"></td>*@
             </tr>
         }
     </tbody>

@@ -25,7 +25,7 @@ case class SimpleSearch
 (
   query: String,
   override val pageIndex: Int,
-  override val pageSize: Int
+  override val pageSize: Int = 50
 ) extends Pagination
 
 object SimpleSearch {

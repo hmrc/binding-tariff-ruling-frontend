@@ -17,8 +17,11 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import akka.stream.Materializer
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
+import org.mockito.Mockito
+import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
 import play.api.test.Helpers._
@@ -32,7 +35,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import scala.concurrent.Future
 
 
-class SearchControllerSpec extends ControllerSpec {
+class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   private val env = Environment.simple()
   private val configuration = Configuration.load(env)
@@ -45,47 +48,50 @@ class SearchControllerSpec extends ControllerSpec {
   private def controller(whitelist: WhitelistedAction = WhitelistDisabled()) = new SearchController(rulingService, whitelist, messageApi, appConfig)
 
   "GET /" should {
-    "return 200" in {
-      val result = await(controller().get(getRequestWithCSRF))
+    "return 200 without form" in {
+      val result = await(controller().get(query = None, page = 1)(getRequestWithCSRF))
 
       status(result) shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
       bodyOf(result) should include("search-heading")
+
+      verifyZeroInteractions(rulingService)
+    }
+
+    "return 200 with form" in {
+      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+
+      val result = await(controller().get(query = Some("query"), page = 1)(getRequestWithCSRF))
+
+      status(result) shouldBe Status.OK
+      contentType(result) shouldBe Some("text/html")
+      charset(result) shouldBe Some("utf-8")
+      bodyOf(result) should include("search-heading")
+
+      verify(rulingService).get(SimpleSearch("query", 1))
+    }
+
+    "return 200 with form errors" in {
+      val result = await(controller().get(query = Some(""), page = 1)(getRequestWithCSRF))
+
+      status(result) shouldBe Status.OK
+      contentType(result) shouldBe Some("text/html")
+      charset(result) shouldBe Some("utf-8")
+      bodyOf(result) should include("search-heading")
+
+      verifyZeroInteractions(rulingService)
     }
 
     "return 403 when whitelisted" in {
-      val result = await(controller(whitelist = WhitelistEnabled()).get(getRequestWithCSRF))
+      val result = await(controller(whitelist = WhitelistEnabled()).get(query = None, page = 1)(getRequestWithCSRF))
 
       status(result) shouldBe Status.FORBIDDEN
     }
   }
 
-  "POST /" should {
-    "return 200" in {
-      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
-
-      val result = await(controller().post(getRequestWithCSRF.withFormUrlEncodedBody("query" -> "xyz")))
-
-      status(result) shouldBe Status.OK
-      contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
-      bodyOf(result) should include("search-heading")
-    }
-
-    "return 200 with form-errors" in {
-      val result = await(controller().post(getRequestWithCSRF.withFormUrlEncodedBody()))
-
-      status(result) shouldBe Status.OK
-      contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
-      bodyOf(result) should include("search-heading")
-    }
-
-    "return 403 when whitelisted" in {
-      val result = await(controller(whitelist = WhitelistEnabled()).post(postRequestWithCSRF))
-
-      status(result) shouldBe Status.FORBIDDEN
-    }
+  override protected def afterEach(): Unit = {
+    super.afterEach()
+    Mockito.reset(rulingService)
   }
 }
