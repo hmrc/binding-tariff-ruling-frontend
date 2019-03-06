@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.config
 
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
-class AppConfigTest extends UnitSpec with GuiceOneAppPerSuite {
+class AppConfigTest extends UnitSpec with WithFakeApplication {
 
   private def appConfig(pairs: (String, String)*): AppConfig = {
     new AppConfig(Configuration.from(pairs.map(e => e._1 -> e._2).toMap), Environment.simple())
@@ -70,4 +69,5 @@ class AppConfigTest extends UnitSpec with GuiceOneAppPerSuite {
       "microservice.services.binding-tariff-classification.protocol" -> "http"
     ).bindingTariffClassificationUrl shouldBe "http://localhost:8080"
   }
+
 }
