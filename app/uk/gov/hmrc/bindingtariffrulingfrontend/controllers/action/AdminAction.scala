@@ -25,7 +25,7 @@ import scala.concurrent.Future
 class AdminAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request, Request] {
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
-    if(appConfig.adminEnabled) {
+    if (appConfig.adminEnabled) {
       Future.successful(Right(request))
     } else {
       Future.successful(Left(Results.Forbidden))

@@ -23,6 +23,7 @@ import akka.actor.ActorSystem
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.apache.http.HttpStatus
 import org.mockito.BDDMockito._
+import org.mockito.Mockito
 import org.scalatest.mockito.MockitoSugar
 import play.api.Environment
 import play.api.libs.json.Json
@@ -32,25 +33,27 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{Attachment, Case, CaseStatus, Decision}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
-import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-
 
 class BindingTariffClassificationConnectorSpec extends UnitSpec
   with WiremockTestServer with MockitoSugar with WithFakeApplication {
 
-  private val configuration = mock[AppConfig]
-  private val actorSystem = ActorSystem.create("test")
+  private val actorSystem = ActorSystem.create("testActorSystem")
+
+  protected implicit val realConfig: AppConfig = fakeApplication.injector.instanceOf[AppConfig]
+  protected val appConfig: AppConfig = mock[AppConfig]
+
   private val wsClient: WSClient = fakeApplication.injector.instanceOf[WSClient]
   private val auditConnector = new DefaultAuditConnector(fakeApplication.configuration, fakeApplication.injector.instanceOf[Environment])
-  private val client = new DefaultHttpClient(fakeApplication.configuration, auditConnector, wsClient, actorSystem)
-  private implicit val hc = HeaderCarrier()
+  private val client = new AuthenticatedHttpClient(auditConnector, wsClient, actorSystem)
+  private implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  private val connector = new BindingTariffClassificationConnector(configuration, client)
+  private val connector = new BindingTariffClassificationConnector(appConfig, client)
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    given(configuration.bindingTariffClassificationUrl).willReturn(wireMockUrl)
+    Mockito.reset(appConfig)
+    given(appConfig.bindingTariffClassificationUrl).willReturn(wireMockUrl)
   }
 
   "Connector 'GET Case'" should {
@@ -69,7 +72,7 @@ class BindingTariffClassificationConnectorSpec extends UnitSpec
     "Get valid case" in {
       val responseJSON = Json.toJson(validCase).toString()
 
-      stubFor(get(urlEqualTo(s"/cases/ref"))
+      stubFor(get(urlEqualTo("/cases/ref"))
         .willReturn(aResponse()
           .withStatus(HttpStatus.SC_OK)
           .withBody(responseJSON)
@@ -77,16 +80,26 @@ class BindingTariffClassificationConnectorSpec extends UnitSpec
       )
 
       await(connector.get("ref")) shouldBe Some(validCase)
+
+      verify(
+        getRequestedFor(urlEqualTo("/cases/ref"))
+          .withHeader("X-Api-Token", equalTo(realConfig.authorization))
+      )
     }
 
     "Return None for 404" in {
-      stubFor(get(urlEqualTo(s"/cases/ref"))
+      stubFor(get(urlEqualTo("/cases/ref"))
         .willReturn(aResponse()
           .withStatus(HttpStatus.SC_NOT_FOUND)
         )
       )
 
       await(connector.get("ref")) shouldBe None
+
+      verify(
+        getRequestedFor(urlEqualTo("/cases/ref"))
+          .withHeader("X-Api-Token", equalTo(realConfig.authorization))
+      )
     }
   }
 
