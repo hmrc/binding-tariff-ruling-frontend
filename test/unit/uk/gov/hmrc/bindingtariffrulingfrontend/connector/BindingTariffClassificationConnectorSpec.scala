@@ -50,8 +50,8 @@ class BindingTariffClassificationConnectorSpec extends UnitSpec
 
   private val connector = new BindingTariffClassificationConnector(appConfig, client)
 
-  override protected def beforeEach(): Unit = {
-    super.beforeEach()
+  override def beforeAll(): Unit = {
+    super.beforeAll()
     Mockito.reset(appConfig)
     given(appConfig.bindingTariffClassificationUrl).willReturn(wireMockUrl)
   }
