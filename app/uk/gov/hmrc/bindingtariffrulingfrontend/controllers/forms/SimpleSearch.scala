@@ -34,7 +34,7 @@ object SimpleSearch {
     mapping(
       "query" -> nonEmptyText,
       "page" -> optional(number).transform(_.getOrElse(1), (page: Int) => Some(page))
-    )((q, p) => SimpleSearch(q,p))(s => Some(s.query, s.pageIndex))
+    )((q: String, p: Int) => SimpleSearch(q, p))(s => Some(s.query, s.pageIndex))
   )
 
 }
