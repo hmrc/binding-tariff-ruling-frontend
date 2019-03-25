@@ -94,4 +94,5 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     super.afterEach()
     Mockito.reset(rulingService)
   }
+
 }

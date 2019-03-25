@@ -21,14 +21,15 @@ import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
 import scala.concurrent.Future
+import scala.concurrent.Future.successful
 
 class AdminAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request, Request] {
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
     if (appConfig.adminEnabled) {
-      Future.successful(Right(request))
+      successful(Right(request))
     } else {
-      Future.successful(Left(Results.Forbidden))
+      successful(Left(Results.Forbidden))
     }
   }
 

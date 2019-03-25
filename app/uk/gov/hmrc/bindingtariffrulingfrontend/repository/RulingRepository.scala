@@ -105,7 +105,7 @@ class RulingMongoRepository @Inject()(config: AppConfig,
 
   private def regex(regex: String, ignoreCase: Boolean = false): JsValue = Json.obj(
     "$regex" -> regex,
-    "$options" -> (if(ignoreCase) "i" else "")
+    "$options" -> (if (ignoreCase) "i" else "")
   )
 
   private def either(options: (String, JsValue)*): JsObject = {
@@ -113,4 +113,5 @@ class RulingMongoRepository @Inject()(config: AppConfig,
       options.map(element => Json.obj(element._1 -> element._2)))
     )
   }
+
 }
