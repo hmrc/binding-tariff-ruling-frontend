@@ -46,10 +46,10 @@ class RulingService @Inject()(repository: RulingRepository, bindingTariffClassif
       existingRuling <- repository.get(reference)
       updatedCase: Option[Case] <- bindingTariffClassificationConnector.get(reference)
       updatedRuling: Option[Ruling] = updatedCase
-        .filter(c => c.status == CaseStatus.COMPLETED)
-        .filter(c => c.decision.isDefined)
-        .filter(c => c.decision.flatMap(_.effectiveStartDate).isDefined)
-        .filter(c => c.decision.flatMap(_.effectiveEndDate).isDefined)
+        .filter(_.status == CaseStatus.COMPLETED)
+        .filter(_.decision.isDefined)
+        .filter(_.decision.flatMap(_.effectiveStartDate).isDefined)
+        .filter(_.decision.flatMap(_.effectiveEndDate).isDefined)
         .map(toRuling)
     } yield (existingRuling, updatedRuling)
 

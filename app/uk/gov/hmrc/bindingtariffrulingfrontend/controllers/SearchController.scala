@@ -27,7 +27,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.Future.successful
 
 @Singleton
 class SearchController @Inject()(rulingService: RulingService,
@@ -36,19 +36,19 @@ class SearchController @Inject()(rulingService: RulingService,
                                  implicit val appConfig: AppConfig) extends FrontendController with I18nSupport {
 
   def get(query: Option[String], page: Int): Action[AnyContent] = (Action andThen whitelist).async { implicit request =>
-    if (query.isDefined) {
-      SimpleSearch.form.bindFromRequest
-        .fold(
-          errors =>
-            Future.successful(Ok(views.html.search(errors, None))),
+    query match {
+      case None => successful(Ok(views.html.search(SimpleSearch.form, None)))
+      case _ =>
+        SimpleSearch.form.bindFromRequest
+          .fold(
+            errors => successful(Ok(views.html.search(errors, None))),
 
-          query =>
-            rulingService.get(query).map { results =>
-              Ok(views.html.search(SimpleSearch.form.fill(query), Some(results)))
-            }
-        )
-    } else {
-      Future.successful(Ok(views.html.search(SimpleSearch.form, None)))
+            query =>
+              rulingService.get(query).map { results =>
+                Ok(views.html.search(SimpleSearch.form.fill(query), Some(results)))
+              }
+          )
     }
   }
+
 }

@@ -38,7 +38,7 @@ class RulingController @Inject()(rulingService: RulingService,
   def get(id: String): Action[AnyContent] = (Action andThen whitelist).async { implicit request =>
     rulingService.get(id) map {
       case Some(ruling) => Ok(views.html.ruling(ruling))
-      case None => Ok(views.html.ruling_not_found(id))
+      case _ => Ok(views.html.ruling_not_found(id))
     }
   }
 
