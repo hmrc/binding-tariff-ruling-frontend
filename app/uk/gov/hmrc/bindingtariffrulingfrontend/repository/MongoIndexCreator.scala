@@ -50,13 +50,4 @@ object MongoIndexCreator {
     )
   }
 
-  def createTTLIndex(ttl: Duration): Index = {
-    createCompoundIndex(
-      indexFieldMappings = Seq(("lastUpdated", IndexType.Ascending)),
-      isUnique = false,
-      name = Some("expiry"),
-      options = BSONDocument("expireAfterSeconds" -> ttl.toSeconds)
-    )
-  }
-
 }

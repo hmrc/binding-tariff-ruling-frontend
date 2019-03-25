@@ -19,6 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
 import javax.inject.Inject
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{ErrorCode, JsErrorResponse}
 
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
@@ -29,7 +30,7 @@ class AdminAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request,
     if (appConfig.adminEnabled) {
       successful(Right(request))
     } else {
-      successful(Left(Results.Forbidden))
+      successful(Left(Results.Forbidden(JsErrorResponse(ErrorCode.FORBIDDEN, s"You are not allowed to call ${request.method} ${request.uri}"))))
     }
   }
 
