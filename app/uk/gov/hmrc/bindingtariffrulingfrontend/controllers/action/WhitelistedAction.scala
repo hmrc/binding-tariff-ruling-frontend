@@ -21,6 +21,7 @@ import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
 import scala.concurrent.Future
+import scala.concurrent.Future.successful
 
 class WhitelistedAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request, Request] {
 
@@ -28,10 +29,10 @@ class WhitelistedAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Re
     appConfig.whitelist match {
       case Some(addresses: Set[String]) =>
         request.headers.get("True-Client-IP") match {
-          case Some(ip: String) if addresses.contains(ip) => Future.successful(Right(request))
-          case _ => Future.successful(Left(Results.Forbidden))
+          case Some(ip: String) if addresses.contains(ip) => successful(Right(request))
+          case _ => successful(Left(Results.Forbidden))
         }
-      case _ => Future.successful(Right(request))
+      case _ => successful(Right(request))
     }
   }
 
