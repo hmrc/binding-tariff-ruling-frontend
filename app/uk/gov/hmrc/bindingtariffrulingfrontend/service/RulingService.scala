@@ -46,16 +46,21 @@ class RulingService @Inject()(repository: RulingRepository,
 
   def refresh(reference: String)(implicit hc: HeaderCarrier): Future[Unit] = {
 
-    val rulingUpdate: Future[(Option[Ruling], Option[Ruling])] = for {
-      existingRuling <- repository.get(reference)
+    type ExistingRuling = Option[Ruling]
+    type UpdatedRuling = Option[Ruling]
+    type RulingUpdate = (ExistingRuling, UpdatedRuling)
+
+    val rulingUpdate: Future[RulingUpdate] = for {
+      existingRuling: ExistingRuling <- repository.get(reference)
       updatedCase: Option[Case] <- bindingTariffClassificationConnector.get(reference)
-      updatedRuling: Option[Ruling] = updatedCase
+      updatedRuling: UpdatedRuling = updatedCase
         .filter(_.status == CaseStatus.COMPLETED)
         .filter(_.decision.isDefined)
         .filter(_.decision.flatMap(_.effectiveStartDate).isDefined)
         .filter(_.decision.flatMap(_.effectiveEndDate).isDefined)
         .map(toRuling)
-    } yield (existingRuling, updatedRuling)
+      result: RulingUpdate = (existingRuling, updatedRuling)
+    } yield result
 
     rulingUpdate flatMap {
       case (Some(_), Some(u)) =>
