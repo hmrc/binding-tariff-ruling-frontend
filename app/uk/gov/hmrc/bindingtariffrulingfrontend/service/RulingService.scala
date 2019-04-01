@@ -17,6 +17,7 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
 import javax.inject.Inject
+import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditService
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{Case, CaseStatus, Decision}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
@@ -27,7 +28,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RulingService @Inject()(repository: RulingRepository, bindingTariffClassificationConnector: BindingTariffClassificationConnector) {
+class RulingService @Inject()(repository: RulingRepository,
+                              auditService: AuditService,
+                              bindingTariffClassificationConnector: BindingTariffClassificationConnector) {
 
   def delete(): Future[Unit] = {
     repository.delete()
@@ -42,23 +45,45 @@ class RulingService @Inject()(repository: RulingRepository, bindingTariffClassif
   }
 
   def refresh(reference: String)(implicit hc: HeaderCarrier): Future[Unit] = {
-    val rulingPair: Future[(Option[Ruling], Option[Ruling])] = for {
-      existingRuling <- repository.get(reference)
+
+    type ExistingRuling = Option[Ruling]
+    type UpdatedRuling = Option[Ruling]
+    type RulingUpdate = (ExistingRuling, UpdatedRuling)
+
+    val rulingUpdate: Future[RulingUpdate] = for {
+      existingRuling: ExistingRuling <- repository.get(reference)
       updatedCase: Option[Case] <- bindingTariffClassificationConnector.get(reference)
-      updatedRuling: Option[Ruling] = updatedCase
+      updatedRuling: UpdatedRuling = updatedCase
         .filter(_.status == CaseStatus.COMPLETED)
         .filter(_.decision.isDefined)
         .filter(_.decision.flatMap(_.effectiveStartDate).isDefined)
         .filter(_.decision.flatMap(_.effectiveEndDate).isDefined)
         .map(toRuling)
-    } yield (existingRuling, updatedRuling)
+      result: RulingUpdate = (existingRuling, updatedRuling)
+    } yield result
 
-    rulingPair flatMap {
-      case (Some(_), Some(u)) => repository.update(u, upsert = false).map(_ => ())
-      case (Some(_), None) => repository.delete(reference)
-      case (None, Some(u)) => repository.update(u, upsert = true).map(_ => ())
+    rulingUpdate flatMap {
+      case (Some(_), Some(u)) =>
+        for {
+          _ <- repository.update(u, upsert = false)
+          _ = auditService.auditRulingUpdated(u)
+        } yield ()
+
+      case (Some(_), None) =>
+        for {
+          _ <- repository.delete(reference)
+          _ = auditService.auditRulingDeleted(reference)
+        } yield ()
+
+      case (None, Some(u)) =>
+        for {
+          _ <- repository.update(u, upsert = true)
+          _ = auditService.auditRulingCreated(u)
+        } yield ()
+
       case _ => Future.successful(())
     }
+
   }
 
   private def toRuling(c: Case): Ruling = {

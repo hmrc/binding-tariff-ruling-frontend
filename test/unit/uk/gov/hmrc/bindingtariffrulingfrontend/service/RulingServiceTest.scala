@@ -27,6 +27,7 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
+import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditService
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{Attachment, Case, CaseStatus, Decision}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
@@ -40,16 +41,24 @@ import scala.concurrent.Future
 class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEach {
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
+
   private val connector = mock[BindingTariffClassificationConnector]
   private val repository = mock[RulingRepository]
+  private val auditService = mock[AuditService]
 
-  private val service = new RulingService(repository, connector)
+  private val service = new RulingService(repository, auditService, connector)
+
+  override protected def afterEach(): Unit = {
+    super.afterEach()
+    reset(repository, connector, auditService)
+  }
 
   "Service DELETE" should {
 
     "delegate to repository" in {
       given(repository.delete()) willReturn Future.successful(())
-      await(service.delete()) shouldBe ()
+      await(service.delete()) shouldBe ((): Unit)
+      verifyZeroInteractions(auditService)
     }
   }
 
@@ -58,6 +67,7 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
     "delegate to repository" in {
       given(repository.get("id")) willReturn Future.successful(None)
       await(service.get("id")) shouldBe None
+      verifyZeroInteractions(auditService)
     }
   }
 
@@ -67,6 +77,7 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
     "delegate to repository" in {
       given(repository.get(search)) willReturn Future.successful(Paged.empty[Ruling])
       await(service.get(search)) shouldBe Paged.empty[Ruling]
+      verifyZeroInteractions(auditService)
     }
   }
 
@@ -84,13 +95,14 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
       keywords = Set("keyword")
     )
 
-    "do nothing when case doesnt exist in repository or connector" in {
+    "do nothing when case doesn't exist in repository or connector" in {
       given(repository.get("ref")) willReturn Future.successful(None)
       given(connector.get("ref")) willReturn Future.successful(None)
 
-      await(service.refresh("ref"))
+      await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository, never()).update(any[Ruling], anyBoolean())
+      verifyZeroInteractions(auditService)
     }
 
     "create new ruling" in {
@@ -98,10 +110,10 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
       given(connector.get("ref")) willReturn Future.successful(Some(validCase))
       given(repository.update(any[Ruling], any[Boolean])) will returnTheRuling
 
-      await(service.refresh("ref"))
+      await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository).update(any[Ruling], refEq(true))
-      theRulingUpdated shouldBe Ruling(
+      val expectedRuling = Ruling(
         "ref",
         "code",
         startDate,
@@ -111,6 +123,10 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
         Set("keyword"),
         Seq("file-id")
       )
+      theRulingUpdated shouldBe expectedRuling
+
+      verify(auditService).auditRulingCreated(expectedRuling)(hc)
+      verifyNoMoreInteractions(auditService)
     }
 
     "update existing ruling" in {
@@ -119,10 +135,11 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
       given(connector.get("ref")) willReturn Future.successful(Some(validCase))
       given(repository.update(any[Ruling], any[Boolean])) will returnTheRuling
 
-      await(service.refresh("ref"))
+      await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository).update(any[Ruling], refEq(false))
-      theRulingUpdated shouldBe Ruling(
+
+      val expectedRuling = Ruling(
         "ref",
         "code",
         startDate,
@@ -132,6 +149,10 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
         Set("keyword"),
         Seq("file-id")
       )
+      theRulingUpdated shouldBe expectedRuling
+
+      verify(auditService).auditRulingUpdated(expectedRuling)(hc)
+      verifyNoMoreInteractions(auditService)
     }
 
     "delete existing ruling" in {
@@ -140,45 +161,52 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
       given(connector.get("ref")) willReturn Future.successful(None)
       given(repository.delete("ref")) willReturn Future.successful(())
 
-      await(service.refresh("ref"))
+      await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository).delete("ref")
+
+      verify(auditService).auditRulingDeleted("ref")(hc)
+      verifyNoMoreInteractions(auditService)
     }
 
     "filter cases not COMPLETED" in {
       given(repository.get("ref")) willReturn Future.successful(None)
       given(connector.get("ref")) willReturn Future.successful(Some(validCase.copy(status = CaseStatus.OPEN)))
 
-      await(service.refresh("ref"))
+      await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository, never()).update(any[Ruling], anyBoolean())
+      verifyZeroInteractions(auditService)
     }
 
     "filter cases without Decision" in {
       given(repository.get("ref")) willReturn Future.successful(None)
       given(connector.get("ref")) willReturn Future.successful(Some(validCase.copy(decision = None)))
 
-      await(service.refresh("ref"))
+      await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository, never()).update(any[Ruling], anyBoolean())
+      verifyZeroInteractions(auditService)
     }
 
     "filter cases without Decision Start Date" in {
       given(repository.get("ref")) willReturn Future.successful(None)
       given(connector.get("ref")) willReturn Future.successful(Some(validCase.copy(decision = Some(validDecision.copy(effectiveStartDate = None)))))
 
-      await(service.refresh("ref"))
+      await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository, never()).update(any[Ruling], anyBoolean())
+      verifyZeroInteractions(auditService)
     }
 
     "filter cases without Decision End Date" in {
       given(repository.get("ref")) willReturn Future.successful(None)
       given(connector.get("ref")) willReturn Future.successful(Some(validCase.copy(decision = Some(validDecision.copy(effectiveEndDate = None)))))
 
-      await(service.refresh("ref"))
+      await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository, never()).update(any[Ruling], anyBoolean())
+      verifyZeroInteractions(auditService)
     }
 
     def theRulingUpdated: Ruling = {
@@ -190,11 +218,7 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
     def returnTheRuling: Answer[Future[Ruling]] = new Answer[Future[Ruling]] {
       override def answer(invocation: InvocationOnMock): Future[Ruling] = Future.successful(invocation.getArgument(0))
     }
+
   }
 
-
-  override protected def afterEach(): Unit = {
-    super.afterEach()
-    reset(repository, connector)
-  }
 }
