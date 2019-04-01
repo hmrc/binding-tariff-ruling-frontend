@@ -63,6 +63,7 @@ class RulingService @Inject()(repository: RulingRepository,
     } yield result
 
     rulingUpdate flatMap {
+
       case (Some(_), Some(u)) =>
         for {
           _ <- repository.update(u, upsert = false)
@@ -82,6 +83,7 @@ class RulingService @Inject()(repository: RulingRepository,
         } yield ()
 
       case _ => Future.successful(())
+
     }
 
   }

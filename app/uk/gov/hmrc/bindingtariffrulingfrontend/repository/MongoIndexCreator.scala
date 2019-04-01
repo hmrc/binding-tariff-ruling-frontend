@@ -20,8 +20,6 @@ import reactivemongo.api.indexes.IndexType.Ascending
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 
-import scala.concurrent.duration.Duration
-
 object MongoIndexCreator {
 
   def createSingleFieldAscendingIndex(indexFieldKey: String,
