@@ -35,13 +35,6 @@ class AuditService @Inject()(auditConnector: DefaultAuditConnector) {
     )
   }
 
-  def auditRulingUpdated(ruling: Ruling)(implicit hc: HeaderCarrier): Unit = {
-    sendExplicitAuditEvent(
-      auditEventType = rulingUpdated,
-      auditPayload = ruling
-    )
-  }
-
   def auditRulingDeleted(reference: String)(implicit hc: HeaderCarrier): Unit = {
     auditConnector.sendExplicitAudit(
       auditType = rulingDeleted,
@@ -58,6 +51,5 @@ class AuditService @Inject()(auditConnector: DefaultAuditConnector) {
 
 object AuditPayloadType {
   val rulingCreated = "bindingTariffRulingCreated"
-  val rulingUpdated = "bindingTariffRulingUpdated"
   val rulingDeleted = "bindingTariffRulingDeleted"
 }

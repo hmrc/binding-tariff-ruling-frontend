@@ -64,12 +64,6 @@ class RulingService @Inject()(repository: RulingRepository,
 
     rulingUpdate flatMap {
 
-      case (Some(_), Some(u)) =>
-        for {
-          _ <- repository.update(u, upsert = false)
-          _ = auditService.auditRulingUpdated(u)
-        } yield ()
-
       case (Some(_), None) =>
         for {
           _ <- repository.delete(reference)
@@ -81,6 +75,8 @@ class RulingService @Inject()(repository: RulingRepository,
           _ <- repository.update(u, upsert = true)
           _ = auditService.auditRulingCreated(u)
         } yield ()
+
+      case (Some(_), Some(u)) => repository.update(u, upsert = false).map(_ => ())
 
       case _ => Future.successful(())
 

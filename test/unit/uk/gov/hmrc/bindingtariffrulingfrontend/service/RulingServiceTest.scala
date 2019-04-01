@@ -151,8 +151,7 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
       )
       theRulingUpdated shouldBe expectedRuling
 
-      verify(auditService).auditRulingUpdated(expectedRuling)(hc)
-      verifyNoMoreInteractions(auditService)
+      verifyZeroInteractions(auditService)
     }
 
     "delete existing ruling" in {
