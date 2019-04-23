@@ -53,7 +53,8 @@ class RulingMongoRepository @Inject()(config: AppConfig,
   extends ReactiveRepository[Ruling, BSONObjectID](
     collectionName = "rulings",
     mongo = mongoDbProvider.mongo,
-    domainFormat = Ruling.format) with RulingRepository {
+    domainFormat = Ruling.formatMongo) with RulingRepository {
+  import Ruling.formatMongo
 
   collection.indexesManager.drop("goodsDescription")
 

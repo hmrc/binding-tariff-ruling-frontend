@@ -33,6 +33,8 @@ case class Ruling
 )
 
 object Ruling {
+  implicit val formatREST: OFormat[Ruling] = Json.format[Ruling]
+
   private implicit val formatInstant: OFormat[Instant] = new OFormat[Instant] {
     override def writes(datetime: Instant): JsObject = {
       Json.obj("$date" -> datetime.toEpochMilli)
@@ -50,5 +52,5 @@ object Ruling {
     }
   }
 
-  implicit val format: OFormat[Ruling] = Json.format[Ruling]
+  implicit val formatMongo: OFormat[Ruling] = Json.format[Ruling]
 }
