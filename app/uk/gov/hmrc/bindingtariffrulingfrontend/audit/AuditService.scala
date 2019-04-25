@@ -26,7 +26,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 @Singleton
 class AuditService @Inject()(auditConnector: DefaultAuditConnector) {
 
-  import Ruling.formatREST
+  import Ruling.REST.format
   import AuditPayloadType._
 
   def auditRulingCreated(ruling: Ruling)(implicit hc: HeaderCarrier): Unit = {

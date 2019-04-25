@@ -51,7 +51,7 @@ class AuditServiceSpec extends UnitSpec with MockitoSugar {
     "call the audit connector when a ruling is created" in {
       service.auditRulingCreated(ruling)
 
-      verify(auditConnector).sendExplicitAudit(rulingCreated, ruling)(hc, global, Ruling.formatREST)
+      verify(auditConnector).sendExplicitAudit(rulingCreated, ruling)(hc, global, Ruling.REST.format)
     }
 
     "call the audit connector when a ruling is deleted" in {

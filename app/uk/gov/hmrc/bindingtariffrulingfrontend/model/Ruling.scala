@@ -33,24 +33,29 @@ case class Ruling
 )
 
 object Ruling {
-  implicit val formatREST: OFormat[Ruling] = Json.format[Ruling]
 
-  private implicit val formatInstant: OFormat[Instant] = new OFormat[Instant] {
-    override def writes(datetime: Instant): JsObject = {
-      Json.obj("$date" -> datetime.toEpochMilli)
-    }
-
-    override def reads(json: JsValue): JsResult[Instant] = {
-      json match {
-        case JsObject(map) if map.contains("$date") =>
-          map("$date") match {
-            case JsNumber(v) => JsSuccess(Instant.ofEpochMilli(v.toLong))
-            case _ => JsError("Unexpected Instant Format")
-          }
-        case _ => JsError("Unexpected Instant Format")
-      }
-    }
+  object REST {
+    implicit val format: OFormat[Ruling] = Json.format[Ruling]
   }
 
-  implicit val formatMongo: OFormat[Ruling] = Json.format[Ruling]
+  object Mongo {
+    private implicit val formatInstant: OFormat[Instant] = new OFormat[Instant] {
+      override def writes(datetime: Instant): JsObject = {
+        Json.obj("$date" -> datetime.toEpochMilli)
+      }
+
+      override def reads(json: JsValue): JsResult[Instant] = {
+        json match {
+          case JsObject(map) if map.contains("$date") =>
+            map("$date") match {
+              case JsNumber(v) => JsSuccess(Instant.ofEpochMilli(v.toLong))
+              case _ => JsError("Unexpected Instant Format")
+            }
+          case _ => JsError("Unexpected Instant Format")
+        }
+      }
+    }
+
+    implicit val format: OFormat[Ruling] = Json.format[Ruling]
+  }
 }

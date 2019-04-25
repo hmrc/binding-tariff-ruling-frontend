@@ -38,7 +38,7 @@ class RulingMongoRepositoryTest extends MongoUnitSpec
   with MockitoSugar {
   self =>
 
-  import Ruling.formatMongo
+  import Ruling.Mongo.format
 
   private val provider: MongoDbProvider = new MongoDbProvider {
     override val mongo: () => DB = self.mongo
