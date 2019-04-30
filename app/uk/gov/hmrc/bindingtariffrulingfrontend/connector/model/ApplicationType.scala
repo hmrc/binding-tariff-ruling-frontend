@@ -16,19 +16,11 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector.model
 
-import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.CaseStatus.CaseStatus
+import play.api.libs.json.Format
+import uk.gov.hmrc.bindingtariffrulingfrontend.utils.EnumJson
 
-case class Case
-(
-  reference: String,
-  status: CaseStatus,
-  application: Application,
-  decision: Option[Decision] = None,
-  attachments: Seq[Attachment],
-  keywords: Set[String]
-)
-
-object Case {
-  implicit val format: OFormat[Case] = Json.format[Case]
+object ApplicationType extends Enumeration {
+  type ApplicationType = Value
+  val BTI, LIABILITY_ORDER = Value
+  implicit val format: Format[ApplicationType.Value] = EnumJson.format(ApplicationType)
 }

@@ -30,7 +30,7 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.bindingtariffrulingfrontend.WiremockTestServer
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{Attachment, Case, CaseStatus, Decision}
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
@@ -64,6 +64,7 @@ class BindingTariffClassificationConnectorSpec extends UnitSpec
     val validCase: Case = Case(
       reference = "ref",
       status = CaseStatus.COMPLETED,
+      application = Application(`type` = ApplicationType.BTI),
       decision = Some(validDecision),
       attachments = Seq(publicAttachment),
       keywords = Set("keyword")

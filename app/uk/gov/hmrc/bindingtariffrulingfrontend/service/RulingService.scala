@@ -19,7 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.service
 import javax.inject.Inject
 import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditService
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{Case, CaseStatus, Decision}
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{ApplicationType, Case, CaseStatus, Decision}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
@@ -54,6 +54,7 @@ class RulingService @Inject()(repository: RulingRepository,
       existingRuling: ExistingRuling <- repository.get(reference)
       updatedCase: Option[Case] <- bindingTariffClassificationConnector.get(reference)
       updatedRuling: UpdatedRuling = updatedCase
+        .filter(_.application.`type` == ApplicationType.BTI)
         .filter(_.status == CaseStatus.COMPLETED)
         .filter(_.decision.isDefined)
         .filter(_.decision.flatMap(_.effectiveStartDate).isDefined)

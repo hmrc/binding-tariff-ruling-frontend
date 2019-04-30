@@ -17,18 +17,14 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector.model
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.CaseStatus.CaseStatus
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType.ApplicationType
 
-case class Case
+
+case class Application
 (
-  reference: String,
-  status: CaseStatus,
-  application: Application,
-  decision: Option[Decision] = None,
-  attachments: Seq[Attachment],
-  keywords: Set[String]
+  `type`: ApplicationType
 )
 
-object Case {
-  implicit val format: OFormat[Case] = Json.format[Case]
+object Application {
+  implicit val outboundFormat: OFormat[Application] = Json.format[Application]
 }

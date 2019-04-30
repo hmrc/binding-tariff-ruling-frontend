@@ -29,7 +29,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditService
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{Attachment, Case, CaseStatus, Decision}
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
@@ -90,6 +90,7 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
     val validCase: Case = Case(
       reference = "ref",
       status = CaseStatus.COMPLETED,
+      application = Application(`type` = ApplicationType.BTI),
       decision = Some(validDecision),
       attachments = Seq(publicAttachment, privateAttachment),
       keywords = Set("keyword")
@@ -171,6 +172,16 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
     "filter cases not COMPLETED" in {
       given(repository.get("ref")) willReturn Future.successful(None)
       given(connector.get("ref")) willReturn Future.successful(Some(validCase.copy(status = CaseStatus.OPEN)))
+
+      await(service.refresh("ref")) shouldBe ((): Unit)
+
+      verify(repository, never()).update(any[Ruling], anyBoolean())
+      verifyZeroInteractions(auditService)
+    }
+
+    "filter cases not BTT" in {
+      given(repository.get("ref")) willReturn Future.successful(None)
+      given(connector.get("ref")) willReturn Future.successful(Some(validCase.copy(application = Application(`type` = ApplicationType.LIABILITY_ORDER))))
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
