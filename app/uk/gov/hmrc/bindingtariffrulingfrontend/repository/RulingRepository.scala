@@ -56,7 +56,7 @@ class RulingMongoRepository @Inject()(config: AppConfig,
     domainFormat = Ruling.Mongo.format) with RulingRepository {
   import Ruling.Mongo.format
 
-  collection.indexesManager.drop("goodsDescription_Index")
+  //collection.indexesManager.drop("goodsDescription_Index")
 
   override lazy val indexes: Seq[Index] = Seq(
     createSingleFieldAscendingIndex("reference", isUnique = true),
