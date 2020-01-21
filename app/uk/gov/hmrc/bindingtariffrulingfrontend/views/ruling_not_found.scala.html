@@ -21,7 +21,7 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.utils.Dates
 @(id: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@main_template(title = "Binding Tariff Rulings", bodyClasses = None) {
+@main_template(title = Some(messages("ruling_not_found.heading.no.reference")), bodyClasses = None) {
 
  <a id="ruling_not_found-back" href="@routes.SearchController.get()" class="link-back">@messages("site.back")</a>
 

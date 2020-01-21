@@ -19,12 +19,13 @@ object AppDependencies {
     "org.mockito"             %  "mockito-core"             % "2.26.0"         % scope,
     "org.jsoup"               %  "jsoup"                    % "1.11.3"         % scope,
     "org.pegdown"             %  "pegdown"                  % "1.6.0"          % scope,
-    "org.scalatest"           %% "scalatest"                % "3.0.4"          % scope,
+    "org.scalatest"           %% "scalatest"                % "3.0.7"          % scope,
     "org.scalatestplus.play"  %% "scalatestplus-play"       % "2.0.1"          % scope,
     "uk.gov.hmrc"             %% "hmrctest"                 % "3.8.0-play-25"  % scope,
     "uk.gov.hmrc"             %% "http-verbs-test"          % "1.6.0-play-25"  % scope,
     "uk.gov.hmrc"             %% "reactivemongo-test"       % "4.14.0-play-25" % scope,
-    "uk.gov.hmrc"             %% "service-integration-test" % "0.6.0-play-25"  % scope
+    "uk.gov.hmrc"             %% "service-integration-test" % "0.6.0-play-25"  % scope,
+    "org.scalacheck"          %% "scalacheck"               % "1.14.0"         % scope
   )
 
 }

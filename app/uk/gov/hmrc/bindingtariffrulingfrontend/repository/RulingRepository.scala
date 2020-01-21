@@ -84,9 +84,9 @@ class RulingMongoRepository @Inject()(config: AppConfig,
 
   override def get(search: SimpleSearch): Future[Paged[Ruling]] = {
     val filter = either(
-      "reference" -> eq(search.query),
-      "bindingCommodityCode" -> numberStartingWith(search.query),
-      "goodsDescription" -> contains(search.query)
+      "reference" -> eq(search.query.getOrElse("")),
+      "bindingCommodityCode" -> numberStartingWith(search.query.getOrElse("")),
+      "goodsDescription" -> contains(search.query.getOrElse(""))
     )
     for {
       results <- collection.find[JsObject, Ruling](filter)

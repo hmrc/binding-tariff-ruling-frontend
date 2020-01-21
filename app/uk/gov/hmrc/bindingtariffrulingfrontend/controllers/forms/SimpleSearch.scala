@@ -19,11 +19,13 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms
 import play.api.data.Form
 import play.api.data.Forms._
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Pagination
+import play.api.data.FormError
+import play.api.data.format.Formatter
 
 
 case class SimpleSearch
 (
-  query: String,
+  query: Option[String],
   override val pageIndex: Int,
   override val pageSize: Int = 50
 ) extends Pagination
@@ -32,9 +34,26 @@ object SimpleSearch {
 
   val form: Form[SimpleSearch] = Form(
     mapping(
-      "query" -> nonEmptyText,
+      "query" -> of(optionalStringFormatter),
       "page" -> optional(number).transform(_.getOrElse(1), (page: Int) => Some(page))
-    )((q: String, p: Int) => SimpleSearch(q, p))(s => Some((s.query, s.pageIndex)))
+    )((q: Option[String], p: Int) => SimpleSearch(q, p))(s => Some((s.query, s.pageIndex)))
   )
+
+  private def standardiseText(s: String): String = {
+    s.replaceAll("""\s{1,}""", " ").trim
+  }
+
+  private lazy val optionalStringFormatter: Formatter[Option[String]] = new Formatter[Option[String]] {
+    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] =
+      Right(
+        data
+          .get(key)
+          .map(standardiseText)
+          .filter(_.lengthCompare(0) > 0)
+      )
+
+    override def unbind(key: String, value: Option[String]): Map[String, String] =
+      Map(key -> value.getOrElse(""))
+  }
 
 }
