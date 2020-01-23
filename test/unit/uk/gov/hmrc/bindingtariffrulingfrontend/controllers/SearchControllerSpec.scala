@@ -17,6 +17,8 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import akka.stream.Materializer
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
 import org.mockito.Mockito
@@ -26,6 +28,7 @@ import play.api.http.Status
 import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
 import play.api.test.Helpers._
 import play.api.{Configuration, Environment}
+import play.twirl.api.Html
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{WhitelistDisabled, WhitelistEnabled, WhitelistedAction}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
@@ -55,6 +58,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
       bodyOf(result) should include("search-heading")
+      asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.heading")
 
       verifyZeroInteractions(rulingService)
     }
@@ -68,11 +72,12 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
       bodyOf(result) should include("search-heading")
+      asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.result.title")
 
-      verify(rulingService).get(SimpleSearch("query", 1))
+      verify(rulingService).get(SimpleSearch(Some("query"), 1))
     }
 
-    "return 200 with form errors" in {
+    "return 200 without form errors" in {
       val result = await(controller().get(query = Some(""), page = 1)(getRequestWithCSRF()))
 
       status(result) shouldBe Status.OK
@@ -89,6 +94,9 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result) shouldBe Status.FORBIDDEN
     }
   }
+
+
+  def asDocument(html: String): Document = Jsoup.parse(html)
 
   override protected def afterEach(): Unit = {
     super.afterEach()

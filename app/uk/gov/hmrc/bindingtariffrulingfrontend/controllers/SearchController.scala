@@ -38,11 +38,11 @@ class SearchController @Inject()(rulingService: RulingService,
   def get(query: Option[String], page: Int): Action[AnyContent] = (Action andThen whitelist).async { implicit request =>
     query match {
       case None => successful(Ok(views.html.search(SimpleSearch.form, None)))
+      case Some(str) if str.isEmpty => successful(Ok(views.html.search(SimpleSearch.form, None)))
       case _ =>
         SimpleSearch.form.bindFromRequest
           .fold(
             errors => successful(Ok(views.html.search(errors, None))),
-
             query =>
               rulingService.get(query).map { results =>
                 Ok(views.html.search(SimpleSearch.form.fill(query), Some(results)))
@@ -50,5 +50,4 @@ class SearchController @Inject()(rulingService: RulingService,
           )
     }
   }
-
 }

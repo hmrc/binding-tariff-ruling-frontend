@@ -22,13 +22,14 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 @(form: Form[SimpleSearch], results: Option[Paged[Ruling]])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@main_template(title = "Binding Tariff Rulings", bodyClasses = None) {
+
+@main_template(title = if(results.isDefined){Some(messages("search.result.title"))}else{Some(messages("search.title"))}, bodyClasses = None) {
 
  @error_summary(form.errors)
 
  <a id="search-back" href="@routes.IndexController.get()" class="link-back">@messages("site.back")</a>
 
- <h1 id="search-heading">@messages("search.heading")</h1>
+ <h1 id="search-heading">@if(results.isDefined){@messages("search.result.title")}else{@messages("search.heading")}</h1>
 
  <p>@messages("search.content1")</p>
 
@@ -48,7 +49,7 @@
    pluralName = "rulings",
    pager = results.get,
    containerClass = Some("mb-1"),
-   onChange = page => routes.SearchController.get(query = Some(form.get.query), page = page)
+   onChange = page => routes.SearchController.get(query = form.get.query, page = page)
   )
 
   @search_results(results.get)
@@ -59,7 +60,7 @@
    pluralName = "rulings",
    pager = results.get,
    containerClass = Some("mt-3"),
-   onChange = page => routes.SearchController.get(query = Some(form.get.query), page = page)
+   onChange = page => routes.SearchController.get(query = form.get.query, page = page)
   )
  }
 

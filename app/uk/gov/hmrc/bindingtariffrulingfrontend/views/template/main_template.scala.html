@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.govuk_wrapper
-@(title: String,
+@(title: Option[String],
   sidebarLinks: Option[Html] = None,
   contentHeader: Option[Html] = None,
   bodyClasses: Option[String] = None,
@@ -36,7 +36,7 @@
 
 
 @govuk_wrapper(appConfig = appConfig,
-               title = title,
+               title = title.fold(messages("site.title.suffix"))(_ + " - " + messages("site.title.suffix")),
                mainClass = mainClass,
                bodyClasses = bodyClasses,
                sidebar = sidebar,

@@ -21,11 +21,11 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 @(ruling: Ruling)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@main_template(title = "Binding Tariff Rulings", bodyClasses = None) {
+@main_template(title = Some(messages("ruling.title")), bodyClasses = None) {
 
  <a id="ruling-back" href="@routes.SearchController.get()" class="link-back">@messages("site.back")</a>
 
- <h1 id="ruling-heading">@messages("ruling.heading")</h1>
+ <h1 id="ruling-heading">@messages("ruling.heading", ruling.reference)</h1>
 
  <div class="grid-row">
   <div class="column-one-half">

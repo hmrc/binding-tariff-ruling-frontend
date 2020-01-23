@@ -72,7 +72,7 @@ class RulingServiceTest extends UnitSpec with MockitoSugar with BeforeAndAfterEa
   }
 
   "Service GET by search" should {
-    val search = SimpleSearch("query", 1, 1)
+    val search = SimpleSearch(Some("query"), 1, 1)
 
     "delegate to repository" in {
       given(repository.get(search)) willReturn Future.successful(Paged.empty[Ruling])
