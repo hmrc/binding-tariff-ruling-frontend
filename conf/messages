@@ -1,14 +1,14 @@
 site.service_name = UK published Binding Tariff Information rulings
 site.title.suffix = UK published Binding Tariff Information rulings - GOV.UK
 index.heading = UK published Binding Tariff Information rulings
-index.content1 = This service publishes all the new and current legally binding tariff information rulings.
+index.content1 = All new Binding Tariff Information rulings are published here.
 index.content2 = Use this service for
 index.content3 = Searching and viewing current BTI rulings
 
 search.title = Search
 search.result.title = Search results
 search.heading = Search UK published Binding Tariff Information rulings
-search.content1 = You can search by reference number, commodity code and description
+search.content1 = Search by reference number, commodity code or description.
 search.advanced_search = Advanced search
 search.form.search = Search
 search.form.search.required = Search query is required
