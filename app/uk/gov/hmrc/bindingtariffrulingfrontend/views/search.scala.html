@@ -34,6 +34,7 @@
  <p>@messages("search.content1")</p>
 
  @helper.form(action = routes.SearchController.get()) {
+  @helper.CSRF.formField
 
   @input_search(
    field = form("query"),
