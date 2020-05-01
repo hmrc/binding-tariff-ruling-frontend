@@ -50,4 +50,14 @@ class SearchController @Inject()(rulingService: RulingService,
           )
     }
   }
+
+  def post(): Action[AnyContent] = (Action andThen whitelist).async {
+    implicit request =>
+      SimpleSearch.form.bindFromRequest
+        .fold(
+          _ => successful(Redirect(routes.SearchController.get(None, 0))),
+          query =>
+            successful(Redirect(routes.SearchController.get(query.query, query.pageIndex)))
+        )
+  }
 }
