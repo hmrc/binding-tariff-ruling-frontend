@@ -19,18 +19,15 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.audit
 import java.time.Instant
 
 import org.mockito.Mockito.verify
-import org.scalatest.mockito.MockitoSugar
 import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditPayloadType._
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AuditServiceSpec extends UnitSpec with MockitoSugar {
+class AuditServiceSpec extends BaseSpec {
 
-  private implicit val hc: HeaderCarrier = HeaderCarrier()
   private val auditConnector: DefaultAuditConnector = mock[DefaultAuditConnector]
 
   private val service = new AuditService(auditConnector)

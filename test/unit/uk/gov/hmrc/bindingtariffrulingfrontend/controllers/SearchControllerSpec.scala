@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
-import akka.stream.Materializer
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentMatchers._
@@ -25,11 +24,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
-import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
 import play.api.test.Helpers._
-import play.api.{Configuration, Environment}
-import play.twirl.api.Html
-import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{WhitelistDisabled, WhitelistEnabled, WhitelistedAction}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
@@ -37,18 +32,11 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 
 import scala.concurrent.Future
 
-
 class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
-  private val env = Environment.simple()
-  private val configuration = Configuration.load(env)
-
-  private val messageApi = new DefaultMessagesApi(env, configuration, new DefaultLangs(configuration))
-  private val appConfig = new AppConfig(configuration, env)
-  private implicit val mat: Materializer = fakeApplication.materializer
   private val rulingService = mock[RulingService]
 
-  private def controller(whitelist: WhitelistedAction = WhitelistDisabled()) = new SearchController(rulingService, whitelist, messageApi, appConfig)
+  private def controller(whitelist: WhitelistedAction = WhitelistDisabled()) = new SearchController(rulingService, whitelist, mcc, realConfig)
 
   "GET /" should {
     "return 200 without form" in {

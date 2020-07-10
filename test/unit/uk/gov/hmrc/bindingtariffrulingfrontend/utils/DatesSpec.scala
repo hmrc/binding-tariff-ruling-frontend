@@ -18,9 +18,9 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.utils
 
 import java.time.{LocalDate, ZoneOffset}
 
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
-class DatesSpec extends UnitSpec {
+class DatesSpec extends BaseSpec {
 
   "Format" should {
 

@@ -16,14 +16,11 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
-class PagedTest extends UnitSpec {
+class PagedTest extends BaseSpec {
 
   "Paged" should {
-    val search = SimpleSearch
-
     "map" in {
       Paged(Seq("hello")).map(_.toUpperCase) shouldBe Paged(Seq("HELLO"))
     }

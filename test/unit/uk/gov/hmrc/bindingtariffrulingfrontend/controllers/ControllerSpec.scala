@@ -18,41 +18,30 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import org.scalatest.mockito.MockitoSugar
 import play.api.mvc.{AnyContentAsEmpty, Result}
+import play.api.test.CSRFTokenHelper.CSRFFRequestHeader
+import play.api.test.FakeRequest
 import play.api.test.Helpers.LOCATION
-import play.api.test.{FakeHeaders, FakeRequest}
-import play.filters.csrf.CSRF.{Token, TokenProvider}
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
 import scala.concurrent.Future
 
-trait ControllerSpec extends UnitSpec with WithFakeApplication with MockitoSugar {
+trait ControllerSpec extends BaseSpec {
 
   protected def locationOf(result: Result): Option[String] = {
     result.header.headers.get(LOCATION)
   }
 
-  protected def getRequestWithCSRF(uri: String = "/"): FakeRequest[AnyContentAsEmpty.type] = {
-    val tokenProvider: TokenProvider = fakeApplication.injector.instanceOf[TokenProvider]
-    val csrfTags = Map(Token.NameRequestTag -> "csrfToken", Token.RequestTag -> tokenProvider.generateToken)
-    FakeRequest("GET", uri, FakeHeaders(), AnyContentAsEmpty, tags = csrfTags)
-  }
+  protected def getRequestWithCSRF(uri: String = "/"): FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest("GET", uri).withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]]
 
-  protected def deleteRequestWithCSRF: FakeRequest[AnyContentAsEmpty.type] = {
-    val tokenProvider: TokenProvider = fakeApplication.injector.instanceOf[TokenProvider]
-    val csrfTags = Map(Token.NameRequestTag -> "csrfToken", Token.RequestTag -> tokenProvider.generateToken)
-    FakeRequest("DELETE", "/", FakeHeaders(), AnyContentAsEmpty, tags = csrfTags)
-  }
+  protected def deleteRequestWithCSRF(): FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest("DELETE", "/").withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]]
 
-  protected def postRequestWithCSRF: FakeRequest[AnyContentAsEmpty.type] = {
-    val tokenProvider: TokenProvider = fakeApplication.injector.instanceOf[TokenProvider]
-    val csrfTags = Map(Token.NameRequestTag -> "csrfToken", Token.RequestTag -> tokenProvider.generateToken)
-    FakeRequest("POST", "/", FakeHeaders(), AnyContentAsEmpty, tags = csrfTags)
-  }
+  protected def postRequestWithCSRF: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest("POST", "/").withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]]
 
-  protected def returnTheFirstArgument[T]: Answer[Future[T]] = new Answer[Future[T]] {
-    override def answer(invocation: InvocationOnMock): Future[T] = Future.successful(invocation.getArgument(0))
-  }
+  protected def returnTheFirstArgument[T]: Answer[Future[T]] =
+    (invocation: InvocationOnMock) => Future.successful(invocation.getArgument(0))
 
 }

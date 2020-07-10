@@ -17,22 +17,12 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import play.api.http.Status
-import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
 import play.api.test.Helpers._
-import play.api.{Configuration, Environment}
-import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{WhitelistDisabled, WhitelistEnabled, WhitelistedAction}
-
 
 class IndexControllerSpec extends ControllerSpec {
 
-  private val env = Environment.simple()
-  private val configuration = Configuration.load(env)
-
-  private val messageApi = new DefaultMessagesApi(env, configuration, new DefaultLangs(configuration))
-  private val appConfig = new AppConfig(configuration, env)
-
-  private def controller(whitelist: WhitelistedAction = WhitelistDisabled()) = new IndexController(whitelist, messageApi, appConfig)
+  private def controller(whitelist: WhitelistedAction = WhitelistDisabled()) = new IndexController(whitelist, mcc, realConfig)
 
   "GET /" should {
     "return 200" in {

@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.config
 
-import play.api.{Configuration, Environment}
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import play.api.Configuration
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
-class AppConfigTest extends UnitSpec with WithFakeApplication {
+class AppConfigTest extends BaseSpec {
 
   private def appConfig(pairs: (String, String)*): AppConfig = {
-    new AppConfig(Configuration.from(pairs.map(e => e._1 -> e._2).toMap), Environment.simple())
+    val config = Configuration.from(pairs.map(e => e._1 -> e._2).toMap)
+    new AppConfig(config, runMode)
   }
 
   "Build assets prefix" in {

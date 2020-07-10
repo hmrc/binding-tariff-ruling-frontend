@@ -18,11 +18,11 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
 import reactivemongo.api.indexes.Index
 import reactivemongo.play.json.collection.JSONCollection
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait MongoUnitSpec extends UnitSpec {
+trait MongoUnitSpec extends BaseSpec {
 
   protected implicit val ordering: Ordering[Index] = Ordering.by { i: Index => i.name }
 
