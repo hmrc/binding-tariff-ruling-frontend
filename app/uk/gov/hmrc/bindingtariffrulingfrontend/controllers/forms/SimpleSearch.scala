@@ -22,13 +22,14 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.model.Pagination
 import play.api.data.FormError
 import play.api.data.format.Formatter
 
-
+// scalastyle:off magic.number
 case class SimpleSearch
 (
   query: Option[String],
   override val pageIndex: Int,
   override val pageSize: Int = 50
 ) extends Pagination
+// scalastyle:on magic.number
 
 object SimpleSearch {
 

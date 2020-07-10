@@ -18,14 +18,10 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import java.time.Instant
 
-import akka.stream.Materializer
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
 import play.api.http.Status
-import play.api.i18n.{DefaultLangs, DefaultMessagesApi}
 import play.api.test.Helpers._
-import play.api.{Configuration, Environment}
-import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action._
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
@@ -33,22 +29,16 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-
 class RulingControllerSpec extends ControllerSpec {
 
-  private implicit val hc: HeaderCarrier = HeaderCarrier()
-  private val env = Environment.simple()
-  private val configuration = Configuration.load(env)
-
-  private val messageApi = new DefaultMessagesApi(env, configuration, new DefaultLangs(configuration))
-  private val appConfig = new AppConfig(configuration, env)
-  private implicit val mat: Materializer = fakeApplication.materializer
   private val rulingService = mock[RulingService]
 
-  private def controller(whitelist: WhitelistedAction = WhitelistDisabled(),
-                         auth: AuthenticatedAction = SuccessfulAuth(),
-                         admin: AdminAction = AdminEnabled()
-                        ) = new RulingController(rulingService, whitelist, auth, admin, messageApi, appConfig)
+  private def controller(
+                          whitelist: WhitelistedAction = WhitelistDisabled(),
+                          auth: AuthenticatedAction = SuccessfulAuth(),
+                          admin: AdminAction = AdminEnabled()
+                        ) =
+    new RulingController(rulingService, whitelist, auth, admin, mcc, realConfig)
 
   "GET /" should {
     "return 200" in {

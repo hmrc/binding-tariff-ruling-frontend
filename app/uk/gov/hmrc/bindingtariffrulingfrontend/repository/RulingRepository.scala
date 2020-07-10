@@ -23,7 +23,6 @@ import reactivemongo.api.indexes.Index
 import reactivemongo.api.{Cursor, QueryOpts}
 import reactivemongo.bson.BSONObjectID
 import reactivemongo.play.json.ImplicitBSONHandlers._
-import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.repository.MongoIndexCreator.createSingleFieldAscendingIndex
@@ -48,8 +47,7 @@ trait RulingRepository {
 }
 
 @Singleton
-class RulingMongoRepository @Inject()(config: AppConfig,
-                                      mongoDbProvider: MongoDbProvider)
+class RulingMongoRepository @Inject()(mongoDbProvider: MongoDbProvider)
   extends ReactiveRepository[Ruling, BSONObjectID](
     collectionName = "rulings",
     mongo = mongoDbProvider.mongo,
@@ -64,7 +62,7 @@ class RulingMongoRepository @Inject()(config: AppConfig,
   )
 
   override def ensureIndexes(implicit ec: ExecutionContext): Future[Seq[Boolean]] = {
-    Future.sequence(indexes.map(collection.indexesManager.ensure(_)))
+    Future.sequence(indexes.map(collection.indexesManager(ec).ensure(_)))(implicitly, ec)
   }
 
   override def update(ruling: Ruling, upsert: Boolean): Future[Ruling] = collection.findAndUpdate(

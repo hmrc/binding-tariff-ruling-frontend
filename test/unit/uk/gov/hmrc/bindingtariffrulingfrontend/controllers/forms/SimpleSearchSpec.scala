@@ -17,21 +17,22 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms
 
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalatest.{FreeSpec, Matchers, OptionValues}
-import play.api.data.{Form, FormError}
 import org.scalacheck.Gen
+import org.scalatest.Assertion
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import play.api.data.{Form, FormError}
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
-class SimpleSearchSpec extends FreeSpec with OptionValues with Matchers with ScalaCheckPropertyChecks{
+class SimpleSearchSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
-  def checkForError(form: Form[_], data: Map[String, String], expectedErrors: Seq[FormError]) = {
+  def checkForError(form: Form[_], data: Map[String, String], expectedErrors: Seq[FormError]): Assertion = {
 
     form.bind(data).fold(
       formWithErrors => {
         for (error <- expectedErrors) formWithErrors.errors should contain(FormError(error.key, error.message, error.args))
         formWithErrors.errors.size shouldBe expectedErrors.size
       },
-      form => {
+      _ => {
         fail("Expected a validation error when binding the form, but it was bound successfully.")
       }
     )
@@ -39,7 +40,7 @@ class SimpleSearchSpec extends FreeSpec with OptionValues with Matchers with Sca
 
   def error(key: String, value: String, args: Any*) = Seq(FormError(key, value, args))
 
-  lazy val emptyForm = Map[String, String]()
+  lazy val emptyForm: Map[String, String] = Map[String, String]()
 
   def fieldThatBindsValidData(form: Form[_],
                               fieldName: String,
@@ -50,7 +51,7 @@ class SimpleSearchSpec extends FreeSpec with OptionValues with Matchers with Sca
       forAll(validDataGenerator -> "validDataItem") {
         dataItem: String =>
           val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
-          result.value.value shouldBe dataItem
+          result.value.get shouldBe dataItem
       }
     }
   }
@@ -68,16 +69,16 @@ class SimpleSearchSpec extends FreeSpec with OptionValues with Matchers with Sca
     "must bind blank values" in {
       val result = form.bind(Map(fieldName -> "")).apply(fieldName)
       result.errors shouldEqual Seq.empty
-      result.value.value shouldBe ""
+      result.value.get shouldBe ""
     }
   }
 
   def nonEmptyString: Gen[String] =
     arbitrary[String] suchThat (_.nonEmpty)
 
-  val form = SimpleSearch.form
+  val form: Form[SimpleSearch] = SimpleSearch.form
 
-  ".page" - {
+  ".page" should {
 
     val fieldName = "page"
 

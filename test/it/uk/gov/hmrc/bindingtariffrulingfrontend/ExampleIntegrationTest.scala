@@ -1,18 +1,11 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend
 
-import org.scalatest.BeforeAndAfterEach
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
+import org.scalatest.FeatureSpec
 
-class ExampleIntegrationTest extends WiremockFeatureTestServer with ResourceFiles with BeforeAndAfterEach {
-
-  override def fakeApplication(): Application = new GuiceApplicationBuilder()
-    .configure()
-    .build()
+class ExampleIntegrationTest extends FeatureSpec {
 
   feature("TODO") {
     scenario("TODO") {
-
     }
   }
 

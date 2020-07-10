@@ -1,6 +1,6 @@
 # microservice specific routes
 
-GET        /assets/*file                        controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                       controllers.Assets.at(path="/public", file)
 
 GET        /                                    @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.IndexController.get()
 GET        /search                              @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.SearchController.get(query: Option[String] ?= None, page: Int ?= 1)

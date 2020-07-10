@@ -18,16 +18,15 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
 
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
-import org.scalatestplus.mockito.MockitoSugar
+import play.api.http.Status.FORBIDDEN
 import play.api.mvc.{Request, Result, Results}
 import play.api.test.FakeRequest
-import play.api.http.Status.FORBIDDEN
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future
 
-class AdminActionSpec extends UnitSpec with MockitoSugar {
+class AdminActionSpec extends BaseSpec {
 
   private val block = mock[Request[_] => Future[Result]]
   private val config = mock[AppConfig]

@@ -14,9 +14,11 @@
  * limitations under the License.
  *@
 
-@import layouts.{govuk_template => hmrcGovUkTemplate}
+@import layouts.govuk_template
 @import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 @import uk.gov.hmrc.play.views.html.{helpers => uiHelpers, layouts => uiLayouts}
+@import play.twirl.api.HtmlFormat
+
 @(appConfig: AppConfig,
   title: String,
   mainClass: Option[String] = None,
@@ -34,13 +36,13 @@
       headScripts = None)
 
     <meta name="format-detection" content="telephone=no" />
-    <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/app.css")' />
-    <script data-main="@routes.Assets.versioned("javascripts/app.js")" type="text/javascript"></script>
+    <link rel="stylesheet" href='@routes.Assets.at("stylesheets/app.css")' />
+    <script data-main="@routes.Assets.at("javascripts/app.js")" type="text/javascript"></script>
     <noscript>
         <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NDJKHWK"
         height="0" width="0" style="display:none;visibility:hidden"></iframe>
     </noscript>
-    <script type="text/javascript" src=@routes.Assets.versioned("javascripts/ga-tag-manager.js")></script>
+    <script type="text/javascript" src=@routes.Assets.at("javascripts/ga-tag-manager.js")></script>
 }
 
 @headerNavLinks = {}
@@ -93,4 +95,4 @@
       sidebar = sidebar)
 }
 
-@hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(uiLayouts.footer_links()), true)(content)
+@govuk_template(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(uiLayouts.footer_links()), true)(content)

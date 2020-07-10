@@ -24,29 +24,23 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import org.apache.http.HttpStatus
 import org.mockito.BDDMockito._
 import org.mockito.Mockito
-import org.scalatest.mockito.MockitoSugar
-import play.api.Environment
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.bindingtariffrulingfrontend.WiremockTestServer
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.play.audit.http.HttpAuditing
 
-class BindingTariffClassificationConnectorSpec extends UnitSpec
-  with WiremockTestServer with MockitoSugar with WithFakeApplication {
+class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTestServer {
 
   private val actorSystem = ActorSystem.create("testActorSystem")
 
-  protected implicit val realConfig: AppConfig = fakeApplication.injector.instanceOf[AppConfig]
   protected val appConfig: AppConfig = mock[AppConfig]
 
   private val wsClient: WSClient = fakeApplication.injector.instanceOf[WSClient]
-  private val auditConnector = new DefaultAuditConnector(fakeApplication.configuration, fakeApplication.injector.instanceOf[Environment])
-  private val client = new AuthenticatedHttpClient(auditConnector, wsClient, actorSystem)
-  private implicit val hc: HeaderCarrier = HeaderCarrier()
+  private val httpAuditing: HttpAuditing = fakeApplication.injector.instanceOf[HttpAuditing]
+  private val client = new AuthenticatedHttpClient(httpAuditing, wsClient, actorSystem, realConfig)
 
   private val connector = new BindingTariffClassificationConnector(appConfig, client)
 

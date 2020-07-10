@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.views.components
 
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
-class PaginationUtilTest extends UnitSpec {
+class PaginationUtilTest extends BaseSpec {
 
   "Surrounding Pages" should {
     "return empty" in {

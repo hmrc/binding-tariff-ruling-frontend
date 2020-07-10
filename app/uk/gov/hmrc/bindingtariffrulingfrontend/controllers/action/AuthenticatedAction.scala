@@ -20,7 +20,8 @@ import javax.inject.Inject
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class AuthenticatedAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request, Request] {
 
@@ -32,4 +33,5 @@ class AuthenticatedAction @Inject()(appConfig: AppConfig) extends ActionRefiner[
     }
   }
 
+  override protected def executionContext: ExecutionContext = global
 }

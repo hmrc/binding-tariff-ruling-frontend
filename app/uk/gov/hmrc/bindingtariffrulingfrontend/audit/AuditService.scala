@@ -26,7 +26,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 @Singleton
 class AuditService @Inject()(auditConnector: DefaultAuditConnector) {
 
-  import Ruling.REST.format
   import AuditPayloadType._
 
   def auditRulingCreated(ruling: Ruling)(implicit hc: HeaderCarrier): Unit = {
@@ -45,7 +44,7 @@ class AuditService @Inject()(auditConnector: DefaultAuditConnector) {
 
   private def sendExplicitAuditEvent(auditEventType: String, auditPayload: Ruling)
                                     (implicit hc: HeaderCarrier): Unit = {
-    auditConnector.sendExplicitAudit(auditType = auditEventType, detail = auditPayload)
+    auditConnector.sendExplicitAudit(auditType = auditEventType, detail = auditPayload)(implicitly, implicitly, Ruling.REST.format)
   }
 
 }

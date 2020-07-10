@@ -19,9 +19,9 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.model
 import java.time.Instant
 
 import play.api.libs.json.{JsArray, JsString, Json}
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
-class RulingTest extends UnitSpec {
+class RulingTest extends BaseSpec {
 
   val ruling: Ruling = Ruling(
     reference = "reference",
