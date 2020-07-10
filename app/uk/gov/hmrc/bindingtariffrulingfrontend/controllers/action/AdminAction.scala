@@ -21,8 +21,9 @@ import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{ErrorCode, JsErrorResponse}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.Future.successful
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class AdminAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request, Request] {
 
@@ -34,4 +35,5 @@ class AdminAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request,
     }
   }
 
+  override protected def executionContext: ExecutionContext = global
 }

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.WhitelistedAction
@@ -30,10 +30,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future.successful
 
 @Singleton
-class SearchController @Inject()(rulingService: RulingService,
-                                 whitelist: WhitelistedAction,
-                                 val messagesApi: MessagesApi,
-                                 implicit val appConfig: AppConfig) extends FrontendController with I18nSupport {
+class SearchController @Inject()(
+                                  rulingService: RulingService,
+                                  whitelist: WhitelistedAction,
+                                  mcc: MessagesControllerComponents,
+                                  implicit val appConfig: AppConfig
+                                ) extends FrontendController(mcc) with I18nSupport {
 
   def get(query: Option[String], page: Int): Action[AnyContent] = (Action andThen whitelist).async { implicit request =>
     query match {

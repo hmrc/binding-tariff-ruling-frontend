@@ -21,8 +21,10 @@ trait Pagination {
   val pageSize: Int
 }
 
+// scalastyle:off magic.number
 case class SimplePagination
 (
   override val pageIndex: Int = 1,
- override val pageSize: Int = 100
+  override val pageSize: Int = 100
 ) extends Pagination
+// scalastyle:on magic.number
