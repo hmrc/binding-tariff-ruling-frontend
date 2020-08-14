@@ -21,9 +21,7 @@ import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class AppConfig @Inject()(
-                           val configuration: Configuration,
-                         ) extends ServicesConfig(configuration) {
+class AppConfig @Inject()(val configuration: Configuration) extends ServicesConfig(configuration) {
 
   lazy val assetsPrefix: String = loadConfig(s"assets.url") + loadConfig(s"assets.version")
   lazy val analyticsToken: String = loadConfig(s"google-analytics.token")
