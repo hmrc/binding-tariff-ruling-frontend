@@ -23,7 +23,7 @@ class AppConfigTest extends BaseSpec {
 
   private def appConfig(pairs: (String, String)*): AppConfig = {
     val config = Configuration.from(pairs.map(e => e._1 -> e._2).toMap)
-    new AppConfig(config, runMode)
+    new AppConfig(config)
   }
 
   "Build assets prefix" in {
