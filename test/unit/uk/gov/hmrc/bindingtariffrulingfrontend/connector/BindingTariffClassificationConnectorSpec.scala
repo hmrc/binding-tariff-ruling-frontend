@@ -38,8 +38,8 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
   protected val appConfig: AppConfig = mock[AppConfig]
 
-  private val wsClient: WSClient = fakeApplication.injector.instanceOf[WSClient]
-  private val httpAuditing: HttpAuditing = fakeApplication.injector.instanceOf[HttpAuditing]
+  private val wsClient: WSClient = app.injector.instanceOf[WSClient]
+  private val httpAuditing: HttpAuditing = app.injector.instanceOf[HttpAuditing]
   private val client = new AuthenticatedHttpClient(httpAuditing, wsClient, actorSystem, realConfig)
 
   private val connector = new BindingTariffClassificationConnector(appConfig, client)

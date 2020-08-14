@@ -24,25 +24,23 @@ import play.api.i18n.{Lang, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.config.RunMode
-import uk.gov.hmrc.play.test.UnitSpec
 
 trait BaseSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar {
 
-  override lazy val fakeApplication: Application = GuiceApplicationBuilder()
+  override implicit lazy val app: Application = GuiceApplicationBuilder()
     .configure(
       //turn off metrics
       "metrics.jvm" -> false,
       "metrics.enabled" -> false
     ).build()
 
-  lazy val runMode: RunMode = fakeApplication.injector.instanceOf[RunMode]
-  lazy val realConfig: AppConfig = fakeApplication.injector.instanceOf[AppConfig]
-  lazy val messageApi: MessagesApi = fakeApplication.injector.instanceOf[MessagesApi]
-  implicit val mcc: MessagesControllerComponents = fakeApplication.injector.instanceOf[MessagesControllerComponents]
+  lazy val realConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  lazy val messageApi: MessagesApi = app.injector.instanceOf[MessagesApi]
+  implicit val mcc: MessagesControllerComponents = app.injector.instanceOf[MessagesControllerComponents]
   implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val mat: Materializer = fakeApplication.materializer
+  implicit val mat: Materializer = app.materializer
   implicit val lang: Lang = mcc.langs.availables.head
 
 }

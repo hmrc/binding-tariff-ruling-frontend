@@ -18,13 +18,12 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.config
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
 class AppConfig @Inject()(
-                           val runModeConfiguration: Configuration,
-                           runMode: RunMode
-                         ) extends ServicesConfig(runModeConfiguration, runMode) {
+                           val configuration: Configuration,
+                         ) extends ServicesConfig(configuration) {
 
   lazy val assetsPrefix: String = loadConfig(s"assets.url") + loadConfig(s"assets.version")
   lazy val analyticsToken: String = loadConfig(s"google-analytics.token")
@@ -45,9 +44,9 @@ class AppConfig @Inject()(
       )
     } else None
   }
-  private val contactHost = runModeConfiguration.getOptional[String](s"contact-frontend.host").getOrElse("")
+  private val contactHost = configuration.getOptional[String](s"contact-frontend.host").getOrElse("")
   private val contactFormServiceIdentifier = "BindingTariffRulings"
 
-  private def loadConfig(key: String) = runModeConfiguration.getOptional[String](key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
+  private def loadConfig(key: String) = configuration.getOptional[String](key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
 
 }
