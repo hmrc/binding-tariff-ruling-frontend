@@ -31,10 +31,10 @@ class AppConfig @Inject()(val configuration: Configuration) extends ServicesConf
   lazy val authorization: String = loadConfig("auth.api-token")
   lazy val bindingTariffClassificationUrl: String = baseUrl("binding-tariff-classification")
   lazy val adminEnabled: Boolean = getBoolean("admin-mode")
-  lazy val whitelist: Option[Set[String]] = {
-    if (getBoolean("filters.whitelist.enabled")) {
+  lazy val allowlist: Option[Set[String]] = {
+    if (getBoolean("filters.allowlist.enabled")) {
       Some[Set[String]](
-        getString("filters.whitelist.ips")
+        getString("filters.allowlist.ips")
           .split(",")
           .map(_.trim)
           .filter(_.nonEmpty)
