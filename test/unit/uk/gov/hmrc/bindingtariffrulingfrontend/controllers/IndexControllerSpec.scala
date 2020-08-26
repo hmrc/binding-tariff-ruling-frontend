@@ -18,11 +18,11 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{WhitelistDisabled, WhitelistEnabled, WhitelistedAction}
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AllowListDisabled, AllowListEnabled, AllowedAction}
 
 class IndexControllerSpec extends ControllerSpec {
 
-  private def controller(whitelist: WhitelistedAction = WhitelistDisabled()) = new IndexController(whitelist, mcc, realConfig)
+  private def controller(allowlist: AllowedAction = AllowListDisabled()) = new IndexController(allowlist, mcc, realConfig)
 
   "GET /" should {
     "return 200" in {
@@ -32,8 +32,8 @@ class IndexControllerSpec extends ControllerSpec {
       charset(result) shouldBe Some("utf-8")
     }
 
-    "return 403 when whitelisted" in {
-      val result = controller(WhitelistEnabled()).get(getRequestWithCSRF())
+    "return 403 when allowed" in {
+      val result = controller(AllowListEnabled()).get(getRequestWithCSRF())
       status(result) shouldBe Status.FORBIDDEN
     }
 

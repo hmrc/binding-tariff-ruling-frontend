@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.WhitelistedAction
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowedAction
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
@@ -32,12 +32,12 @@ import scala.concurrent.Future.successful
 @Singleton
 class SearchController @Inject()(
                                   rulingService: RulingService,
-                                  whitelist: WhitelistedAction,
+                                  allowlist: AllowedAction,
                                   mcc: MessagesControllerComponents,
                                   implicit val appConfig: AppConfig
                                 ) extends FrontendController(mcc) with I18nSupport {
 
-  def get(query: Option[String], page: Int): Action[AnyContent] = (Action andThen whitelist).async { implicit request =>
+  def get(query: Option[String], page: Int): Action[AnyContent] = (Action andThen allowlist).async { implicit request =>
     query match {
       case None => successful(Ok(views.html.search(SimpleSearch.form, None)))
       case Some(str) if str.isEmpty => successful(Ok(views.html.search(SimpleSearch.form, None)))

@@ -25,7 +25,7 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers._
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{WhitelistDisabled, WhitelistEnabled, WhitelistedAction}
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AllowListDisabled, AllowListEnabled, AllowedAction}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
@@ -36,7 +36,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   private val rulingService = mock[RulingService]
 
-  private def controller(whitelist: WhitelistedAction = WhitelistDisabled()) = new SearchController(rulingService, whitelist, mcc, realConfig)
+  private def controller(allowlist: AllowedAction = AllowListDisabled()) = new SearchController(rulingService, allowlist, mcc, realConfig)
 
   "GET /" should {
     "return 200 without form" in {
@@ -76,8 +76,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verifyZeroInteractions(rulingService)
     }
 
-    "return 403 when whitelisted" in {
-      val result = await(controller(whitelist = WhitelistEnabled()).get(query = None, page = 1)(getRequestWithCSRF()))
+    "return 403 when allowed" in {
+      val result = await(controller(allowlist = AllowListEnabled()).get(query = None, page = 1)(getRequestWithCSRF()))
 
       status(result) shouldBe Status.FORBIDDEN
     }

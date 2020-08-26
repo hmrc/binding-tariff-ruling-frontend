@@ -54,13 +54,13 @@ class AppConfigTest extends BaseSpec {
     appConfig("admin-mode" -> "true").adminEnabled shouldBe true
   }
 
-  "Build whitelist" in {
+  "Build allowlist" in {
     appConfig(
-      "filters.whitelist.enabled" -> "true",
-      "filters.whitelist.ips" -> "ip1, ip2"
-    ).whitelist shouldBe Some(Set("ip1", "ip2"))
+      "filters.allowlist.enabled" -> "true",
+      "filters.allowlist.ips" -> "ip1, ip2"
+    ).allowlist shouldBe Some(Set("ip1", "ip2"))
 
-    appConfig("filters.whitelist.enabled" -> "false").whitelist shouldBe None
+    appConfig("filters.allowlist.enabled" -> "false").allowlist shouldBe None
   }
 
   "Build Classification Backend URL" in {

@@ -17,21 +17,18 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
 
 import org.mockito.Mockito
-import play.api.mvc.{Request, Result, Results}
+import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
 import scala.concurrent.Future
 
-class WhitelistEnabled extends WhitelistedAction(Mockito.mock(classOf[AppConfig])) {
-  protected override def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = Future.successful(Left(Results.Forbidden))
+class AllowListDisabled extends AllowedAction(Mockito.mock(classOf[AppConfig])) {
+  protected override def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = Future.successful(Right(request))
 }
 
-
-object WhitelistEnabled {
-  def apply(): WhitelistEnabled = new WhitelistEnabled()
+object AllowListDisabled {
+  def apply(): AllowListDisabled = new AllowListDisabled()
 }
-
-
 
 
 

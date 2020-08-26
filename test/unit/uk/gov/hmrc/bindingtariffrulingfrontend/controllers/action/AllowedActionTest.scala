@@ -25,30 +25,30 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
 import scala.concurrent.Future
 
-class WhitelistedActionTest extends BaseSpec {
+class AllowedActionTest extends BaseSpec {
 
   private val block = mock[Request[_] => Future[Result]]
   private val config = mock[AppConfig]
-  private val action = new WhitelistedAction(config)
+  private val action = new AllowedAction(config)
 
-  "Whitelisted Action" should {
+  "Allowed Action" should {
     "Filter unauthenticated" in {
       given(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      given(config.whitelist) willReturn Some(Set[String]())
+      given(config.allowlist) willReturn Some(Set[String]())
 
       await(action.invokeBlock(FakeRequest(), block)) shouldBe Results.Forbidden
     }
 
     "Filter authenticated" in {
       given(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      given(config.whitelist) willReturn Some(Set("ip"))
+      given(config.allowlist) willReturn Some(Set("ip"))
 
       await(action.invokeBlock(FakeRequest().withHeaders("True-Client-IP" -> "ip"), block)) shouldBe Results.Ok
     }
 
     "Not Filter when disabled" in {
       given(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      given(config.whitelist) willReturn None
+      given(config.allowlist) willReturn None
 
       await(action.invokeBlock(FakeRequest(), block)) shouldBe Results.Ok
     }

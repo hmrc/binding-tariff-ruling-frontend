@@ -24,10 +24,10 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.Future.successful
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class WhitelistedAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request, Request] {
+class AllowedAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request, Request] {
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
-    appConfig.whitelist match {
+    appConfig.allowlist match {
       case Some(addresses: Set[String]) =>
         request.headers.get("True-Client-IP") match {
           case Some(ip: String) if addresses.contains(ip) => successful(Right(request))

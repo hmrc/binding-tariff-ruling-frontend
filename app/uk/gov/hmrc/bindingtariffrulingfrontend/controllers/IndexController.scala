@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.WhitelistedAction
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowedAction
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -28,12 +28,12 @@ import scala.concurrent.Future
 
 @Singleton
 class IndexController @Inject()(
-                                 whitelist: WhitelistedAction,
+                                 allowlist: AllowedAction,
                                  mcc: MessagesControllerComponents,
                                  implicit val appConfig: AppConfig
                                ) extends FrontendController(mcc) with I18nSupport {
 
-  def get: Action[AnyContent] = (Action andThen whitelist).async { implicit request =>
+  def get: Action[AnyContent] = (Action andThen allowlist).async { implicit request =>
     Future.successful(Ok(views.html.index()))
   }
 

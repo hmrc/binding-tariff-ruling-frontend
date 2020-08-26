@@ -34,11 +34,11 @@ class RulingControllerSpec extends ControllerSpec {
   private val rulingService = mock[RulingService]
 
   private def controller(
-                          whitelist: WhitelistedAction = WhitelistDisabled(),
+                          allowlist: AllowedAction = AllowListDisabled(),
                           auth: AuthenticatedAction = SuccessfulAuth(),
                           admin: AdminAction = AdminEnabled()
                         ) =
-    new RulingController(rulingService, whitelist, auth, admin, mcc, realConfig)
+    new RulingController(rulingService, allowlist, auth, admin, mcc, realConfig)
 
   "GET /" should {
     "return 200" in {
@@ -61,8 +61,8 @@ class RulingControllerSpec extends ControllerSpec {
       bodyOf(result) should include("ruling_not_found-heading")
     }
 
-    "return 403 when not whitelisted" in {
-      val result = await(controller(whitelist = WhitelistEnabled()).get("id")(getRequestWithCSRF()))
+    "return 403 when not allowed" in {
+      val result = await(controller(allowlist = AllowListEnabled()).get("id")(getRequestWithCSRF()))
       status(result) shouldBe Status.FORBIDDEN
     }
 
