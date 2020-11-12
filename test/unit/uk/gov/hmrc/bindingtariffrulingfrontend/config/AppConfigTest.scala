@@ -42,19 +42,19 @@ class AppConfigTest extends BaseSpec {
   }
 
   "Build report url" in {
-    appConfig("contact-frontend.host" -> "host", "appName" -> "app").reportAProblemPartialUrl shouldBe "host/contact/problem_reports_ajax?service=app"
+    appConfig("contact-frontend.host" -> "host").reportAProblemPartialUrl shouldBe "host/contact/problem_reports_ajax?service=BindingTariffRulings"
   }
 
   "Build report non-json url" in {
-    appConfig("contact-frontend.host" -> "host", "appName" -> "app").reportAProblemNonJSUrl shouldBe "host/contact/problem_reports_nonjs?service=app"
+    appConfig("contact-frontend.host" -> "host").reportAProblemNonJSUrl shouldBe "host/contact/problem_reports_nonjs?service=BindingTariffRulings"
   }
 
   "Build beta feedback url" in {
-    appConfig("contact-frontend.host" -> "host", "appName" -> "app").betaFeedbackUrl shouldBe "host/contact/beta-feedback?service=app"
+    appConfig("contact-frontend.host" -> "host").betaFeedbackUrl shouldBe "host/contact/beta-feedback?service=BindingTariffRulings"
   }
 
   "Build beta feedback unauthenticated url" in {
-    appConfig("contact-frontend.host" -> "host", "appName" -> "app").betaFeedbackUnauthenticatedUrl shouldBe "host/contact/beta-feedback-unauthenticated?service=app"
+    appConfig("contact-frontend.host" -> "host").betaFeedbackUnauthenticatedUrl shouldBe "host/contact/beta-feedback-unauthenticated?service=BindingTariffRulings"
   }
 
   "Build admin enabled" in {
