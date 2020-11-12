@@ -18,8 +18,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.connector.model
 
 import play.api.libs.json.{Json, OFormat}
 
-case class Attachment
-(
+case class Attachment(
   id: String,
   public: Boolean
 )

@@ -47,11 +47,13 @@ trait RulingRepository {
 }
 
 @Singleton
-class RulingMongoRepository @Inject()(mongoDbProvider: MongoDbProvider)
-  extends ReactiveRepository[Ruling, BSONObjectID](
-    collectionName = "rulings",
-    mongo = mongoDbProvider.mongo,
-    domainFormat = Ruling.Mongo.format) with RulingRepository {
+class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)
+    extends ReactiveRepository[Ruling, BSONObjectID](
+      collectionName = "rulings",
+      mongo          = mongoDbProvider.mongo,
+      domainFormat   = Ruling.Mongo.format
+    )
+    with RulingRepository {
   import Ruling.Mongo.format
 
   collection.indexesManager.drop("goodsDescription_Index")
@@ -61,43 +63,44 @@ class RulingMongoRepository @Inject()(mongoDbProvider: MongoDbProvider)
     createSingleFieldAscendingIndex("bindingCommodityCode")
   )
 
-  override def ensureIndexes(implicit ec: ExecutionContext): Future[Seq[Boolean]] = {
+  override def ensureIndexes(implicit ec: ExecutionContext): Future[Seq[Boolean]] =
     Future.sequence(indexes.map(collection.indexesManager(ec).ensure(_)))(implicitly, ec)
-  }
 
-  override def update(ruling: Ruling, upsert: Boolean): Future[Ruling] = collection.findAndUpdate(
-    selector = byReference(ruling.reference),
-    update = ruling,
-    fetchNewObject = true,
-    upsert = upsert
-  ).map(_.value.map(_.as[Ruling]).get)
+  override def update(ruling: Ruling, upsert: Boolean): Future[Ruling] =
+    collection
+      .findAndUpdate(
+        selector       = byReference(ruling.reference),
+        update         = ruling,
+        fetchNewObject = true,
+        upsert         = upsert
+      )
+      .map(_.value.map(_.as[Ruling]).get)
 
   override def get(reference: String): Future[Option[Ruling]] = collection.find(byReference(reference)).one[Ruling]
 
   override def delete(reference: String): Future[Unit] = collection.findAndRemove(byReference(reference)).map(_ => ())
 
-  override def delete(): Future[Unit] = {
+  override def delete(): Future[Unit] =
     removeAll().map(_ => ())
-  }
 
   override def get(search: SimpleSearch): Future[Paged[Ruling]] = {
     val filter = either(
-      "reference" -> eq(search.query.getOrElse("")),
+      "reference"            -> eq(search.query.getOrElse("")),
       "bindingCommodityCode" -> numberStartingWith(search.query.getOrElse("")),
-      "goodsDescription" -> contains(search.query.getOrElse(""))
+      "goodsDescription"     -> contains(search.query.getOrElse(""))
     )
     for {
-      results <- collection.find[JsObject, Ruling](filter)
-        .options(QueryOpts(skipN = (search.pageIndex - 1) * search.pageSize, batchSizeN = search.pageSize))
-        .cursor[Ruling]()
-        .collect[List](search.pageSize, Cursor.FailOnError[List[Ruling]]())
+      results <- collection
+                  .find[JsObject, Ruling](filter)
+                  .options(QueryOpts(skipN = (search.pageIndex - 1) * search.pageSize, batchSizeN = search.pageSize))
+                  .cursor[Ruling]()
+                  .collect[List](search.pageSize, Cursor.FailOnError[List[Ruling]]())
       count <- collection.count(Some(filter))
     } yield Paged(results, search.pageIndex, search.pageSize, count)
   }
 
-  private def byReference(reference: String): JsObject = {
+  private def byReference(reference: String): JsObject =
     Json.obj("reference" -> reference)
-  }
 
   private def eq(string: String): JsValue = JsString(string)
 
@@ -106,14 +109,11 @@ class RulingMongoRepository @Inject()(mongoDbProvider: MongoDbProvider)
   private def contains(value: String): JsValue = regex(s".*$value.*", ignoreCase = true)
 
   private def regex(regex: String, ignoreCase: Boolean = false): JsValue = Json.obj(
-    "$regex" -> regex,
+    "$regex"   -> regex,
     "$options" -> (if (ignoreCase) "i" else "")
   )
 
-  private def either(options: (String, JsValue)*): JsObject = {
-    Json.obj("$or" -> JsArray(
-      options.map(element => Json.obj(element._1 -> element._2)))
-    )
-  }
+  private def either(options: (String, JsValue)*): JsObject =
+    Json.obj("$or" -> JsArray(options.map(element => Json.obj(element._1 -> element._2))))
 
 }

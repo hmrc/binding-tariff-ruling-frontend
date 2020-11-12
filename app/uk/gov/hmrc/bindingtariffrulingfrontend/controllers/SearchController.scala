@@ -30,16 +30,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future.successful
 
 @Singleton
-class SearchController @Inject()(
-                                  rulingService: RulingService,
-                                  allowlist: AllowedAction,
-                                  mcc: MessagesControllerComponents,
-                                  implicit val appConfig: AppConfig
-                                ) extends FrontendController(mcc) with I18nSupport {
+class SearchController @Inject() (
+  rulingService: RulingService,
+  allowlist: AllowedAction,
+  mcc: MessagesControllerComponents,
+  implicit val appConfig: AppConfig
+) extends FrontendController(mcc)
+    with I18nSupport {
 
   def get(query: Option[String], page: Int): Action[AnyContent] = (Action andThen allowlist).async { implicit request =>
     query match {
-      case None => successful(Ok(views.html.search(SimpleSearch.form, None)))
+      case None                     => successful(Ok(views.html.search(SimpleSearch.form, None)))
       case Some(str) if str.isEmpty => successful(Ok(views.html.search(SimpleSearch.form, None)))
       case _ =>
         SimpleSearch.form.bindFromRequest

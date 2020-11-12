@@ -25,7 +25,7 @@ object JsonUtil {
     path.foldLeft(initial)((current: Option[JsValue], key: String) => current.flatMap(get(_, key)))
   }
 
-  private def get(jsValue: JsValue, key: String): Option[JsValue] = {
+  private def get(jsValue: JsValue, key: String): Option[JsValue] =
     jsValue match {
       case array: JsArray if key forall Character.isDigit =>
         Option(array.as[JsArray].value(key.toInt))
@@ -33,6 +33,5 @@ object JsonUtil {
         obj.as[JsObject].value.get(key)
       case _ => None
     }
-  }
 
 }

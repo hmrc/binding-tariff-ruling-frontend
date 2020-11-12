@@ -25,7 +25,7 @@ class DatesSpec extends BaseSpec {
   "Format" should {
 
     "convert instant to string" in {
-      val date = LocalDate.of(2018,1,1).atStartOfDay(ZoneOffset.UTC).toInstant
+      val date   = LocalDate.of(2018, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant
       val output = Dates.format(date)
 
       output shouldBe "01 Jan 2018"

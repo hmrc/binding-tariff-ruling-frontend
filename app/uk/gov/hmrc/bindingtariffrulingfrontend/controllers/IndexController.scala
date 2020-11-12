@@ -27,11 +27,12 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.Future
 
 @Singleton
-class IndexController @Inject()(
-                                 allowlist: AllowedAction,
-                                 mcc: MessagesControllerComponents,
-                                 implicit val appConfig: AppConfig
-                               ) extends FrontendController(mcc) with I18nSupport {
+class IndexController @Inject() (
+  allowlist: AllowedAction,
+  mcc: MessagesControllerComponents,
+  implicit val appConfig: AppConfig
+) extends FrontendController(mcc)
+    with I18nSupport {
 
   def get: Action[AnyContent] = (Action andThen allowlist).async { implicit request =>
     Future.successful(Ok(views.html.index()))

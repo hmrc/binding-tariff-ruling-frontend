@@ -28,31 +28,30 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RulingService @Inject()(repository: RulingRepository,
-                              auditService: AuditService,
-                              bindingTariffClassificationConnector: BindingTariffClassificationConnector) {
+class RulingService @Inject() (
+  repository: RulingRepository,
+  auditService: AuditService,
+  bindingTariffClassificationConnector: BindingTariffClassificationConnector
+) {
 
-  def delete(): Future[Unit] = {
+  def delete(): Future[Unit] =
     repository.delete()
-  }
 
-  def get(reference: String): Future[Option[Ruling]] = {
+  def get(reference: String): Future[Option[Ruling]] =
     repository.get(reference)
-  }
 
-  def get(query: SimpleSearch): Future[Paged[Ruling]] = {
+  def get(query: SimpleSearch): Future[Paged[Ruling]] =
     repository.get(query)
-  }
 
   def refresh(reference: String)(implicit hc: HeaderCarrier): Future[Unit] = {
 
     type ExistingRuling = Option[Ruling]
-    type UpdatedRuling = Option[Ruling]
-    type RulingUpdate = (ExistingRuling, UpdatedRuling)
+    type UpdatedRuling  = Option[Ruling]
+    type RulingUpdate   = (ExistingRuling, UpdatedRuling)
 
     val rulingUpdate: Future[RulingUpdate] = for {
       existingRuling: ExistingRuling <- repository.get(reference)
-      updatedCase: Option[Case] <- bindingTariffClassificationConnector.get(reference)
+      updatedCase: Option[Case]      <- bindingTariffClassificationConnector.get(reference)
       updatedRuling: UpdatedRuling = updatedCase
         .filter(_.application.`type` == ApplicationType.BTI)
         .filter(_.status == CaseStatus.COMPLETED)
@@ -86,20 +85,20 @@ class RulingService @Inject()(repository: RulingRepository,
   }
 
   private def toRuling(c: Case): Ruling = {
-    val keywords: Set[String] = c.keywords
+    val keywords: Set[String]    = c.keywords
     val attachments: Seq[String] = c.attachments.filter(_.public).map(_.id)
-    val reference: String = c.reference
-    val decision: Decision = c.decision.get
+    val reference: String        = c.reference
+    val decision: Decision       = c.decision.get
 
     Ruling(
-      reference = reference,
+      reference            = reference,
       bindingCommodityCode = decision.bindingCommodityCode,
-      effectiveStartDate = decision.effectiveStartDate.get,
-      effectiveEndDate = decision.effectiveEndDate.get,
-      justification = decision.justification,
-      goodsDescription = decision.goodsDescription,
-      keywords = keywords,
-      attachments = attachments
+      effectiveStartDate   = decision.effectiveStartDate.get,
+      effectiveEndDate     = decision.effectiveEndDate.get,
+      justification        = decision.justification,
+      goodsDescription     = decision.goodsDescription,
+      keywords             = keywords,
+      attachments          = attachments
     )
   }
 

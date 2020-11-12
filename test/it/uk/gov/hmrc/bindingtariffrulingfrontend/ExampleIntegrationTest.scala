@@ -5,8 +5,7 @@ import org.scalatest.FeatureSpec
 class ExampleIntegrationTest extends FeatureSpec {
 
   feature("TODO") {
-    scenario("TODO") {
-    }
+    scenario("TODO") {}
   }
 
 }

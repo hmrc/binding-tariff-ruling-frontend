@@ -22,14 +22,15 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AllowListDisa
 
 class IndexControllerSpec extends ControllerSpec {
 
-  private def controller(allowlist: AllowedAction = AllowListDisabled()) = new IndexController(allowlist, mcc, realConfig)
+  private def controller(allowlist: AllowedAction = AllowListDisabled()) =
+    new IndexController(allowlist, mcc, realConfig)
 
   "GET /" should {
     "return 200" in {
       val result = controller().get(getRequestWithCSRF())
-      status(result) shouldBe Status.OK
+      status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
+      charset(result)     shouldBe Some("utf-8")
     }
 
     "return 403 when allowed" in {

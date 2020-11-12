@@ -23,11 +23,10 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import scala.concurrent.Future
 
 class AdminEnabled extends AdminAction(Mockito.mock(classOf[AppConfig])) {
-  protected override def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = Future.successful(Right(request))
+  protected override def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] =
+    Future.successful(Right(request))
 }
 
 object AdminEnabled {
   def apply(): AdminEnabled = new AdminEnabled()
 }
-
-

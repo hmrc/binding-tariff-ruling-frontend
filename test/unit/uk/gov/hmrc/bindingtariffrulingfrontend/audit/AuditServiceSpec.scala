@@ -35,14 +35,14 @@ class AuditServiceSpec extends BaseSpec {
   "AuditService" should {
 
     val ruling = Ruling(
-      reference = "reference",
+      reference            = "reference",
       bindingCommodityCode = "bindingCommodityCode",
-      effectiveStartDate = Instant.now,
-      effectiveEndDate = Instant.now,
-      justification = "justification",
-      goodsDescription = "goodsDescription",
-      keywords = Set("k1", "k2", "k3"),
-      attachments = Seq("f1", "f2", "f3")
+      effectiveStartDate   = Instant.now,
+      effectiveEndDate     = Instant.now,
+      justification        = "justification",
+      goodsDescription     = "goodsDescription",
+      keywords             = Set("k1", "k2", "k3"),
+      attachments          = Seq("f1", "f2", "f3")
     )
 
     "call the audit connector when a ruling is created" in {

@@ -21,16 +21,18 @@ import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class AppConfig @Inject()(val configuration: Configuration) extends ServicesConfig(configuration) {
+class AppConfig @Inject() (val configuration: Configuration) extends ServicesConfig(configuration) {
 
-  lazy val assetsPrefix: String = loadConfig(s"assets.url") + loadConfig(s"assets.version")
+  lazy val assetsPrefix: String   = loadConfig(s"assets.url") + loadConfig(s"assets.version")
   lazy val analyticsToken: String = loadConfig(s"google-analytics.token")
-  lazy val analyticsHost: String = loadConfig(s"google-analytics.host")
-  lazy val reportAProblemPartialUrl: String = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
-  lazy val reportAProblemNonJSUrl: String = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
-  lazy val authorization: String = loadConfig("auth.api-token")
+  lazy val analyticsHost: String  = loadConfig(s"google-analytics.host")
+  lazy val reportAProblemPartialUrl: String =
+    s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
+  lazy val reportAProblemNonJSUrl: String =
+    s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
+  lazy val authorization: String                  = loadConfig("auth.api-token")
   lazy val bindingTariffClassificationUrl: String = baseUrl("binding-tariff-classification")
-  lazy val adminEnabled: Boolean = getBoolean("admin-mode")
+  lazy val adminEnabled: Boolean                  = getBoolean("admin-mode")
   lazy val allowlist: Option[Set[String]] = {
     if (getBoolean("filters.allowlist.enabled")) {
       Some[Set[String]](
@@ -42,9 +44,10 @@ class AppConfig @Inject()(val configuration: Configuration) extends ServicesConf
       )
     } else None
   }
-  private val contactHost = configuration.getOptional[String](s"contact-frontend.host").getOrElse("")
+  private val contactHost                  = configuration.getOptional[String](s"contact-frontend.host").getOrElse("")
   private val contactFormServiceIdentifier = "BindingTariffRulings"
 
-  private def loadConfig(key: String) = configuration.getOptional[String](key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
+  private def loadConfig(key: String) =
+    configuration.getOptional[String](key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
 
 }

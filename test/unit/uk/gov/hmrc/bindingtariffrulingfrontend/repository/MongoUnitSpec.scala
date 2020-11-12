@@ -28,12 +28,10 @@ trait MongoUnitSpec extends BaseSpec {
 
   protected def collection: JSONCollection
 
-  protected def getIndexes: List[Index] = {
+  protected def getIndexes: List[Index] =
     await(collection.indexesManager.list())
-  }
 
-  protected def getIndex(name: String): Option[Index] = {
+  protected def getIndex(name: String): Option[Index] =
     getIndexes.find(_.name.contains(name))
-  }
 
 }

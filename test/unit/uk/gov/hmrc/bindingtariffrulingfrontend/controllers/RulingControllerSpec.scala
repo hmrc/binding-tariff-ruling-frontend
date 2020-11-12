@@ -34,31 +34,33 @@ class RulingControllerSpec extends ControllerSpec {
   private val rulingService = mock[RulingService]
 
   private def controller(
-                          allowlist: AllowedAction = AllowListDisabled(),
-                          auth: AuthenticatedAction = SuccessfulAuth(),
-                          admin: AdminAction = AdminEnabled()
-                        ) =
+    allowlist: AllowedAction  = AllowListDisabled(),
+    auth: AuthenticatedAction = SuccessfulAuth(),
+    admin: AdminAction        = AdminEnabled()
+  ) =
     new RulingController(rulingService, allowlist, auth, admin, mcc, realConfig)
 
   "GET /" should {
     "return 200" in {
-      given(rulingService.get("id")) willReturn Future.successful(Some(Ruling("ref", "code", Instant.now, Instant.now, "justification", "goods description")))
+      given(rulingService.get("id")) willReturn Future.successful(
+        Some(Ruling("ref", "code", Instant.now, Instant.now, "justification", "goods description"))
+      )
 
       val result = await(controller().get("id")(getRequestWithCSRF()))
-      status(result) shouldBe Status.OK
+      status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
-      bodyOf(result) should include("ruling-heading")
+      charset(result)     shouldBe Some("utf-8")
+      bodyOf(result)      should include("ruling-heading")
     }
 
     "return 200 - when not found" in {
       given(rulingService.get("id")) willReturn Future.successful(None)
 
       val result = await(controller().get("id")(getRequestWithCSRF()))
-      status(result) shouldBe Status.OK
+      status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
-      bodyOf(result) should include("ruling_not_found-heading")
+      charset(result)     shouldBe Some("utf-8")
+      bodyOf(result)      should include("ruling_not_found-heading")
     }
 
     "return 403 when not allowed" in {

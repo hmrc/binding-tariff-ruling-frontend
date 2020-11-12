@@ -23,8 +23,7 @@ import play.api.data.FormError
 import play.api.data.format.Formatter
 
 // scalastyle:off magic.number
-case class SimpleSearch
-(
+case class SimpleSearch(
   query: Option[String],
   override val pageIndex: Int,
   override val pageSize: Int = 50
@@ -36,13 +35,12 @@ object SimpleSearch {
   val form: Form[SimpleSearch] = Form(
     mapping(
       "query" -> of(optionalStringFormatter),
-      "page" -> optional(number).transform(_.getOrElse(1), (page: Int) => Some(page))
+      "page"  -> optional(number).transform(_.getOrElse(1), (page: Int) => Some(page))
     )((q: Option[String], p: Int) => SimpleSearch(q, p))(s => Some((s.query, s.pageIndex)))
   )
 
-  private def standardiseText(s: String): String = {
+  private def standardiseText(s: String): String =
     s.replaceAll("""\s{1,}""", " ").trim
-  }
 
   private lazy val optionalStringFormatter: Formatter[Option[String]] = new Formatter[Option[String]] {
     override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[String]] =

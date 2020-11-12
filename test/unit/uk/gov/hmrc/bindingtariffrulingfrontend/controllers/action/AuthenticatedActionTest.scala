@@ -27,7 +27,7 @@ import scala.concurrent.Future
 
 class AuthenticatedActionTest extends BaseSpec {
 
-  private val block = mock[Request[_] => Future[Result]]
+  private val block  = mock[Request[_] => Future[Result]]
   private val config = mock[AppConfig]
   private val action = new AuthenticatedAction(config)
 

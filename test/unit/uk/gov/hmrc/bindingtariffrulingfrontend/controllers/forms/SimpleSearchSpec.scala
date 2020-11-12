@@ -25,39 +25,32 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
 class SimpleSearchSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
-  def checkForError(form: Form[_], data: Map[String, String], expectedErrors: Seq[FormError]): Assertion = {
-
-    form.bind(data).fold(
-      formWithErrors => {
-        for (error <- expectedErrors) formWithErrors.errors should contain(FormError(error.key, error.message, error.args))
-        formWithErrors.errors.size shouldBe expectedErrors.size
-      },
-      _ => {
-        fail("Expected a validation error when binding the form, but it was bound successfully.")
-      }
-    )
-  }
+  def checkForError(form: Form[_], data: Map[String, String], expectedErrors: Seq[FormError]): Assertion =
+    form
+      .bind(data)
+      .fold(
+        formWithErrors => {
+          for (error <- expectedErrors)
+            formWithErrors.errors should contain(FormError(error.key, error.message, error.args))
+          formWithErrors.errors.size shouldBe expectedErrors.size
+        },
+        _ => fail("Expected a validation error when binding the form, but it was bound successfully.")
+      )
 
   def error(key: String, value: String, args: Any*) = Seq(FormError(key, value, args))
 
   lazy val emptyForm: Map[String, String] = Map[String, String]()
 
-  def fieldThatBindsValidData(form: Form[_],
-                              fieldName: String,
-                              validDataGenerator: Gen[String]): Unit = {
-
+  def fieldThatBindsValidData(form: Form[_], fieldName: String, validDataGenerator: Gen[String]): Unit =
     "must bind valid data" in {
 
-      forAll(validDataGenerator -> "validDataItem") {
-        dataItem: String =>
-          val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
-          result.value.get shouldBe dataItem
+      forAll(validDataGenerator -> "validDataItem") { dataItem: String =>
+        val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
+        result.value.get shouldBe dataItem
       }
     }
-  }
 
-  def optionalField(form: Form[_],
-                     fieldName: String): Unit = {
+  def optionalField(form: Form[_], fieldName: String): Unit = {
 
     "must bind when key is not present at all" in {
 
