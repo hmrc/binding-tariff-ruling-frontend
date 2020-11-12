@@ -28,9 +28,8 @@ import scala.concurrent.Future
 
 trait ControllerSpec extends BaseSpec {
 
-  protected def locationOf(result: Result): Option[String] = {
+  protected def locationOf(result: Result): Option[String] =
     result.header.headers.get(LOCATION)
-  }
 
   protected def getRequestWithCSRF(uri: String = "/"): FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest("GET", uri).withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]]

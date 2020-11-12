@@ -20,8 +20,7 @@ import java.time.Instant
 
 import play.api.libs.json.{Json, OFormat}
 
-case class Decision
-(
+case class Decision(
   bindingCommodityCode: String,
   effectiveStartDate: Option[Instant],
   effectiveEndDate: Option[Instant],

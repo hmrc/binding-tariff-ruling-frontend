@@ -21,6 +21,6 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.utils.EnumJson
 
 object ApplicationType extends Enumeration {
   type ApplicationType = Value
-  val BTI, LIABILITY_ORDER = Value
+  val BTI, LIABILITY_ORDER                           = Value
   implicit val format: Format[ApplicationType.Value] = EnumJson.format(ApplicationType)
 }

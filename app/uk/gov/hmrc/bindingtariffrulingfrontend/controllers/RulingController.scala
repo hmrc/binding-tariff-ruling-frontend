@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AdminAction, AuthenticatedAction, AllowedAction}
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AdminAction, AllowedAction, AuthenticatedAction}
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -28,19 +28,20 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class RulingController @Inject()(
-                                  rulingService: RulingService,
-                                  allowlist: AllowedAction,
-                                  authenticate: AuthenticatedAction,
-                                  verifyAdmin: AdminAction,
-                                  mcc: MessagesControllerComponents,
-                                  implicit val appConfig: AppConfig
-                                ) extends FrontendController(mcc) with I18nSupport {
+class RulingController @Inject() (
+  rulingService: RulingService,
+  allowlist: AllowedAction,
+  authenticate: AuthenticatedAction,
+  verifyAdmin: AdminAction,
+  mcc: MessagesControllerComponents,
+  implicit val appConfig: AppConfig
+) extends FrontendController(mcc)
+    with I18nSupport {
 
   def get(id: String): Action[AnyContent] = (Action andThen allowlist).async { implicit request =>
     rulingService.get(id) map {
       case Some(ruling) => Ok(views.html.ruling(ruling))
-      case _ => Ok(views.html.ruling_not_found(id))
+      case _            => Ok(views.html.ruling_not_found(id))
     }
   }
 

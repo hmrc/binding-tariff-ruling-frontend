@@ -23,18 +23,10 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import scala.concurrent.Future
 
 class AllowListEnabled extends AllowedAction(Mockito.mock(classOf[AppConfig])) {
-  protected override def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = Future.successful(Left(Results.Forbidden))
+  protected override def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] =
+    Future.successful(Left(Results.Forbidden))
 }
-
 
 object AllowListEnabled {
   def apply(): AllowListEnabled = new AllowListEnabled()
 }
-
-
-
-
-
-
-
-

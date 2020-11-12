@@ -25,15 +25,20 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.Future.successful
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AdminAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request, Request] {
+class AdminAction @Inject() (appConfig: AppConfig) extends ActionRefiner[Request, Request] {
 
-  override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
+  override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] =
     if (appConfig.adminEnabled) {
       successful(Right(request))
     } else {
-      successful(Left(Results.Forbidden(JsErrorResponse(ErrorCode.FORBIDDEN, s"You are not allowed to call ${request.method} ${request.uri}"))))
+      successful(
+        Left(
+          Results.Forbidden(
+            JsErrorResponse(ErrorCode.FORBIDDEN, s"You are not allowed to call ${request.method} ${request.uri}")
+          )
+        )
+      )
     }
-  }
 
   override protected def executionContext: ExecutionContext = global
 }

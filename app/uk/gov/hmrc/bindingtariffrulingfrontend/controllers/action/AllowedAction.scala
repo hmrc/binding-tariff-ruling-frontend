@@ -24,18 +24,17 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.Future.successful
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AllowedAction @Inject()(appConfig: AppConfig) extends ActionRefiner[Request, Request] {
+class AllowedAction @Inject() (appConfig: AppConfig) extends ActionRefiner[Request, Request] {
 
-  override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
+  override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] =
     appConfig.allowlist match {
       case Some(addresses: Set[String]) =>
         request.headers.get("True-Client-IP") match {
           case Some(ip: String) if addresses.contains(ip) => successful(Right(request))
-          case _ => successful(Left(Results.Forbidden))
+          case _                                          => successful(Left(Results.Forbidden))
         }
       case _ => successful(Right(request))
     }
-  }
 
   override protected def executionContext: ExecutionContext = global
 }

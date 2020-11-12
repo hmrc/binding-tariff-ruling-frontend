@@ -28,11 +28,12 @@ import uk.gov.hmrc.mongo.MongoSpecSupport
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RulingMongoRepositoryTest extends MongoUnitSpec
-  with BeforeAndAfterAll
-  with BeforeAndAfterEach
-  with MongoSpecSupport
-  with Eventually {
+class RulingMongoRepositoryTest
+    extends MongoUnitSpec
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach
+    with MongoSpecSupport
+    with Eventually {
   self =>
 
   import Ruling.Mongo.format
@@ -41,7 +42,7 @@ class RulingMongoRepositoryTest extends MongoUnitSpec
     override val mongo: () => DB = self.mongo
   }
 
-  private def repository = new RulingMongoRepository(provider)
+  private def repository            = new RulingMongoRepository(provider)
   lazy val readConcern: ReadConcern = ReadConcern.Majority
 
   override protected def collection: JSONCollection = repository.collection
@@ -69,8 +70,12 @@ class RulingMongoRepositoryTest extends MongoUnitSpec
 
   "Delete by Reference" should {
     "Delete One" in {
-      givenAnExistingDocument(Ruling(reference = "ref1", "code", Instant.now, Instant.now, "justification", "description"))
-      givenAnExistingDocument(Ruling(reference = "ref2", "code", Instant.now, Instant.now, "justification", "description"))
+      givenAnExistingDocument(
+        Ruling(reference = "ref1", "code", Instant.now, Instant.now, "justification", "description")
+      )
+      givenAnExistingDocument(
+        Ruling(reference = "ref2", "code", Instant.now, Instant.now, "justification", "description")
+      )
 
       await(repository.delete("ref1"))
 
@@ -80,8 +85,12 @@ class RulingMongoRepositoryTest extends MongoUnitSpec
 
   "Delete Many" should {
     "Delete All" in {
-      givenAnExistingDocument(Ruling(reference = "ref1", "code", Instant.now, Instant.now, "justification", "description"))
-      givenAnExistingDocument(Ruling(reference = "ref2", "code", Instant.now, Instant.now, "justification", "description"))
+      givenAnExistingDocument(
+        Ruling(reference = "ref1", "code", Instant.now, Instant.now, "justification", "description")
+      )
+      givenAnExistingDocument(
+        Ruling(reference = "ref2", "code", Instant.now, Instant.now, "justification", "description")
+      )
 
       await(repository.delete())
 
@@ -139,12 +148,10 @@ class RulingMongoRepositoryTest extends MongoUnitSpec
     }
   }
 
-  private def givenAnExistingDocument(ruling: Ruling): Unit = {
+  private def givenAnExistingDocument(ruling: Ruling): Unit =
     await(repository.collection.insert(ordered = false).one(ruling))
-  }
 
-  private def thenTheDocumentCountShouldBe(count: Int): Unit = {
+  private def thenTheDocumentCountShouldBe(count: Int): Unit =
     await(repository.collection.count(None, Some(0), 0, None, readConcern)) shouldBe count
-  }
 
 }

@@ -23,8 +23,7 @@ object Dates {
 
   val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
 
-  def format(instant: Instant) : String = {
+  def format(instant: Instant): String =
     formatter.format(LocalDateTime.ofInstant(instant, ZoneOffset.UTC))
-  }
 
 }

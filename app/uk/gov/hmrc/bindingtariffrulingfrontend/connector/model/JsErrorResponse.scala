@@ -23,7 +23,7 @@ object JsErrorResponse {
 
   def apply(errorCode: ErrorCode.Value, message: JsValueWrapper): JsObject =
     Json.obj(
-      "code" -> errorCode.toString,
+      "code"    -> errorCode.toString,
       "message" -> message
     )
 }

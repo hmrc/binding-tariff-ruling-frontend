@@ -28,7 +28,7 @@ import scala.concurrent.Future
 
 class AdminActionSpec extends BaseSpec {
 
-  private val block = mock[Request[_] => Future[Result]]
+  private val block  = mock[Request[_] => Future[Result]]
   private val config = mock[AppConfig]
   private val action = new AdminAction(config)
 

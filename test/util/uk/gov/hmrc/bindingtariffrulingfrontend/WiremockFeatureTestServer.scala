@@ -24,23 +24,21 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 
 trait WiremockFeatureTestServer extends FeatureSpec with BeforeAndAfterEach with GuiceOneServerPerSuite {
 
-  private val wireHost = "localhost"
-  protected val wirePort = 20001
+  private val wireHost       = "localhost"
+  protected val wirePort     = 20001
   private val wireMockServer = new WireMockServer(wirePort)
 
   lazy val host: String = s"http://$wireHost:$wirePort"
 
-  protected def stubFor(mappingBuilder: MappingBuilder): StubMapping = {
+  protected def stubFor(mappingBuilder: MappingBuilder): StubMapping =
     wireMockServer.stubFor(mappingBuilder)
-  }
 
   override protected def beforeEach(): Unit = {
     wireMockServer.start()
     WireMock.configureFor(wireHost, wirePort)
   }
 
-  override protected def afterEach(): Unit = {
+  override protected def afterEach(): Unit =
     wireMockServer.stop()
-  }
 
 }

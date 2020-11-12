@@ -26,7 +26,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class BindingTariffClassificationConnector @Inject()(appConfig: AppConfig, client: AuthenticatedHttpClient) {
+class BindingTariffClassificationConnector @Inject() (appConfig: AppConfig, client: AuthenticatedHttpClient) {
 
   def get(reference: String)(implicit hc: HeaderCarrier): Future[Option[Case]] = {
     val url = s"${appConfig.bindingTariffClassificationUrl}/cases/$reference"

@@ -38,9 +38,9 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
   protected val appConfig: AppConfig = mock[AppConfig]
 
-  private val wsClient: WSClient = app.injector.instanceOf[WSClient]
+  private val wsClient: WSClient         = app.injector.instanceOf[WSClient]
   private val httpAuditing: HttpAuditing = app.injector.instanceOf[HttpAuditing]
-  private val client = new AuthenticatedHttpClient(httpAuditing, wsClient, actorSystem, realConfig)
+  private val client                     = new AuthenticatedHttpClient(httpAuditing, wsClient, actorSystem, realConfig)
 
   private val connector = new BindingTariffClassificationConnector(appConfig, client)
 
@@ -51,27 +51,29 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
   }
 
   "Connector 'GET Case'" should {
-    val startDate = Instant.now().plus(10, ChronoUnit.SECONDS)
-    val endDate = Instant.now()
-    val validDecision = Decision("code", Some(startDate), Some(endDate), "justification", "description")
+    val startDate        = Instant.now().plus(10, ChronoUnit.SECONDS)
+    val endDate          = Instant.now()
+    val validDecision    = Decision("code", Some(startDate), Some(endDate), "justification", "description")
     val publicAttachment = Attachment("file-id", public = true)
     val validCase: Case = Case(
-      reference = "ref",
-      status = CaseStatus.COMPLETED,
+      reference   = "ref",
+      status      = CaseStatus.COMPLETED,
       application = Application(`type` = ApplicationType.BTI),
-      decision = Some(validDecision),
+      decision    = Some(validDecision),
       attachments = Seq(publicAttachment),
-      keywords = Set("keyword")
+      keywords    = Set("keyword")
     )
 
     "Get valid case" in {
       val responseJSON = Json.toJson(validCase).toString()
 
-      stubFor(get(urlEqualTo("/cases/ref"))
-        .willReturn(aResponse()
-          .withStatus(HttpStatus.SC_OK)
-          .withBody(responseJSON)
-        )
+      stubFor(
+        get(urlEqualTo("/cases/ref"))
+          .willReturn(
+            aResponse()
+              .withStatus(HttpStatus.SC_OK)
+              .withBody(responseJSON)
+          )
       )
 
       await(connector.get("ref")) shouldBe Some(validCase)
@@ -83,10 +85,12 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
     }
 
     "Return None for 404" in {
-      stubFor(get(urlEqualTo("/cases/ref"))
-        .willReturn(aResponse()
-          .withStatus(HttpStatus.SC_NOT_FOUND)
-        )
+      stubFor(
+        get(urlEqualTo("/cases/ref"))
+          .willReturn(
+            aResponse()
+              .withStatus(HttpStatus.SC_NOT_FOUND)
+          )
       )
 
       await(connector.get("ref")) shouldBe None

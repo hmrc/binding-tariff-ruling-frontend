@@ -36,16 +36,17 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   private val rulingService = mock[RulingService]
 
-  private def controller(allowlist: AllowedAction = AllowListDisabled()) = new SearchController(rulingService, allowlist, mcc, realConfig)
+  private def controller(allowlist: AllowedAction = AllowListDisabled()) =
+    new SearchController(rulingService, allowlist, mcc, realConfig)
 
   "GET /" should {
     "return 200 without form" in {
       val result = await(controller().get(query = None, page = 1)(getRequestWithCSRF()))
 
-      status(result) shouldBe Status.OK
-      contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
-      bodyOf(result) should include("search-heading")
+      status(result)                                                   shouldBe Status.OK
+      contentType(result)                                              shouldBe Some("text/html")
+      charset(result)                                                  shouldBe Some("utf-8")
+      bodyOf(result)                                                   should include("search-heading")
       asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.heading")
 
       verifyZeroInteractions(rulingService)
@@ -56,10 +57,10 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
       val result = await(controller().get(query = Some("query"), page = 1)(getRequestWithCSRF("/?query=query&page=1")))
 
-      status(result) shouldBe Status.OK
-      contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
-      bodyOf(result) should include("search-heading")
+      status(result)                                                   shouldBe Status.OK
+      contentType(result)                                              shouldBe Some("text/html")
+      charset(result)                                                  shouldBe Some("utf-8")
+      bodyOf(result)                                                   should include("search-heading")
       asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.result.title")
 
       verify(rulingService).get(SimpleSearch(Some("query"), 1))
@@ -68,10 +69,10 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     "return 200 without form errors" in {
       val result = await(controller().get(query = Some(""), page = 1)(getRequestWithCSRF()))
 
-      status(result) shouldBe Status.OK
+      status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
-      bodyOf(result) should include("search-heading")
+      charset(result)     shouldBe Some("utf-8")
+      bodyOf(result)      should include("search-heading")
 
       verifyZeroInteractions(rulingService)
     }
@@ -82,7 +83,6 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result) shouldBe Status.FORBIDDEN
     }
   }
-
 
   def asDocument(html: String): Document = Jsoup.parse(html)
 

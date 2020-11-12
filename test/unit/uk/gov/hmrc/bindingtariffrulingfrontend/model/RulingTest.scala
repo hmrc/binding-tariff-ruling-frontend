@@ -24,40 +24,40 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 class RulingTest extends BaseSpec {
 
   val ruling: Ruling = Ruling(
-    reference = "reference",
+    reference            = "reference",
     bindingCommodityCode = "commodity-code",
-    effectiveStartDate = Instant.EPOCH,
-    effectiveEndDate = Instant.EPOCH.plusSeconds(1),
-    justification = "justification",
-    goodsDescription = "goods-description",
-    keywords = Set("keyword"),
-    attachments = Seq("attachment")
+    effectiveStartDate   = Instant.EPOCH,
+    effectiveEndDate     = Instant.EPOCH.plusSeconds(1),
+    justification        = "justification",
+    goodsDescription     = "goods-description",
+    keywords             = Set("keyword"),
+    attachments          = Seq("attachment")
   )
 
   "Ruling" should {
     "Convert to REST Json" in {
       Json.toJson(ruling)(Ruling.REST.format) shouldBe Json.obj(
-        "reference" -> JsString("reference"),
+        "reference"            -> JsString("reference"),
         "bindingCommodityCode" -> JsString("commodity-code"),
-        "effectiveStartDate" -> JsString("1970-01-01T00:00:00Z"),
-        "effectiveEndDate" -> JsString("1970-01-01T00:00:01Z"),
-        "justification" -> JsString("justification"),
-        "goodsDescription" -> JsString("goods-description"),
-        "keywords" -> JsArray(Seq(JsString("keyword"))),
-        "attachments" -> JsArray(Seq(JsString("attachment")))
+        "effectiveStartDate"   -> JsString("1970-01-01T00:00:00Z"),
+        "effectiveEndDate"     -> JsString("1970-01-01T00:00:01Z"),
+        "justification"        -> JsString("justification"),
+        "goodsDescription"     -> JsString("goods-description"),
+        "keywords"             -> JsArray(Seq(JsString("keyword"))),
+        "attachments"          -> JsArray(Seq(JsString("attachment")))
       )
     }
 
     "Convert to Mongo Json" in {
       Json.toJson(ruling)(Ruling.Mongo.format) shouldBe Json.obj(
-        "reference" -> JsString("reference"),
+        "reference"            -> JsString("reference"),
         "bindingCommodityCode" -> JsString("commodity-code"),
-        "effectiveStartDate" -> Json.obj("$date" -> 0),
-        "effectiveEndDate" -> Json.obj("$date" -> 1000),
-        "justification" -> JsString("justification"),
-        "goodsDescription" -> JsString("goods-description"),
-        "keywords" -> JsArray(Seq(JsString("keyword"))),
-        "attachments" -> JsArray(Seq(JsString("attachment")))
+        "effectiveStartDate"   -> Json.obj("$date" -> 0),
+        "effectiveEndDate"     -> Json.obj("$date" -> 1000),
+        "justification"        -> JsString("justification"),
+        "goodsDescription"     -> JsString("goods-description"),
+        "keywords"             -> JsArray(Seq(JsString("keyword"))),
+        "attachments"          -> JsArray(Seq(JsString("attachment")))
       )
     }
   }

@@ -28,7 +28,7 @@ class AppConfigTest extends BaseSpec {
 
   "Build assets prefix" in {
     appConfig(
-      "assets.url" -> "http://localhost:9032/assets/",
+      "assets.url"     -> "http://localhost:9032/assets/",
       "assets.version" -> "4.5.0"
     ).assetsPrefix shouldBe "http://localhost:9032/assets/4.5.0"
   }
@@ -51,13 +51,13 @@ class AppConfigTest extends BaseSpec {
 
   "Build admin enabled" in {
     appConfig("admin-mode" -> "false").adminEnabled shouldBe false
-    appConfig("admin-mode" -> "true").adminEnabled shouldBe true
+    appConfig("admin-mode" -> "true").adminEnabled  shouldBe true
   }
 
   "Build allowlist" in {
     appConfig(
       "filters.allowlist.enabled" -> "true",
-      "filters.allowlist.ips" -> "ip1, ip2"
+      "filters.allowlist.ips"     -> "ip1, ip2"
     ).allowlist shouldBe Some(Set("ip1", "ip2"))
 
     appConfig("filters.allowlist.enabled" -> "false").allowlist shouldBe None
@@ -65,8 +65,8 @@ class AppConfigTest extends BaseSpec {
 
   "Build Classification Backend URL" in {
     appConfig(
-      "microservice.services.binding-tariff-classification.port" -> "8080",
-      "microservice.services.binding-tariff-classification.host" -> "localhost",
+      "microservice.services.binding-tariff-classification.port"     -> "8080",
+      "microservice.services.binding-tariff-classification.host"     -> "localhost",
       "microservice.services.binding-tariff-classification.protocol" -> "http"
     ).bindingTariffClassificationUrl shouldBe "http://localhost:8080"
   }

@@ -27,7 +27,7 @@ import scala.concurrent.Future
 
 class AllowedActionTest extends BaseSpec {
 
-  private val block = mock[Request[_] => Future[Result]]
+  private val block  = mock[Request[_] => Future[Result]]
   private val config = mock[AppConfig]
   private val action = new AllowedAction(config)
 

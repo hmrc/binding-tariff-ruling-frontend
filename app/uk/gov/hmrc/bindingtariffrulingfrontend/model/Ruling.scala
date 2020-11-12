@@ -20,15 +20,14 @@ import java.time.Instant
 
 import play.api.libs.json._
 
-case class Ruling
-(
+case class Ruling(
   reference: String,
   bindingCommodityCode: String,
   effectiveStartDate: Instant,
   effectiveEndDate: Instant,
   justification: String,
   goodsDescription: String,
-  keywords: Set[String] = Set.empty,
+  keywords: Set[String]    = Set.empty,
   attachments: Seq[String] = Seq.empty
 )
 
@@ -40,20 +39,18 @@ object Ruling {
 
   object Mongo {
     private implicit val formatInstant: OFormat[Instant] = new OFormat[Instant] {
-      override def writes(datetime: Instant): JsObject = {
+      override def writes(datetime: Instant): JsObject =
         Json.obj("$date" -> datetime.toEpochMilli)
-      }
 
-      override def reads(json: JsValue): JsResult[Instant] = {
+      override def reads(json: JsValue): JsResult[Instant] =
         json match {
           case JsObject(map) if map.contains("$date") =>
             map("$date") match {
               case JsNumber(v) => JsSuccess(Instant.ofEpochMilli(v.toLong))
-              case _ => JsError("Unexpected Instant Format")
+              case _           => JsError("Unexpected Instant Format")
             }
           case _ => JsError("Unexpected Instant Format")
         }
-      }
     }
 
     implicit val format: OFormat[Ruling] = Json.format[Ruling]

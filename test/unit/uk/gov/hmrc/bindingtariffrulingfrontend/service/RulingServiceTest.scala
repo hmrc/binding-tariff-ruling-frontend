@@ -38,8 +38,8 @@ import scala.concurrent.Future
 
 class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
 
-  private val connector = mock[BindingTariffClassificationConnector]
-  private val repository = mock[RulingRepository]
+  private val connector    = mock[BindingTariffClassificationConnector]
+  private val repository   = mock[RulingRepository]
   private val auditService = mock[AuditService]
 
   private val service = new RulingService(repository, auditService, connector)
@@ -78,18 +78,18 @@ class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
   }
 
   "Service Refresh" should {
-    val startDate = Instant.now().plus(10, ChronoUnit.SECONDS)
-    val endDate = Instant.now()
-    val validDecision = Decision("code", Some(startDate), Some(endDate), "justification", "description")
-    val publicAttachment = Attachment("file-id", public = true)
+    val startDate         = Instant.now().plus(10, ChronoUnit.SECONDS)
+    val endDate           = Instant.now()
+    val validDecision     = Decision("code", Some(startDate), Some(endDate), "justification", "description")
+    val publicAttachment  = Attachment("file-id", public = true)
     val privateAttachment = Attachment("file-id", public = false)
     val validCase: Case = Case(
-      reference = "ref",
-      status = CaseStatus.COMPLETED,
+      reference   = "ref",
+      status      = CaseStatus.COMPLETED,
       application = Application(`type` = ApplicationType.BTI),
-      decision = Some(validDecision),
+      decision    = Some(validDecision),
       attachments = Seq(publicAttachment, privateAttachment),
-      keywords = Set("keyword")
+      keywords    = Set("keyword")
     )
 
     "do nothing when case doesn't exist in repository or connector" in {
@@ -177,7 +177,9 @@ class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
 
     "filter cases not BTT" in {
       given(repository.get("ref")) willReturn Future.successful(None)
-      given(connector.get("ref")) willReturn Future.successful(Some(validCase.copy(application = Application(`type` = ApplicationType.LIABILITY_ORDER))))
+      given(connector.get("ref")) willReturn Future.successful(
+        Some(validCase.copy(application = Application(`type` = ApplicationType.LIABILITY_ORDER)))
+      )
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
@@ -197,7 +199,9 @@ class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
 
     "filter cases without Decision Start Date" in {
       given(repository.get("ref")) willReturn Future.successful(None)
-      given(connector.get("ref")) willReturn Future.successful(Some(validCase.copy(decision = Some(validDecision.copy(effectiveStartDate = None)))))
+      given(connector.get("ref")) willReturn Future.successful(
+        Some(validCase.copy(decision = Some(validDecision.copy(effectiveStartDate = None))))
+      )
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
@@ -207,7 +211,9 @@ class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
 
     "filter cases without Decision End Date" in {
       given(repository.get("ref")) willReturn Future.successful(None)
-      given(connector.get("ref")) willReturn Future.successful(Some(validCase.copy(decision = Some(validDecision.copy(effectiveEndDate = None)))))
+      given(connector.get("ref")) willReturn Future.successful(
+        Some(validCase.copy(decision = Some(validDecision.copy(effectiveEndDate = None))))
+      )
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
