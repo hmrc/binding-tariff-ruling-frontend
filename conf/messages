@@ -1,5 +1,6 @@
-site.service_name = UK published Binding Tariff Information rulings
-site.title.suffix = UK published Binding Tariff Information rulings - GOV.UK
+site.service_name = Search for Advance Tariff Rulings
+site.title.suffix = Search for Advance Tariff Rulings - GOV.UK
+
 index.heading = UK published Binding Tariff Information rulings
 index.content1 = All new Binding Tariff Information rulings are published here.
 index.content2 = Use this service for
