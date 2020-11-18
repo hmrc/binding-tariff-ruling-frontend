@@ -24,11 +24,9 @@
 
 @heading = {<h1 id="search-heading" class="heading-xlarge">@messages("search.heading")</h1>}
 
-@main_template(title = Some(messages("search.title")), bodyClasses = None) {
+@main_template(title = None) {
 
  @error_summary(form.errors)
-
- <a id="search-back" href="@routes.IndexController.get()" class="link-back">@messages("site.back")</a>
 
  @helper.form(action = routes.SearchController.get()) {
 
