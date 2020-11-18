@@ -14,19 +14,64 @@
  * limitations under the License.
  *@
 
-@(field: Field, label: String)(implicit messages: Messages)
+@(
+    queryField: Field,
+    imagesField: Field,
+    imagesLabel: String,
+    submitText: String,
+    label: Option[String] = None,
+    labelClass: Option[String] = None,
+    labelHtml: Option[Html] = None,
+    inputClass: Option[String] = None,
+    hint: Option[String] = None,
+    inputPurpose: Option[String] = None
+)(implicit messages: Messages)
 
-<div id="input_search" class="form-group input-search @if(field.hasErrors){form-group-error}">
-    <label for="input_search-input" class="form-label">
-        @messages("search.form.search")
-        @field.errors.map { error =>
-            <span class="error-message" id="error-message-@{field.id}-input">@messages(error.message, error.args: _*)</span>
+<div class="form-group @if(queryField.hasErrors){form-group-error}">
+    <label class="form-label" for="@{queryField.id}">
+        @labelHtml.map { lb => @lb }
+
+        @if(label.isDefined){
+            <div class="@if(labelClass.nonEmpty) {@labelClass}">@label</div>
+        }
+        @if(hint.isDefined){
+            <div class="form-hint">@hint</div>
+        }
+        @queryField.errors.map { error =>
+            <span class="error-message" id="error-message-@{queryField.id}-input"><span class="visually-hidden">@messages("error.browser.title.prefix")</span>@messages(error.message, error.args: _*)</span>
         }
     </label>
-    <div>
-        <input id="input_search-input" class="form-control" name="query" value="@{field.value}" alt="search" type="text">
-        <button id="input_search-button" type="submit"></button>
-        @*<a class="input_search-link ml-3" href="#">Advanced Search</a>*@
+    <div class="grid-row mt-1">
+        <div class="column-two-thirds">
+            <div class="form-control-wrapper">
+                <input
+                        class="form-control @inputClass"
+                        type="search"
+                        id="@{queryField.id}"
+                        name="@{queryField.name}"
+                        value="@{queryField.value}"
+                        @if(queryField.hasErrors){aria-describedby="error-message-@{queryField.id}-input"}
+                        @if(inputPurpose.isDefined) {autocomplete="@inputPurpose"}
+                />
+            </div>
+        </div>
+        <div class="column-one-third">
+            <button id="submit" class="button">@submitText</button>
+        </div>
     </div>
-</div>
 
+    <fieldset id="@{imagesField.id}" class="mt-1">
+        <div class="multiple-choice">
+            <input
+                    class="form-control"
+                    id="@{imagesField.id}-check"
+                    type="checkbox"
+                    name="@{imagesField.name}"
+                    value="true"
+                    @if(imagesField.value.contains("true")){checked="checked"}/>
+            <label for="@{imagesField.id}">
+                @imagesLabel
+            </label>
+        </div>
+    </fieldset>
+</div>
