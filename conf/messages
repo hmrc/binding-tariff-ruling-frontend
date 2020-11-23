@@ -1,18 +1,10 @@
 site.service_name = Search for Advance Tariff Rulings
 site.title.suffix = Search for Advance Tariff Rulings - GOV.UK
 
-index.heading = UK published Binding Tariff Information rulings
-index.content1 = All new Binding Tariff Information rulings are published here.
-index.content2 = Use this service for
-index.content3 = Searching and viewing current BTI rulings
-
-search.title = Search
-search.result.title = Search results
-search.heading = Search UK published Binding Tariff Information rulings
-search.content1 = Search by reference number, commodity code or description.
-search.advanced_search = Advanced search
-search.form.search = Search
-search.form.search.required = Search query is required
+search.heading = Search for Advance Tariff Rulings
+search.hint = You can search using a combination of words, commodity codes and reference numbers.
+search.form.submit = Search rulings
+search.form.images = Only show rulings that include images
 
 ruling.title = Information for this Binding Tariff Information ruling
 ruling.heading = Information for Binding Tariff Information ruling {0}

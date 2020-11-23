@@ -68,7 +68,7 @@ class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
   }
 
   "Service GET by search" should {
-    val search = SimpleSearch(Some("query"), 1, 1)
+    val search = SimpleSearch(Some("query"), imagesOnly = false, 1, 1)
 
     "delegate to repository" in {
       given(repository.get(search)) willReturn Future.successful(Paged.empty[Ruling])

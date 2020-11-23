@@ -25,6 +25,7 @@ import play.api.data.format.Formatter
 // scalastyle:off magic.number
 case class SimpleSearch(
   query: Option[String],
+  imagesOnly: Boolean,
   override val pageIndex: Int,
   override val pageSize: Int = 50
 ) extends Pagination
@@ -34,9 +35,10 @@ object SimpleSearch {
 
   val form: Form[SimpleSearch] = Form(
     mapping(
-      "query" -> of(optionalStringFormatter),
-      "page"  -> optional(number).transform(_.getOrElse(1), (page: Int) => Some(page))
-    )((q: Option[String], p: Int) => SimpleSearch(q, p))(s => Some((s.query, s.pageIndex)))
+      "query"  -> of(optionalStringFormatter),
+      "images" -> boolean,
+      "page"   -> optional(number).transform(_.getOrElse(1), (page: Int) => Some(page))
+    )((q: Option[String], i: Boolean, p: Int) => SimpleSearch(q, i, p))(s => Some((s.query, s.imagesOnly, s.pageIndex)))
   )
 
   private def standardiseText(s: String): String =

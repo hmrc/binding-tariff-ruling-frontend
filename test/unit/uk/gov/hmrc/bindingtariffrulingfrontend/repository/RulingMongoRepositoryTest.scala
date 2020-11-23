@@ -114,7 +114,7 @@ class RulingMongoRepositoryTest
 
   "Get by SimpleSearch" should {
     "Retrieve None" in {
-      await(repository.get(SimpleSearch(Some("ref"), 1, 100))).results shouldBe Seq.empty
+      await(repository.get(SimpleSearch(Some("ref"), imagesOnly = false, 1, 100))).results shouldBe Seq.empty
     }
 
     "Retrieve One - by Reference - exact match" in {
@@ -124,7 +124,7 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
 
-      await(repository.get(SimpleSearch(Some("ref1"), 1, 100))).results shouldBe Seq(document1)
+      await(repository.get(SimpleSearch(Some("ref1"), imagesOnly = false, 1, 100))).results shouldBe Seq(document1)
     }
 
     "Retrieve One - by Commodity Code - stars with" in {
@@ -134,7 +134,7 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
 
-      await(repository.get(SimpleSearch(Some("0"), 1, 100))).results shouldBe Seq(document1)
+      await(repository.get(SimpleSearch(Some("0"), imagesOnly = false, 1, 100))).results shouldBe Seq(document1)
     }
 
     "Retrieve One - by Goods Description - case insensitive conains" in {
@@ -144,7 +144,7 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
 
-      await(repository.get(SimpleSearch(Some("Tain"), 1, 100))).results shouldBe Seq(document1)
+      await(repository.get(SimpleSearch(Some("Tain"), imagesOnly = false, 1, 100))).results shouldBe Seq(document1)
     }
   }
 
