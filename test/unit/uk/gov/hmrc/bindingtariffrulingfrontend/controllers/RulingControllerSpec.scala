@@ -86,18 +86,38 @@ class RulingControllerSpec extends ControllerSpec {
 
   "DELETE /" should {
     "return 204 when authenticated" in {
-      given(rulingService.delete()) willReturn Future.successful(())
-      val result = await(controller(auth = SuccessfulAuth(), admin = AdminEnabled()).delete()(postRequestWithCSRF))
+      given(rulingService.deleteAll()) willReturn Future.successful(())
+      val result = await(controller(auth = SuccessfulAuth(), admin = AdminEnabled()).deleteAll()(postRequestWithCSRF))
       status(result) shouldBe Status.NO_CONTENT
     }
 
     "return 403 when unauthenticated" in {
-      val result = await(controller(auth = FailedAuth(), admin = AdminEnabled()).delete()(postRequestWithCSRF))
+      val result = await(controller(auth = FailedAuth(), admin = AdminEnabled()).deleteAll()(postRequestWithCSRF))
       status(result) shouldBe Status.FORBIDDEN
     }
 
     "return 403 when admin disabled" in {
-      val result = await(controller(auth = SuccessfulAuth(), admin = AdminDisabled()).delete()(postRequestWithCSRF))
+      val result = await(controller(auth = SuccessfulAuth(), admin = AdminDisabled()).deleteAll()(postRequestWithCSRF))
+      status(result) shouldBe Status.FORBIDDEN
+    }
+
+  }
+
+  "DELETE / $id" should {
+    "return 204 when authenticated" in {
+      given(rulingService.delete(refEq("ref"))) willReturn Future.successful(())
+      val result = await(controller(auth = SuccessfulAuth(), admin = AdminEnabled()).delete("ref")(postRequestWithCSRF))
+      status(result) shouldBe Status.NO_CONTENT
+    }
+
+    "return 403 when unauthenticated" in {
+      val result = await(controller(auth = FailedAuth(), admin = AdminEnabled()).delete("ref")(postRequestWithCSRF))
+      status(result) shouldBe Status.FORBIDDEN
+    }
+
+    "return 403 when admin disabled" in {
+      val result =
+        await(controller(auth = SuccessfulAuth(), admin = AdminDisabled()).delete("ref")(postRequestWithCSRF))
       status(result) shouldBe Status.FORBIDDEN
     }
 

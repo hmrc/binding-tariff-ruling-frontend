@@ -34,8 +34,11 @@ class RulingService @Inject() (
   bindingTariffClassificationConnector: BindingTariffClassificationConnector
 ) {
 
-  def delete(): Future[Unit] =
-    repository.delete()
+  def delete(reference: String): Future[Unit] =
+    repository.delete(reference)
+
+  def deleteAll(): Future[Unit] =
+    repository.deleteAll()
 
   def get(reference: String): Future[Option[Ruling]] =
     repository.get(reference)
