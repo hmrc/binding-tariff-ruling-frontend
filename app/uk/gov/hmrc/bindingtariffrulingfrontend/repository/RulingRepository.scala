@@ -42,7 +42,7 @@ trait RulingRepository {
 
   def delete(id: String): Future[Unit]
 
-  def delete(): Future[Unit]
+  def deleteAll(): Future[Unit]
 
 }
 
@@ -80,7 +80,7 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)
 
   override def delete(reference: String): Future[Unit] = collection.findAndRemove(byReference(reference)).map(_ => ())
 
-  override def delete(): Future[Unit] =
+  override def deleteAll(): Future[Unit] =
     removeAll().map(_ => ())
 
   override def get(search: SimpleSearch): Future[Paged[Ruling]] = {

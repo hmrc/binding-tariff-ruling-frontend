@@ -49,11 +49,20 @@ class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
     reset(repository, connector, auditService)
   }
 
+  "Service DELETE ALL" should {
+
+    "delegate to repository" in {
+      given(repository.deleteAll()) willReturn Future.successful(())
+      await(service.deleteAll()) shouldBe ((): Unit)
+      verifyZeroInteractions(auditService)
+    }
+  }
+
   "Service DELETE" should {
 
     "delegate to repository" in {
-      given(repository.delete()) willReturn Future.successful(())
-      await(service.delete()) shouldBe ((): Unit)
+      given(repository.delete(refEq("ref"))) willReturn Future.successful(())
+      await(service.delete("ref")) shouldBe ((): Unit)
       verifyZeroInteractions(auditService)
     }
   }

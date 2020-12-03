@@ -49,8 +49,12 @@ class RulingController @Inject() (
     rulingService.refresh(id).map(_ => Accepted)
   }
 
-  def delete(): Action[AnyContent] = (Action andThen verifyAdmin andThen authenticate).async {
-    rulingService.delete().map(_ => NoContent)
+  def deleteAll(): Action[AnyContent] = (Action andThen verifyAdmin andThen authenticate).async {
+    rulingService.deleteAll().map(_ => NoContent)
+  }
+
+  def delete(id: String): Action[AnyContent] = (Action andThen verifyAdmin andThen authenticate).async {
+    rulingService.delete(id).map(_ => NoContent)
   }
 
 }

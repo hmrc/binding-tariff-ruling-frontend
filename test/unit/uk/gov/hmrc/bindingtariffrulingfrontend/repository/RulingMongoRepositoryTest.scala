@@ -92,7 +92,7 @@ class RulingMongoRepositoryTest
         Ruling(reference = "ref2", "code", Instant.now, Instant.now, "justification", "description")
       )
 
-      await(repository.delete())
+      await(repository.deleteAll())
 
       thenTheDocumentCountShouldBe(0)
     }
