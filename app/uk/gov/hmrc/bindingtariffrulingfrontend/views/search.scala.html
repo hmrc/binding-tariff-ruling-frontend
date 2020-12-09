@@ -20,7 +20,7 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.{error_summary, input_search, pagination, result_summary, search_results}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
-@(form: Form[SimpleSearch], search: Option[SimpleSearch], results: Option[Paged[Ruling]])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(form: Form[SimpleSearch], search: Option[SimpleSearch], searchResults: Option[Paged[Ruling]])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @heading = {
   <h1 id="search-heading" class="heading-xlarge">@messages("search.heading")</h1>
@@ -28,33 +28,31 @@
 
 @main_template(title = None) {
 
- @error_summary(form.errors)
+  @error_summary(form.errors)
 
- @helper.form(action = routes.SearchController.get()) {
+  @helper.form(action = routes.SearchController.get()) {
+    @input_search(
+      queryField = form("query"),
+      imagesField = form("images"),
+      imagesLabel = messages("search.form.images"),
+      submitText = messages("search.form.submit"),
+      labelHtml = Some(heading),
+      hint = Some(messages("search.hint")),
+    )
+  }
 
-  @input_search(
-   queryField = form("query"),
-   imagesField = form("images"),
-   imagesLabel = messages("search.form.images"),
-   submitText = messages("search.form.submit"),
-   labelHtml = Some(heading),
-   hint = Some(messages("search.hint")),
-  )
+  @searchResults.filterNot(_ => form.hasErrors).map { results =>
+    @result_summary(
+      id = "search-summary_top",
+      pager = results
+    )
 
- }
+    @search_results(search, results)
 
- @if(results.isDefined && !form.hasErrors) {
-  @result_summary(
-   id = "search-summary_top",
-   pager = results.get,
-  )
-
-  @search_results(search, results.get)
-
-  @pagination(
-   id = "search-pagination_bottom",
-   pager = results.get,
-   onChange = page => routes.SearchController.get(query = form.get.query, page = page)
-  )
- }
+    @pagination(
+      id = "search-pagination_bottom",
+      pager = results,
+      onChange = page => routes.SearchController.get(query = form.get.query, page = page)
+    )
+  }
 }

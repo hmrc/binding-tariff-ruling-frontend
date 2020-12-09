@@ -25,23 +25,23 @@
     @if(pager.pageCount == 1) {
       <h2 id="@id-one" class="mt-1 mb-3 heading-medium">
         @if(pager.resultCount == 1){
-          @messages("search.pagination.onematch")
+          @messages("search.summary.onematch")
         } else {
-          @messages("search.pagination.onepage", pager.resultCount)
+          @messages("search.summary.onepage", pager.resultCount)
         }
       </h2>
     } else {
       <h2 id="@id-some" class="mt-1 mb-3 heading-medium">
         @defining((pager.pageIndex - 1) * pager.pageSize + 1) { from =>
           @defining((pager.pageIndex - 1) * pager.pageSize + pager.size) { to =>
-            @messages("search.pagination.manypage", from, to, pager.resultCount)
+            @messages("search.summary.manypage", from, to, pager.resultCount)
           }
         }
       </h2>
     }
   } else {
     <h2 id="@id-none" class="mt-1 mb-3 heading-medium">
-      @messages("search.pagination.nomatch")
+      @messages("search.summary.nomatch")
     </h2>
   }
 </div>

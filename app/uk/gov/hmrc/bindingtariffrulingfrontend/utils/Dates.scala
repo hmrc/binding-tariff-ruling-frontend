@@ -21,7 +21,7 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 object Dates {
 
-  val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
+  val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
   def format(instant: Instant): String =
     formatter.format(LocalDateTime.ofInstant(instant, ZoneOffset.UTC))

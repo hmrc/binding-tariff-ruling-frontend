@@ -56,10 +56,10 @@
                             Images go here
                         </div>
                     </td>
-                    <td id="search_results-table-row_@index-end_date">
+                    <td class="valign-top" id="search_results-table-row_@index-end_date">
                         @Dates.format(result.effectiveEndDate)
                     </td>
-                    <td>
+                    <td class="valign-top">
                         <a href="@routes.RulingController.get(result.reference)">
                             @messages("search.results.ruling.view")
                         </a>

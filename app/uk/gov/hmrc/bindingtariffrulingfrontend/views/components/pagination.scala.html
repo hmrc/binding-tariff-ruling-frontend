@@ -19,33 +19,46 @@
 @(id: String = "pagination",
   pager: Paged[_],
   onChange: Int => Call,
-  linksClass: Option[String] = None
 )(implicit messages: Messages)
 
-<div>
- @if(pager.pageCount > 1) {
-  <div id="@id-links" class="column-one-half align-right @linksClass.getOrElse("")">
-  @defining(pager.pageCount) { pageCount: Int =>
-   @* Previous Page *@
-   @if(pager.pageIndex > 1) {
-    <a id="@id-page_back" class="mr-0_5" href="@onChange(pager.pageIndex - 1)">Previous</a>
-   }
+@if(pager.pageCount > 1) {
+  <nav class="moj-pagination mt-2" id="pagination-label">
+    <p class="visually-hidden" aria-labelledby="pagination-label">Pagination navigation</p>
 
-   @* Surrounding 5 Pages *@
-   @for(pageIndex <- PaginationUtil.surroundingPages(pager.pageIndex, pager.pageCount, 5)) {
-    @if(pageIndex == pager.pageIndex) {
-     <span id="@id-page_current" class="mx-0_5">@pageIndex</span>
-    } else {
-     <a id="@id-page_@pageIndex" class="mx-0_5" href="@onChange(pageIndex)">@pageIndex</a>
-    }
-   }
+    <ul class="moj-pagination__list">
+      @if(pager.pageIndex > 1) {
+        <li id="@id-page_back" class="moj-pagination__item  moj-pagination__item--prev">
+          <a href="@onChange(pager.pageIndex - 1)" class="moj-pagination__link" href="">
+            Previous<span class="visually-hidden"> set of pages</span>
+          </a>
+        </li>
+      }
 
-   @* Next Page *@
-   @if(pager.pageIndex < pageCount) {
-    <a id="@id-page_next" class="ml-0_5" href="@onChange(pager.pageIndex + 1)">Next</a>
-   }
+      @for(pageIndex <- PaginationUtil.surroundingPages(pager.pageIndex, pager.pageCount, 5)) {
+        @if(pageIndex == pager.pageIndex) {
+          <li id="@id-page_current" class="moj-pagination__item moj-pagination__item--active">@pageIndex</li>
+        } else {
+          <li id="@id-page_@pageIndex" class="moj-pagination__item">
+            <a class="moj-pagination__link" href="@onChange(pageIndex)">@pageIndex</a>
+          </li>
+        }
+      }
 
-  }
-  </div>
- }
- </div>
+      @if(pager.pageIndex < pager.pageCount) {
+        <li id="@id-page_next" class="moj-pagination__item  moj-pagination__item--next">
+          <a href="@onChange(pager.pageIndex + 1)" class="moj-pagination__link" href="">
+            Next<span class="visually-hidden"> set of pages</span>
+          </a>
+        </li>
+      }
+    </ul>
+
+    <p class="moj-pagination__results">
+      @defining((pager.pageIndex - 1) * pager.pageSize + 1) { from =>
+        @defining((pager.pageIndex - 1) * pager.pageSize + pager.size) { to =>
+          @Html(messages("search.pagination.label", from, to, pager.resultCount))
+        }
+      }
+    </p>
+  </nav>
+}
