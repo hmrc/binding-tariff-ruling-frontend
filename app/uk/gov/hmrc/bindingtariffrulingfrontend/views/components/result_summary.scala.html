@@ -16,53 +16,32 @@
 
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.components.PaginationUtil
-@(id: String = "pagination",
-singularName: String = "result",
-pluralName: String = "results",
-pager: Paged[_],
-onChange: Int => Call,
-containerClass: Option[String] = None,
-counterClass: Option[String] = None,
-linksClass: Option[String] = None
+@(id: String,
+  pager: Paged[_],
 )(implicit messages: Messages)
 
-<div id="@id" class="grid-row @containerClass.getOrElse("")">
-
-  <div class="column-one-half">
-    @if(pager.nonEmpty) {
-      @if(pager.pageCount == 1) {
-        <h2 id="@id-one" class="@counterClass.getOrElse("")">
-          <span>@messages("search.pagination.showing")</span>
-          <span id="@id-total" class="bold">@{pager.resultCount}</span>
-          <span>
-            @if(pager.resultCount == 1){
-              @singularName @messages("search.pagination.match.singular")
-            } else {
-              @pluralName @messages("search.pagination.match.plural")
-            }
-          </span>
-        </h2>
-      } else {
-        <h2 id="@id-some" class="@counterClass.getOrElse("")">
-          <span>@messages("search.pagination.showing")</span>
-          <span id="@id-start">@{(pager.pageIndex-1) * pager.pageSize + 1}</span>
-          <span>@messages("search.pagination.to")</span>
-          <span id="@id-end">@{(pager.pageIndex-1) * pager.pageSize + pager.size}</span>
-          <span>@messages("search.pagination.of")</span>
-          <span id="@id-total" class="bold">@{pager.resultCount}</span>
-          <span>
-            @if(pager.resultCount == 1){
-              @singularName @messages("search.pagination.match.singular")
-            } else {
-              @pluralName @messages("search.pagination.match.plural")
-            }
-          </span>
-        </h2>
-      }
+<div id="@id" class="mb-1">
+  @if(pager.nonEmpty) {
+    @if(pager.pageCount == 1) {
+      <h2 id="@id-one" class="mt-1 mb-3 heading-medium">
+        @if(pager.resultCount == 1){
+          @messages("search.pagination.onematch")
+        } else {
+          @messages("search.pagination.onepage", pager.resultCount)
+        }
+      </h2>
     } else {
-      <h2 id="@id-none">
-        <span>@messages("search.pagination.nomatch")</span>
+      <h2 id="@id-some" class="mt-1 mb-3 heading-medium">
+        @defining((pager.pageIndex - 1) * pager.pageSize + 1) { from =>
+          @defining((pager.pageIndex - 1) * pager.pageSize + pager.size) { to =>
+            @messages("search.pagination.manypage", from, to, pager.resultCount)
+          }
+        }
       </h2>
     }
-  </div>
+  } else {
+    <h2 id="@id-none" class="mt-1 mb-3 heading-medium">
+      @messages("search.pagination.nomatch")
+    </h2>
+  }
 </div>

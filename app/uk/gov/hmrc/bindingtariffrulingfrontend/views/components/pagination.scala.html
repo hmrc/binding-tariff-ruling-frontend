@@ -17,13 +17,9 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.components.PaginationUtil
 @(id: String = "pagination",
-        singularName: String = "result",
-        pluralName: String = "results",
-        pager: Paged[_],
-        onChange: Int => Call,
-        containerClass: Option[String] = None,
-        counterClass: Option[String] = None,
-        linksClass: Option[String] = None
+  pager: Paged[_],
+  onChange: Int => Call,
+  linksClass: Option[String] = None
 )(implicit messages: Messages)
 
 <div>

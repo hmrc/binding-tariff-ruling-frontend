@@ -22,7 +22,9 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 @(form: Form[SimpleSearch], search: Option[SimpleSearch], results: Option[Paged[Ruling]])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@heading = {<h1 id="search-heading" class="heading-xlarge">@messages("search.heading")</h1>}
+@heading = {
+  <h1 id="search-heading" class="heading-xlarge">@messages("search.heading")</h1>
+}
 
 @main_template(title = None) {
 
@@ -44,24 +46,15 @@
  @if(results.isDefined && !form.hasErrors) {
   @result_summary(
    id = "search-summary_top",
-   singularName = messages("search.pagination.singular"),
-   pluralName = messages("search.pagination.plural"),
    pager = results.get,
-   containerClass = Some("mb-1"),
-   counterClass = Some("mt-1 mb-3 heading-medium"),
-   onChange = page => routes.SearchController.get(query = form.get.query, page = page)
   )
 
   @search_results(search, results.get)
 
   @pagination(
    id = "search-pagination_bottom",
-   singularName = messages("search.pagination.singular"),
-   pluralName = messages("search.pagination.plural"),
    pager = results.get,
-   containerClass = Some("mt-3"),
    onChange = page => routes.SearchController.get(query = form.get.query, page = page)
   )
  }
-
 }
