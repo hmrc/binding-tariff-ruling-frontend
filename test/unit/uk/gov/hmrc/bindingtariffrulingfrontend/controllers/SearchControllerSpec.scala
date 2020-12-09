@@ -41,6 +41,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   "GET /" should {
     "return 200 without form" in {
+      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+
       val result = await(controller().get(query = None, imagesOnly = false, page = 1)(getRequestWithCSRF()))
 
       status(result)                                                   shouldBe Status.OK
@@ -49,7 +51,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       bodyOf(result)                                                   should include("search-heading")
       asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.heading")
 
-      verifyZeroInteractions(rulingService)
+      verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
     }
 
     "return 200 with form" in {
@@ -70,6 +72,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 200 without form errors" in {
+      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+
       val result = await(controller().get(query = Some(""), imagesOnly = false, page = 1)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.OK
@@ -77,10 +81,10 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       charset(result)     shouldBe Some("utf-8")
       bodyOf(result)      should include("search-heading")
 
-      verifyZeroInteractions(rulingService)
+      verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
     }
 
-    "return 403 when allowed" in {
+    "return 403 when disallowed" in {
       val result = await(
         controller(allowlist = AllowListEnabled()).get(query = None, imagesOnly = false, page = 1)(getRequestWithCSRF())
       )

@@ -52,7 +52,7 @@ class RulingTest extends BaseSpec {
       Json.toJson(ruling)(Ruling.Mongo.format) shouldBe Json.obj(
         "reference"            -> JsString("reference"),
         "bindingCommodityCode" -> JsString("0011223344"),
-        "bindingCommodityCodeNgrams" -> Json.arr(
+        "bindingCommodityCodeNGrams" -> Json.arr(
           "0",
           "00",
           "001",
@@ -64,8 +64,8 @@ class RulingTest extends BaseSpec {
           "001122334",
           "0011223344"
         ),
-        "effectiveStartDate" -> Json.obj("$date" -> 0),
-        "effectiveEndDate"   -> Json.obj("$date" -> 1000),
+        "effectiveStartDate" -> Json.obj("$date" -> Json.obj("$numberLong" -> 0)),
+        "effectiveEndDate"   -> Json.obj("$date" -> Json.obj("$numberLong" -> 1000)),
         "justification"      -> JsString("justification"),
         "goodsDescription"   -> JsString("goods-description"),
         "keywords"           -> JsArray(Seq(JsString("keyword"))),

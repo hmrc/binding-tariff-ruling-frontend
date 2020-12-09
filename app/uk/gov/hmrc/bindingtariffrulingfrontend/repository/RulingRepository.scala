@@ -84,14 +84,6 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
     )
   )
 
-  override def ensureIndexes(implicit ec: ExecutionContext): Future[Seq[Boolean]] = {
-    for {
-      _ <- collection.create(failsIfExists = false)
-      _ <- collection.indexesManager(ec).dropAll()
-      ensure <- Future.sequence(indexes.map(collection.indexesManager(ec).ensure(_)))
-    } yield ensure
-  }
-
   override def update(ruling: Ruling, upsert: Boolean): Future[Ruling] =
     collection
       .findAndUpdate(

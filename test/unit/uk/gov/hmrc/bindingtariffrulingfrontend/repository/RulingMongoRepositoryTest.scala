@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
-import java.time.Instant
+import java.time.{Instant, LocalDate, ZoneId}
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
@@ -27,9 +27,6 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.mongo.MongoSpecSupport
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import java.time.temporal.ChronoUnit
-import java.time.LocalDate
-import java.time.ZoneId
 
 class RulingMongoRepositoryTest
     extends MongoUnitSpec
@@ -60,11 +57,11 @@ class RulingMongoRepositoryTest
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    await(repository.drop)
+    await(repository.ensureIndexes)
   }
 
-  override def afterAll(): Unit = {
-    super.afterAll()
+  override def afterEach(): Unit = {
+    super.afterEach()
     await(repository.drop)
   }
 
