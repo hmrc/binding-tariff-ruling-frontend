@@ -35,10 +35,10 @@ object MongoIndexCreator {
 
   def createCompoundIndex(
     indexFieldMappings: Seq[(String, IndexType)],
-    isUnique: Boolean,
+    isUnique: Boolean     = false,
     name: Option[String]  = None,
     isBackground: Boolean = false,
-    options: BSONDocument
+    options: BSONDocument = BSONDocument()
   ): Index =
     Index(
       key        = indexFieldMappings,

@@ -24,50 +24,9 @@
         containerClass: Option[String] = None,
         counterClass: Option[String] = None,
         linksClass: Option[String] = None
-)
+)(implicit messages: Messages)
 
-<div id="@id" class="grid-row @containerClass.getOrElse("")">
-
- <div class="column-one-half">
-  @if(pager.nonEmpty) {
-   @if(pager.pageCount == 1) {
-    <div id="@id-one" class="@counterClass.getOrElse("")">
-     <span>Showing</span>
-     <span id="@id-total" class="bold">@{pager.resultCount}</span>
-     <span>
-     @if(pager.resultCount == 1){
-      @singularName
-     } else {
-      @pluralName
-     }
-     </span>
-    </div>
-   } else {
-    <div id="@id-some" class="@counterClass.getOrElse("")">
-     <span>Showing</span>
-     <span id="@id-start">@{(pager.pageIndex-1) * pager.pageSize + 1}</span>
-     <span>-</span>
-     <span id="@id-end">@{(pager.pageIndex-1) * pager.pageSize + pager.size}</span>
-     <span>of</span>
-     <span id="@id-total" class="bold">@{pager.resultCount}</span>
-     <span>
-     @if(pager.resultCount == 1){
-      @singularName
-     } else {
-      @pluralName
-     }
-     </span>
-    </div>
-   }
-  } else {
-   <div id="@id-none">
-    <span>Showing</span>
-    <span>no @{pluralName}</span>
-   </div>
-  }
-
- </div>
-
+<div>
  @if(pager.pageCount > 1) {
   <div id="@id-links" class="column-one-half align-right @linksClass.getOrElse("")">
   @defining(pager.pageCount) { pageCount: Int =>
@@ -93,4 +52,4 @@
   }
   </div>
  }
-</div>
+ </div>

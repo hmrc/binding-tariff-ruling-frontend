@@ -19,6 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.model
 import java.time.Instant
 
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 case class Ruling(
   reference: String,
@@ -29,7 +30,13 @@ case class Ruling(
   goodsDescription: String,
   keywords: Set[String]    = Set.empty,
   attachments: Seq[String] = Seq.empty
-)
+) {
+  lazy val bindingCommodityCodeNgrams = bindingCommodityCode
+    .scanLeft("") {
+      case (ngram, char) => ngram + char
+    }
+    .filterNot(_.isEmpty)
+}
 
 object Ruling {
 
@@ -38,9 +45,9 @@ object Ruling {
   }
 
   object Mongo {
-    private implicit val formatInstant: OFormat[Instant] = new OFormat[Instant] {
+    implicit val formatInstant: OFormat[Instant] = new OFormat[Instant] {
       override def writes(datetime: Instant): JsObject =
-        Json.obj("$date" -> datetime.toEpochMilli)
+        Json.obj("$date" -> Json.obj("$numberLong" -> datetime.toEpochMilli()))
 
       override def reads(json: JsValue): JsResult[Instant] =
         json match {
@@ -53,6 +60,35 @@ object Ruling {
         }
     }
 
-    implicit val format: OFormat[Ruling] = Json.format[Ruling]
+    implicit val rulingReads: Reads[Ruling] = Json.reads[Ruling]
+
+    implicit val rulingWrites: OWrites[Ruling] = (
+      (__ \ "reference").write[String] and
+        (__ \ "bindingCommodityCode").write[String] and
+        (__ \ "bindingCommodityCodeNGrams").write[Seq[String]] and
+        (__ \ "effectiveStartDate").write[Instant](formatInstant) and
+        (__ \ "effectiveEndDate").write[Instant](formatInstant) and
+        (__ \ "justification").write[String] and
+        (__ \ "goodsDescription").write[String] and
+        (__ \ "keywords").write[Set[String]] and
+        (__ \ "attachments").write[Seq[String]]
+    )(ruling =>
+      (
+        ruling.reference,
+        ruling.bindingCommodityCode,
+        ruling.bindingCommodityCodeNgrams,
+        ruling.effectiveStartDate,
+        ruling.effectiveEndDate,
+        ruling.justification,
+        ruling.goodsDescription,
+        ruling.keywords,
+        ruling.attachments
+      )
+    )
+
+    implicit val format: OFormat[Ruling] = OFormat(
+      rulingReads,
+      rulingWrites
+    )
   }
 }

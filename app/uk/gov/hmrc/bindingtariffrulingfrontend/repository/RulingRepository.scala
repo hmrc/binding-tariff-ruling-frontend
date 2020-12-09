@@ -16,20 +16,25 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
+import cats.syntax.all._
 import com.google.inject.ImplementedBy
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json._
-import reactivemongo.api.indexes.Index
-import reactivemongo.api.{Cursor, QueryOpts}
-import reactivemongo.bson.BSONObjectID
+import reactivemongo.api.indexes.{Index, IndexType}
+import reactivemongo.api.{Cursor, QueryOpts, ReadConcern}
+import reactivemongo.bson.{BSONDocument, BSONInteger, BSONObjectID}
 import reactivemongo.play.json.ImplicitBSONHandlers._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
-import uk.gov.hmrc.bindingtariffrulingfrontend.repository.MongoIndexCreator.createSingleFieldAscendingIndex
+import uk.gov.hmrc.bindingtariffrulingfrontend.repository.MongoIndexCreator._
 import uk.gov.hmrc.mongo.ReactiveRepository
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
+import java.time.Instant
+import java.time.ZonedDateTime
+import java.time.ZoneId
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 @ImplementedBy(classOf[RulingMongoRepository])
 trait RulingRepository {
@@ -47,7 +52,7 @@ trait RulingRepository {
 }
 
 @Singleton
-class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)
+class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implicit val ec: ExecutionContext)
     extends ReactiveRepository[Ruling, BSONObjectID](
       collectionName = "rulings",
       mongo          = mongoDbProvider.mongo,
@@ -56,15 +61,36 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)
     with RulingRepository {
   import Ruling.Mongo.format
 
-  collection.indexesManager.drop("goodsDescription_Index")
-
   override lazy val indexes: Seq[Index] = Seq(
     createSingleFieldAscendingIndex("reference", isUnique = true),
-    createSingleFieldAscendingIndex("bindingCommodityCode")
+    createSingleFieldAscendingIndex("bindingCommodityCode"),
+    createCompoundIndex(
+      name = Some("textIndex"),
+      indexFieldMappings = Seq(
+        "reference"                  -> IndexType.Text,
+        "bindingCommodityCode"       -> IndexType.Text,
+        "bindingCommodityCodeNGrams" -> IndexType.Text,
+        "justification"              -> IndexType.Text,
+        "goodsDescription"           -> IndexType.Text,
+        "keywords"                   -> IndexType.Text
+      ),
+      options = BSONDocument(
+        "weights" -> BSONDocument(
+          "bindingCommodityCode"       -> BSONInteger(10),
+          "bindingCommodityCodeNgrams" -> BSONInteger(10),
+          "keywords"                   -> BSONInteger(5)
+        )
+      )
+    )
   )
 
-  override def ensureIndexes(implicit ec: ExecutionContext): Future[Seq[Boolean]] =
-    Future.sequence(indexes.map(collection.indexesManager(ec).ensure(_)))(implicitly, ec)
+  override def ensureIndexes(implicit ec: ExecutionContext): Future[Seq[Boolean]] = {
+    for {
+      _ <- collection.create(failsIfExists = false)
+      _ <- collection.indexesManager(ec).dropAll()
+      ensure <- Future.sequence(indexes.map(collection.indexesManager(ec).ensure(_)))
+    } yield ensure
+  }
 
   override def update(ruling: Ruling, upsert: Boolean): Future[Ruling] =
     collection
@@ -84,18 +110,51 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)
     removeAll().map(_ => ())
 
   override def get(search: SimpleSearch): Future[Paged[Ruling]] = {
-    val filter = either(
-      "reference"            -> eq(search.query.getOrElse("")),
-      "bindingCommodityCode" -> numberStartingWith(search.query.getOrElse("")),
-      "goodsDescription"     -> contains(search.query.getOrElse(""))
-    )
+    val startOfToday = LocalDate.now().atStartOfDay
+    val zoneOffset = ZoneId.of("Europe/London").getRules().getOffset(startOfToday)
+    val today = Json.toJson(startOfToday.toInstant(zoneOffset))(Ruling.Mongo.formatInstant)
+
+    println(("*" * 50) + " " + search)
+
+    val dateFilter =
+      Json.obj("effectiveEndDate" -> Json.obj("$gt" -> today))
+
+    val textSearch = search.query.map { query =>
+      Json.obj("$text" -> Json.obj("$search" -> query))
+    }.getOrElse {
+      Json.obj()
+    }
+
+    val imageFilter =  if (search.imagesOnly)
+        Json.obj("attachments" -> Json.obj("$gt" -> Json.arr()))
+      else
+        Json.obj()
+
+    val allSearches: JsObject = dateFilter ++ textSearch ++ imageFilter
+
+    val textScore: JsObject =
+      Json.obj("score" -> Json.obj("$meta" -> "textScore"))
+
     for {
       results <- collection
-                  .find[JsObject, Ruling](filter)
+                  .find[JsObject, JsObject](
+                    selector   = allSearches,
+                    projection = Some(textScore)
+                  )
                   .options(QueryOpts(skipN = (search.pageIndex - 1) * search.pageSize, batchSizeN = search.pageSize))
-                  .cursor[Ruling]()
-                  .collect[List](search.pageSize, Cursor.FailOnError[List[Ruling]]())
-      count <- collection.count(Some(filter))
+                  .sort(textScore)
+                  .cursor[JsObject]()
+                  .collect[List](search.pageSize, Cursor.FailOnError[List[JsObject]]())
+                  .map(_.map(_.as[Ruling](Ruling.Mongo.format.reads)))
+
+      count <- collection.count(
+                selector    = Some(allSearches),
+                limit       = None,
+                skip        = 0,
+                hint        = None,
+                readConcern = ReadConcern.Available
+              )
+
     } yield Paged(results, search.pageIndex, search.pageSize, count)
   }
 

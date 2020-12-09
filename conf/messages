@@ -6,6 +6,20 @@ search.hint = You can search using a combination of words, commodity codes and r
 search.form.submit = Search rulings
 search.form.images = Only show rulings that include images
 
+search.pagination.showing = Showing
+search.pagination.to = to
+search.pagination.of = of
+search.pagination.singular = ruling
+search.pagination.plural = rulings
+search.pagination.match.singular = that matches your search.
+search.pagination.match.plural = that match your search.
+search.pagination.nomatch = There are no rulings that match your search.
+
+search.results.ruling.reference = Ruling reference:
+search.results.ruling.commodityCode = Commodity code:
+search.results.ruling.commodityCode.newTab = (opens in new tab)
+search.results.ruling.view = View ruling
+
 ruling.title = Information for this Binding Tariff Information ruling
 ruling.heading = Information for Binding Tariff Information ruling {0}
 ruling.reference = BTI reference

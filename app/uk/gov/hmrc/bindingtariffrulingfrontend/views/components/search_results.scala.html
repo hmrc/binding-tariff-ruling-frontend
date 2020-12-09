@@ -14,33 +14,58 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+@import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
-@import uk.gov.hmrc.bindingtariffrulingfrontend.utils.Dates
-@(results: Paged[Ruling])(implicit messages: Messages)
+@import uk.gov.hmrc.bindingtariffrulingfrontend.utils.{Dates, GlobalTariff}
+@(search: Option[SimpleSearch], results: Paged[Ruling])(implicit messages: Messages, appConfig: AppConfig)
 
-<table id="search_results-table">
-    <thead>
-        <tr>
-            <th>Reference</th>
-            <th>Description</th>
-            <th>Start date</th>
-            <th>End date</th>
-            @*<th>Image</th>*@
-        </tr>
-    </thead>
-    <tbody>
-        @for((result: Ruling, index: Int) <- results.results.zipWithIndex) {
-            <tr id="search_results-table-row_@index">
-                <td id="search_results-table-row_@index-index">
-                    <a href="@routes.RulingController.get(result.reference)">@result.reference</a>
-                </td>
-                <td id="search_results-table-row_@index-description">@result.goodsDescription</td>
-                <td id="search_results-table-row_@index-start_date">@Dates.format(result.effectiveStartDate)</td>
-                <td id="search_results-table-row_@index-end_date">@Dates.format(result.effectiveEndDate)</td>
-                @*<td id="search_results-table-row_@index-images"></td>*@
+@if(results.nonEmpty) {
+    <table id="search_results-table">
+        <thead>
+            <tr>
+                <th>Advance Tariff Ruling details</th>
+                <th width="15%">Expiry date</th>
+                <th width="11%"></th>
             </tr>
-        }
-    </tbody>
-</table>
-
+        </thead>
+        <tbody>
+            @for((result: Ruling, index: Int) <- results.results.zipWithIndex) {
+                <tr id="search_results-table-row_@index">
+                    <td id="search_results-table-row_@index-index">
+                        <div class="mb-1">
+                            @messages("search.results.ruling.reference")
+                            <a href="@routes.RulingController.get(result.reference)">@result.reference</a>
+                        </div>
+                        <div class="mb-1">
+                            @result.goodsDescription
+                        </div>
+                        <div class="mb-1">
+                            @result.keywords.map { keyword =>
+                                <a href="@routes.SearchController.get(Some(keyword), search.map(_.imagesOnly).getOrElse(false), 1)" class="govuk-tag govuk-tag--grey">@keyword</a>
+                            }
+                        </div>
+                        <div class="mb-1">
+                            @messages("search.results.ruling.commodityCode")
+                            <a href="@GlobalTariff.link(result.bindingCommodityCode)" target="_blank">
+                                @result.bindingCommodityCode @messages("search.results.ruling.commodityCode.newTab")
+                            </a>
+                        </div>
+                        <div class="mb-1">
+                            Images go here
+                        </div>
+                    </td>
+                    <td id="search_results-table-row_@index-end_date">
+                        @Dates.format(result.effectiveEndDate)
+                    </td>
+                    <td>
+                        <a href="@routes.RulingController.get(result.reference)">
+                            @messages("search.results.ruling.view")
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

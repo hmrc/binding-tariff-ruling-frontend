@@ -40,18 +40,13 @@ class SearchController @Inject() (
 
   def get(query: Option[String], imagesOnly: Boolean, page: Int): Action[AnyContent] =
     (Action andThen allowlist).async { implicit request =>
-      query match {
-        case None                     => successful(Ok(views.html.search(SimpleSearch.form, None)))
-        case Some(str) if str.isEmpty => successful(Ok(views.html.search(SimpleSearch.form, None)))
-        case _ =>
-          SimpleSearch.form.bindFromRequest
-            .fold(
-              errors => successful(Ok(views.html.search(errors, None))),
-              query =>
-                rulingService.get(query).map { results =>
-                  Ok(views.html.search(SimpleSearch.form.fill(query), Some(results)))
-                }
-            )
-      }
+      SimpleSearch.form.bindFromRequest
+        .fold(
+          errors => successful(Ok(views.html.search(errors, None, None))),
+          query =>
+            rulingService.get(query).map { results =>
+              Ok(views.html.search(SimpleSearch.form.fill(query), Some(query), Some(results)))
+            }
+        )
     }
 }

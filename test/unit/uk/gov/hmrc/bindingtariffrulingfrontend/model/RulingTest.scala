@@ -25,7 +25,7 @@ class RulingTest extends BaseSpec {
 
   val ruling: Ruling = Ruling(
     reference            = "reference",
-    bindingCommodityCode = "commodity-code",
+    bindingCommodityCode = "0011223344",
     effectiveStartDate   = Instant.EPOCH,
     effectiveEndDate     = Instant.EPOCH.plusSeconds(1),
     justification        = "justification",
@@ -38,7 +38,7 @@ class RulingTest extends BaseSpec {
     "Convert to REST Json" in {
       Json.toJson(ruling)(Ruling.REST.format) shouldBe Json.obj(
         "reference"            -> JsString("reference"),
-        "bindingCommodityCode" -> JsString("commodity-code"),
+        "bindingCommodityCode" -> JsString("0011223344"),
         "effectiveStartDate"   -> JsString("1970-01-01T00:00:00Z"),
         "effectiveEndDate"     -> JsString("1970-01-01T00:00:01Z"),
         "justification"        -> JsString("justification"),
@@ -51,13 +51,25 @@ class RulingTest extends BaseSpec {
     "Convert to Mongo Json" in {
       Json.toJson(ruling)(Ruling.Mongo.format) shouldBe Json.obj(
         "reference"            -> JsString("reference"),
-        "bindingCommodityCode" -> JsString("commodity-code"),
-        "effectiveStartDate"   -> Json.obj("$date" -> 0),
-        "effectiveEndDate"     -> Json.obj("$date" -> 1000),
-        "justification"        -> JsString("justification"),
-        "goodsDescription"     -> JsString("goods-description"),
-        "keywords"             -> JsArray(Seq(JsString("keyword"))),
-        "attachments"          -> JsArray(Seq(JsString("attachment")))
+        "bindingCommodityCode" -> JsString("0011223344"),
+        "bindingCommodityCodeNgrams" -> Json.arr(
+          "0",
+          "00",
+          "001",
+          "0011",
+          "00112",
+          "001122",
+          "0011223",
+          "00112233",
+          "001122334",
+          "0011223344"
+        ),
+        "effectiveStartDate" -> Json.obj("$date" -> 0),
+        "effectiveEndDate"   -> Json.obj("$date" -> 1000),
+        "justification"      -> JsString("justification"),
+        "goodsDescription"   -> JsString("goods-description"),
+        "keywords"           -> JsArray(Seq(JsString("keyword"))),
+        "attachments"        -> JsArray(Seq(JsString("attachment")))
       )
     }
   }
