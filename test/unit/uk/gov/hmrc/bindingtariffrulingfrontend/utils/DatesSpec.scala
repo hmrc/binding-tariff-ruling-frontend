@@ -28,7 +28,7 @@ class DatesSpec extends BaseSpec {
       val date   = LocalDate.of(2018, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant
       val output = Dates.format(date)
 
-      output shouldBe "01 Jan 2018"
+      output shouldBe "01/01/2018"
     }
 
   }
