@@ -17,6 +17,8 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
 import com.google.inject.ImplementedBy
+import java.time.ZoneId
+import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json._
 import reactivemongo.api.indexes.{Index, IndexType}
@@ -29,11 +31,6 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.repository.MongoIndexCreator._
 import uk.gov.hmrc.mongo.ReactiveRepository
 
 import scala.concurrent.{ExecutionContext, Future}
-import java.time.Instant
-import java.time.ZonedDateTime
-import java.time.ZoneId
-import java.time.LocalDate
-import java.time.ZoneOffset
 
 @ImplementedBy(classOf[RulingMongoRepository])
 trait RulingRepository {

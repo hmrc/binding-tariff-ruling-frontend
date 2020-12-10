@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowedAction
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
@@ -28,7 +29,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.Future.successful
 import scala.concurrent.ExecutionContext
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 
 @Singleton
 class SearchController @Inject() (
@@ -41,7 +41,8 @@ class SearchController @Inject() (
     extends FrontendController(mcc)
     with I18nSupport {
 
-  private lazy val noMetadata: Map[String, FileMetadata] = Map.empty
+  type Metadata = Map[String, FileMetadata]
+  private lazy val noMetadata: Metadata = Map.empty
 
   def get(query: Option[String], imagesOnly: Boolean, page: Int): Action[AnyContent] =
     (Action andThen allowlist).async { implicit request =>
@@ -52,9 +53,8 @@ class SearchController @Inject() (
             search.query
               .map { query =>
                 for {
-                  paged <- rulingService.get(search)
-                  attachmentIds = paged.results.flatMap(result => result.attachments ++ result.images)
-                  fileMetadata <- fileStoreService.get(attachmentIds)
+                  paged        <- rulingService.get(search)
+                  fileMetadata <- fileStoreService.get(paged)
                 } yield Ok(views.html.search(SimpleSearch.form.fill(search), Some(search), Some(paged), fileMetadata))
               }
               .getOrElse {

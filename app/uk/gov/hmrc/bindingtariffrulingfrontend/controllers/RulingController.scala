@@ -47,9 +47,8 @@ class RulingController @Inject() (
 
   def get(id: String): Action[AnyContent] = (Action andThen allowlist).async { implicit request =>
     val maybeRulingDetails = for {
-      ruling <- OptionT(rulingService.get(id))
-      attachmentIds = ruling.attachments ++ ruling.images
-      fileMetadata <- OptionT.liftF[Future, Metadata](fileStoreService.get(attachmentIds))
+      ruling       <- OptionT(rulingService.get(id))
+      fileMetadata <- OptionT.liftF[Future, Metadata](fileStoreService.get(ruling))
     } yield Ok(views.html.ruling(ruling, fileMetadata))
 
     maybeRulingDetails.getOrElse(Ok(views.html.ruling_not_found(id)))

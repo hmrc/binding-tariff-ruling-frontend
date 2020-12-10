@@ -182,7 +182,7 @@ class RulingMongoRepositoryTest
 
     "Retrieve One - by Goods Description - images only" in {
       // Given
-      val document1 = Ruling(reference = "ref1", "0", Instant.now, tomorrow, "justification", "exacting", attachments = Seq("id1, id2"))
+      val document1 = Ruling(reference = "ref1", "0", Instant.now, tomorrow, "justification", "exacting", images = Seq("id1, id2"))
       val document2 = Ruling(reference = "ref2", "0", Instant.now, tomorrow, "justification", "exactly")
       val document3 = Ruling(reference = "ref3", "0", Instant.now, tomorrow, "justification", "fountain pen")
       givenAnExistingDocument(document1)

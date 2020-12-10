@@ -19,16 +19,55 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.service
 import org.mockito.Mockito._
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.FileStoreConnector
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
+import java.time.Instant
+import org.scalatest.BeforeAndAfterEach
 
-class FileStoreServiceTest extends BaseSpec {
+class FileStoreServiceTest extends BaseSpec with BeforeAndAfterEach {
   val connector = mock[FileStoreConnector]
-  val service = new FileStoreService(connector)
+  val service   = new FileStoreService(connector)
 
-  "FileStoreService.get" should {
+  def makeRuling(id: Int = 0) = Ruling(
+    "ref" + id,
+    "10101010",
+    Instant.now,
+    Instant.now,
+    "justification",
+    "description",
+    Set("foo", "bar"),
+    Seq("file1", "file2"),
+    Seq("image1", "image2")
+  )
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(connector)
+  }
+
+  "FileStoreService.get with ids" should {
     "delegate to connector" in {
       val ids = Seq("id1", "id2")
       service.get(ids)
-      verify(connector).get(ids)
+      verify(connector).get(ids.toSet)
+    }
+  }
+
+  "FileStoreService.get for a single ruling" should {
+    val ruling = makeRuling()
+
+    "delegate to connector" in {
+      service.get(ruling)
+      verify(connector).get(Set("file1", "file2", "image1", "image2"))
+    }
+  }
+
+  "FileStoreService.get with page of rulings" should {
+    "delegate to connector" in {
+      val rulings = Paged((0 until 5).map(makeRuling))
+      service.get(rulings)
+      val ids = Seq("file1", "file2", "image1", "image2")
+      verify(connector).get(Seq.fill(5)(ids).flatten.toSet)
     }
   }
 }

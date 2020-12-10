@@ -32,6 +32,8 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, Ruling
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 
 class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
@@ -56,6 +58,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
     "return 200 with form" in {
       given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier])).willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       val result = await(
         controller()

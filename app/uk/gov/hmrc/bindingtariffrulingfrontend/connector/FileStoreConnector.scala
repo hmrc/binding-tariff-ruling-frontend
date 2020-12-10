@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import com.kenshoo.play.metrics.Metrics
+import akka.stream.scaladsl.Source
+import akka.stream.Materializer
 import javax.inject.{Inject, Singleton}
-import play.api.libs.ws.WSClient
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.http.HeaderCarrier
@@ -29,18 +29,34 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class FileStoreConnector @Inject() (
   appConfig: AppConfig,
-  http: AuthenticatedHttpClient,
-  ws: WSClient,
-  val metrics: Metrics
-)(implicit ec: ExecutionContext) {
+  http: AuthenticatedHttpClient
+)(implicit mat: Materializer) {
 
-  def get(attachmentIds: Seq[String])(implicit headerCarrier: HeaderCarrier): Future[Map[String, FileMetadata]] =
-    if (attachmentIds.isEmpty) {
+  implicit val ec: ExecutionContext =
+    mat.executionContext
+
+  type Metadata = Map[String, FileMetadata]
+  private lazy val noMetadata: Metadata = Map.empty
+
+  private val ParamLength = 40 // A 36-char UUID plus &id=
+  private val BatchSize   = (appConfig.maxUriLength / ParamLength).intValue()
+
+  private def makeQuery(ids: Seq[String]): String = {
+    val query = s"?${ids.map("id=" + _).mkString("&")}"
+    s"${appConfig.bindingTariffFileStoreUrl}/file$query"
+  }
+
+  def get(attachmentIds: Set[String])(implicit headerCarrier: HeaderCarrier): Future[Metadata] =
+    if (attachmentIds.isEmpty)
       Future.successful(Map.empty)
-    } else {
-      val query = s"?${attachmentIds.map(att => s"id=$att").mkString("&")}"
-      http
-        .GET[Seq[FileMetadata]](s"${appConfig.bindingTariffFileStoreUrl}/file$query")
-        .map(_.map(meta => (meta.id, meta)).toMap)
-    }
+    else
+      Source(attachmentIds)
+        .grouped(BatchSize)
+        .mapAsyncUnordered(Runtime.getRuntime().availableProcessors()) { ids =>
+          http.GET[Seq[FileMetadata]](makeQuery(ids))
+        }
+        .runFold(noMetadata) {
+          case (metadata, newEntries) =>
+            metadata ++ newEntries.map(entry => entry.id -> entry).toMap
+        }
 }

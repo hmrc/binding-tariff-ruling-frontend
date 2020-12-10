@@ -35,6 +35,8 @@ class AppConfig @Inject() (val configuration: Configuration) extends ServicesCon
   lazy val adminEnabled: Boolean                  = getBoolean("admin-mode")
   lazy val ukGlobalTariffHost: String             = loadConfig("uk-global-tariff.host")
 
+  lazy val maxUriLength: Long = configuration.underlying.getBytes("akka.http.parsing.max-uri-length")
+
   lazy val allowlist: Option[Set[String]] = {
     if (getBoolean("filters.allowlist.enabled")) {
       Some[Set[String]](

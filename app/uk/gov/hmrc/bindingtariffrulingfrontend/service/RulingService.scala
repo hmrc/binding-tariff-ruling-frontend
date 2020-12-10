@@ -68,7 +68,7 @@ class RulingService @Inject() (
 
       fileMetaData <- validCase
         .map(_.attachments.map(_.id))
-        .map(fileStoreService.get)
+        .map(fileStoreService.get(_))
         .getOrElse(Future.successful(Map.empty[String, FileMetadata]))
 
       updatedRuling: UpdatedRuling = validCase.map(toRuling(_, fileMetaData))

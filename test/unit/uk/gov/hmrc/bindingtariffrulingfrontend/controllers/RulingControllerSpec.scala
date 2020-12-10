@@ -28,6 +28,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, Ruling
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 
 class RulingControllerSpec extends ControllerSpec {
 
@@ -46,6 +47,7 @@ class RulingControllerSpec extends ControllerSpec {
       given(rulingService.get("id")) willReturn Future.successful(
         Some(Ruling("ref", "code", Instant.now, Instant.now, "justification", "goods description"))
       )
+      given(fileStoreService.get(any[Ruling])(any[HeaderCarrier])).willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       val result = await(controller().get("id")(getRequestWithCSRF()))
       status(result)      shouldBe Status.OK
