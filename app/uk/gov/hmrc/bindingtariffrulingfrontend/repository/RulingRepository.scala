@@ -106,21 +106,9 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
     val zoneOffset = ZoneId.of("Europe/London").getRules().getOffset(startOfToday)
     val today = Json.toJson(startOfToday.toInstant(zoneOffset))(Ruling.Mongo.formatInstant)
 
-    println(("*" * 50) + " " + search)
-
-    val dateFilter =
-      Json.obj("effectiveEndDate" -> Json.obj("$gt" -> today))
-
-    val textSearch = search.query.map { query =>
-      Json.obj("$text" -> Json.obj("$search" -> query))
-    }.getOrElse {
-      Json.obj()
-    }
-
-    val imageFilter =  if (search.imagesOnly)
-        Json.obj("attachments" -> Json.obj("$gt" -> Json.arr()))
-      else
-        Json.obj()
+    val dateFilter = gt("effectiveEndDate", today)
+    val textSearch = search.query.map(text(_)).getOrElse(Json.obj())
+    val imageFilter =  if (search.imagesOnly) nonEmpty("attachments") else Json.obj()
 
     val allSearches: JsObject = dateFilter ++ textSearch ++ imageFilter
 
@@ -153,18 +141,12 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
   private def byReference(reference: String): JsObject =
     Json.obj("reference" -> reference)
 
-  private def eq(string: String): JsValue = JsString(string)
+  private def text(query: String): JsObject =
+    Json.obj("$text" -> Json.obj("$search" -> query))
 
-  private def numberStartingWith(value: String): JsValue = regex(s"^$value\\d*")
+  private def nonEmpty(field: String): JsObject =
+    Json.obj(field -> Json.obj("$gt" -> Json.arr()))
 
-  private def contains(value: String): JsValue = regex(s".*$value.*", ignoreCase = true)
-
-  private def regex(regex: String, ignoreCase: Boolean = false): JsValue = Json.obj(
-    "$regex"   -> regex,
-    "$options" -> (if (ignoreCase) "i" else "")
-  )
-
-  private def either(options: (String, JsValue)*): JsObject =
-    Json.obj("$or" -> JsArray(options.map(element => Json.obj(element._1 -> element._2))))
-
+  private def gt(field: String, value: JsValue): JsObject =
+    Json.obj(field -> Json.obj("$gt" -> value))
 }

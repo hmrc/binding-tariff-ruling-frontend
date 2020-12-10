@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.utils
 
-import play.api.mvc.Call
-import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
-object GlobalTariff {
-  def link(commodityCode: String)(implicit appConfig: AppConfig): Call =
-    Call("GET", s"${appConfig.ukGlobalTariffHost}/tariff?q=${commodityCode}")
+class GlobalTariffSpec extends BaseSpec {
+  "GlobalTariff.link" should {
+    "produce a link to UK Global Tariff" in {
+      GlobalTariff.link("8888")(realConfig).url shouldBe "https://www.check-future-uk-trade-tariffs.service.gov.uk/tariff?q=8888"
+    }
+  }
 }

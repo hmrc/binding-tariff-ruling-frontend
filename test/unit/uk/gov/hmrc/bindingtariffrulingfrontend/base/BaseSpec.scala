@@ -37,11 +37,10 @@ trait BaseSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar {
     )
     .build()
 
-  lazy val realConfig: AppConfig                 = app.injector.instanceOf[AppConfig]
-  lazy val messageApi: MessagesApi               = app.injector.instanceOf[MessagesApi]
-  implicit val mcc: MessagesControllerComponents = app.injector.instanceOf[MessagesControllerComponents]
-  implicit val hc: HeaderCarrier                 = HeaderCarrier()
-  implicit val mat: Materializer                 = app.materializer
-  implicit val lang: Lang                        = mcc.langs.availables.head
-
+  lazy val realConfig: AppConfig                      = app.injector.instanceOf[AppConfig]
+  lazy val messageApi: MessagesApi                    = app.injector.instanceOf[MessagesApi]
+  implicit lazy val mcc: MessagesControllerComponents = app.injector.instanceOf[MessagesControllerComponents]
+  implicit val hc: HeaderCarrier                      = HeaderCarrier()
+  implicit lazy val mat: Materializer                 = app.materializer
+  implicit lazy val lang: Lang                        = mcc.langs.availables.head
 }

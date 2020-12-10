@@ -125,6 +125,18 @@ class RulingMongoRepositoryTest
       await(repository.get(SimpleSearch(Some("ref"), imagesOnly = false, 1, 100))).results shouldBe Seq.empty
     }
 
+    "Retrieve Multiple - no query" in {
+      // Given
+      val document1 = Ruling(reference = "ref1", "0", Instant.now, tomorrow, "justification", "exacting")
+      val document2 = Ruling(reference = "ref2", "0", Instant.now, tomorrow, "justification", "exactly")
+      val document3 = Ruling(reference = "ref3", "0", Instant.now, tomorrow, "justification", "fountain pen")
+      givenAnExistingDocument(document1)
+      givenAnExistingDocument(document2)
+      givenAnExistingDocument(document3)
+
+      await(repository.get(SimpleSearch(None, imagesOnly = false, 1, 100))).results shouldBe Seq(document1, document2, document3)
+    }
+
     "Retrieve One - by Reference - exact match" in {
       // Given
       val document1 = Ruling(reference = "ref1", "0", Instant.now, tomorrow, "justification", "description")
@@ -156,7 +168,7 @@ class RulingMongoRepositoryTest
       await(repository.get(SimpleSearch(Some("lapTOP"), imagesOnly = false, 1, 100))).results shouldBe Seq(document2)
     }
 
-    "Retrieve One - by Goods Description - word stems" in {
+    "Retrieve Multiple - by Goods Description - word stems" in {
       // Given
       val document1 = Ruling(reference = "ref1", "0", Instant.now, tomorrow, "justification", "exacting")
       val document2 = Ruling(reference = "ref2", "0", Instant.now, tomorrow, "justification", "exactly")
@@ -166,6 +178,18 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document3)
 
       await(repository.get(SimpleSearch(Some("exact"), imagesOnly = false, 1, 100))).results shouldBe Seq(document1, document2)
+    }
+
+    "Retrieve One - by Goods Description - images only" in {
+      // Given
+      val document1 = Ruling(reference = "ref1", "0", Instant.now, tomorrow, "justification", "exacting", attachments = Seq("id1, id2"))
+      val document2 = Ruling(reference = "ref2", "0", Instant.now, tomorrow, "justification", "exactly")
+      val document3 = Ruling(reference = "ref3", "0", Instant.now, tomorrow, "justification", "fountain pen")
+      givenAnExistingDocument(document1)
+      givenAnExistingDocument(document2)
+      givenAnExistingDocument(document3)
+
+      await(repository.get(SimpleSearch(Some("exact"), imagesOnly = true, 1, 100))).results shouldBe Seq(document1)
     }
   }
 
