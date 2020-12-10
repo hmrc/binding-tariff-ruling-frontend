@@ -14,13 +14,15 @@
  * limitations under the License.
  *@
 
+@import play.twirl.api.HtmlFormat
 @import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+@import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 @import uk.gov.hmrc.bindingtariffrulingfrontend.utils.{Dates, GlobalTariff}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 
-@(ruling: Ruling)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(ruling: Ruling, fileMetadata: Map[String, FileMetadata])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @main_template(title = Some(messages("ruling.title")), bodyClasses = None) {
 
@@ -76,10 +78,44 @@
      </td>
     </tr>
    }
+   @if(ruling.images.nonEmpty) {
+    <tr>
+      <th scope="row">@messages("ruling.images")</th>
+      <td>
+        @ruling.images.map { id =>
+            @fileMetadata.get(id).map { meta =>
+              @meta.fileName.map { fileName =>
+                @meta.url.map { url =>
+                  <img class="image-thumbnail-large" alt="@fileName" src="@url" />
+                }
+              }.getOrElse {
+                HtmlFormat.empty
+              }
+            }
+        }
+      </td>
+    </tr>
+   }
    @if(ruling.attachments.nonEmpty) {
     <tr>
-     <th scope="row">@messages("ruling.attachments")</th>
-     <td></td>
+      <th scope="row">@messages("ruling.attachments")</th>
+        <td>
+        <ul>
+          @ruling.attachments.map { id =>
+            @fileMetadata.get(id).map { meta =>
+              @meta.fileName.map { fileName =>
+                @meta.url.map { url =>
+                  <li class="mb-1">
+                    <a href="@url">@fileName</a>
+                  </li>
+                }
+              }.getOrElse {
+                HtmlFormat.empty
+              }
+            }
+          }
+        </ul>
+      </td>
     </tr>
    }
    <tr>

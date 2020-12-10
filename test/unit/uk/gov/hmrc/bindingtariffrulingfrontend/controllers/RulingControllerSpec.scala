@@ -24,21 +24,22 @@ import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action._
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
-import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
+import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
 class RulingControllerSpec extends ControllerSpec {
 
-  private val rulingService = mock[RulingService]
+  private val rulingService    = mock[RulingService]
+  private val fileStoreService = mock[FileStoreService]
 
   private def controller(
     allowlist: AllowedAction  = AllowListDisabled(),
     auth: AuthenticatedAction = SuccessfulAuth(),
     admin: AdminAction        = AdminEnabled()
   ) =
-    new RulingController(rulingService, allowlist, auth, admin, mcc, realConfig)
+    new RulingController(rulingService, fileStoreService, allowlist, auth, admin, mcc, realConfig)
 
   "GET /" should {
     "return 200" in {

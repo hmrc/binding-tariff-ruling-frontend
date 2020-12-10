@@ -31,6 +31,7 @@ class AppConfig @Inject() (val configuration: Configuration) extends ServicesCon
   lazy val analyticsHost: String                  = loadConfig(s"google-analytics.host")
   lazy val authorization: String                  = loadConfig("auth.api-token")
   lazy val bindingTariffClassificationUrl: String = baseUrl("binding-tariff-classification")
+  lazy val bindingTariffFileStoreUrl: String      = baseUrl("binding-tariff-filestore")
   lazy val adminEnabled: Boolean                  = getBoolean("admin-mode")
   lazy val ukGlobalTariffHost: String             = loadConfig("uk-global-tariff.host")
 

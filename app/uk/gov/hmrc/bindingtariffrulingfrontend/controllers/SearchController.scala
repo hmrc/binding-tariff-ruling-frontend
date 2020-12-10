@@ -22,36 +22,48 @@ import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowedAction
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
-import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
+import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future.successful
+import scala.concurrent.ExecutionContext
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 
 @Singleton
 class SearchController @Inject() (
   rulingService: RulingService,
+  fileStoreService: FileStoreService,
   allowlist: AllowedAction,
   mcc: MessagesControllerComponents,
   implicit val appConfig: AppConfig
-) extends FrontendController(mcc)
+)(implicit ec: ExecutionContext)
+    extends FrontendController(mcc)
     with I18nSupport {
+
+  private lazy val noMetadata: Map[String, FileMetadata] = Map.empty
 
   def get(query: Option[String], imagesOnly: Boolean, page: Int): Action[AnyContent] =
     (Action andThen allowlist).async { implicit request =>
       SimpleSearch.form.bindFromRequest
         .fold(
-          errors => successful(Ok(views.html.search(errors, None, None))),
+          errors => successful(Ok(views.html.search(errors, None, None, noMetadata))),
           search =>
             search.query
               .map { query =>
-                rulingService.get(search).map { results =>
-                  Ok(views.html.search(SimpleSearch.form.fill(search), Some(search), Some(results)))
-                }
+                for {
+                  paged <- rulingService.get(search)
+                  attachmentIds = paged.results.flatMap(result => result.attachments ++ result.images)
+                  fileMetadata <- fileStoreService.get(attachmentIds)
+                } yield Ok(views.html.search(SimpleSearch.form.fill(search), Some(search), Some(paged), fileMetadata))
               }
               .getOrElse {
-                successful(Ok(views.html.search(SimpleSearch.form.fill(search), Some(search), None)))
+                successful(
+                  Ok(
+                    views.html
+                      .search(SimpleSearch.form.fill(search), Some(search), None, noMetadata)
+                  )
+                )
               }
         )
     }

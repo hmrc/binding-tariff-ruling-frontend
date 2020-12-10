@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
+import cats.data.OptionT
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -26,10 +27,14 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
+import scala.concurrent.Future
 
 @Singleton
 class RulingController @Inject() (
   rulingService: RulingService,
+  fileStoreService: FileStoreService,
   allowlist: AllowedAction,
   authenticate: AuthenticatedAction,
   verifyAdmin: AdminAction,
@@ -38,11 +43,16 @@ class RulingController @Inject() (
 ) extends FrontendController(mcc)
     with I18nSupport {
 
+  type Metadata = Map[String, FileMetadata]
+
   def get(id: String): Action[AnyContent] = (Action andThen allowlist).async { implicit request =>
-    rulingService.get(id) map {
-      case Some(ruling) => Ok(views.html.ruling(ruling))
-      case _            => Ok(views.html.ruling_not_found(id))
-    }
+    val maybeRulingDetails = for {
+      ruling <- OptionT(rulingService.get(id))
+      attachmentIds = ruling.attachments ++ ruling.images
+      fileMetadata <- OptionT.liftF[Future, Metadata](fileStoreService.get(attachmentIds))
+    } yield Ok(views.html.ruling(ruling, fileMetadata))
+
+    maybeRulingDetails.getOrElse(Ok(views.html.ruling_not_found(id)))
   }
 
   def post(id: String): Action[AnyContent] = (Action andThen authenticate).async { implicit request =>

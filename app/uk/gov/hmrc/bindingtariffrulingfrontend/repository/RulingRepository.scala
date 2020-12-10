@@ -107,7 +107,7 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
 
     val dateFilter  = gt("effectiveEndDate", today)
     val textSearch  = search.query.map(text(_)).getOrElse(Json.obj())
-    val imageFilter = if (search.imagesOnly) nonEmpty("attachments") else Json.obj()
+    val imageFilter = if (search.imagesOnly) nonEmpty("images") else Json.obj()
 
     val allSearches: JsObject = dateFilter ++ textSearch ++ imageFilter
 

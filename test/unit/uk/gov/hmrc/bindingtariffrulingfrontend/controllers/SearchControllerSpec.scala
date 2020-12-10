@@ -28,16 +28,18 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AllowListDisabled, AllowListEnabled, AllowedAction}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
-import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
+import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
-  private val rulingService = mock[RulingService]
+  private val rulingService    = mock[RulingService]
+  private val fileStoreService = mock[FileStoreService]
 
   private def controller(allowlist: AllowedAction = AllowListDisabled()) =
-    new SearchController(rulingService, allowlist, mcc, realConfig)
+    new SearchController(rulingService, fileStoreService, allowlist, mcc, realConfig)
 
   "GET /" should {
     "return 200 without form" in {

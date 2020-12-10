@@ -31,7 +31,8 @@ class RulingTest extends BaseSpec {
     justification        = "justification",
     goodsDescription     = "goods-description",
     keywords             = Set("keyword"),
-    attachments          = Seq("attachment")
+    attachments          = Seq("attachment"),
+    images               = Seq("image")
   )
 
   "Ruling" should {
@@ -44,7 +45,8 @@ class RulingTest extends BaseSpec {
         "justification"        -> JsString("justification"),
         "goodsDescription"     -> JsString("goods-description"),
         "keywords"             -> JsArray(Seq(JsString("keyword"))),
-        "attachments"          -> JsArray(Seq(JsString("attachment")))
+        "attachments"          -> JsArray(Seq(JsString("attachment"))),
+        "images"               -> JsArray(Seq(JsString("image")))
       )
     }
 
@@ -69,7 +71,8 @@ class RulingTest extends BaseSpec {
         "justification"      -> JsString("justification"),
         "goodsDescription"   -> JsString("goods-description"),
         "keywords"           -> JsArray(Seq(JsString("keyword"))),
-        "attachments"        -> JsArray(Seq(JsString("attachment")))
+        "attachments"        -> JsArray(Seq(JsString("attachment"))),
+        "images"             -> JsArray(Seq(JsString("image")))
       )
     }
   }
