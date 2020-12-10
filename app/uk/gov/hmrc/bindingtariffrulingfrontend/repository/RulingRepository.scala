@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
-import cats.syntax.all._
 import com.google.inject.ImplementedBy
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json._
@@ -145,7 +144,7 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
     Json.obj("$text" -> Json.obj("$search" -> query))
 
   private def nonEmpty(field: String): JsObject =
-    Json.obj(field -> Json.obj("$gt" -> Json.arr()))
+    gt(field, Json.arr())
 
   private def gt(field: String, value: JsValue): JsObject =
     Json.obj(field -> Json.obj("$gt" -> value))
