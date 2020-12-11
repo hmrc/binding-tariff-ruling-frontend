@@ -17,17 +17,25 @@ search.results.ruling.commodityCode = Commodity code:
 search.results.ruling.commodityCode.newTab = (opens in new tab)
 search.results.ruling.view = View ruling
 
-ruling.title = Information for this Binding Tariff Information ruling
-ruling.heading = Information for Binding Tariff Information ruling {0}
-ruling.reference = BTI reference
-ruling.commodity_code = Commodity code
-ruling.start_date = Start date
-ruling.end_date = End date
-ruling.justification = Justification
+ruling.title = Information for ruling
+ruling.heading = Information for ruling {0}
+ruling.heading.secondary = Advance Tariff Ruling
+ruling.startDate = Start date
+ruling.expiryDate = Expiry date
+ruling.commodityCode = Commodity code
 ruling.description = Description
+ruling.keywords = Keywords
+ruling.images = Images
+ruling.attachments = Attachments
+ruling.justification = Justification
+ruling.printRuling = Print this ruling
+ruling.downloadRuling = Download this ruling
+ruling.feedback.heading = Tell us about your experience of the Search for Advance Tariff Rulings service
+ruling.feedback.paragraph = to help us understand if this service has helped you to find the ruling you were looking for.
+ruling.feedback.link = Complete a short survey
 
 ruling_not_found.heading = Ruling with reference {0} was not found
 ruling_not_found.heading.no.reference = Ruling reference not found
 
 error.summary.title = There''s a problem
-site.back = back
+site.back = Back

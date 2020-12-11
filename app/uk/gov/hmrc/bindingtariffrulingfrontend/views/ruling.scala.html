@@ -17,53 +17,81 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
-@import uk.gov.hmrc.bindingtariffrulingfrontend.utils.Dates
+@import uk.gov.hmrc.bindingtariffrulingfrontend.utils.{Dates, GlobalTariff}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
+
 @(ruling: Ruling)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @main_template(title = Some(messages("ruling.title")), bodyClasses = None) {
 
  <a id="ruling-back" href="@routes.SearchController.get()" class="link-back">@messages("site.back")</a>
 
- <h1 id="ruling-heading">@messages("ruling.heading", ruling.reference)</h1>
-
- <div class="grid-row">
-  <div class="column-one-half">
-   <div class="grid-row">
-    <p class="column-one-third font-bold">@messages("ruling.reference")</p>
-    <p id="ruling-reference" class="column-two-thirds">@ruling.reference</p>
-   </div>
-  </div>
-
-  <div class="column-one-half">
-   <div class="grid-row">
-    <p class="column-one-third font-bold">@messages("ruling.start_date")</p>
-    <p id="ruling-start_date" class="column-two-thirds">@Dates.format(ruling.effectiveStartDate)</p>
-   </div>
-  </div>
+ <div class="heading-xlarge">
+  <span class="heading-secondary">
+   @messages("ruling.heading.secondary")
+  </span>
+  <h1 id="ruling-heading" class="mt-0 heading-xlarge">
+   @messages("ruling.heading", ruling.reference)
+  </h1>
  </div>
 
- <div class="grid-row">
-  <div class="column-one-half">
-   <div class="grid-row">
-    <p class="column-one-third font-bold">@messages("ruling.commodity_code")</p>
-    <p id="ruling-commodity_code" class="column-two-thirds">@ruling.bindingCommodityCode</p>
-   </div>
-  </div>
+ <button class="button-gray" onclick="window.print()">@messages("ruling.printRuling")</button>
+@* <button class="button-gray">@messages("ruling.downloadRuling")</button>*@
 
-  <div class="column-one-half">
-   <div class="grid-row">
-    <p class="column-one-third font-bold">@messages("ruling.end_date")</p>
-    <p id="ruling-end_date" class="column-two-thirds">@Dates.format(ruling.effectiveEndDate)</p>
-   </div>
-  </div>
- </div>
+ <table id="ruling-details" class="mt-2">
+  <thead>
+   <tr>
+    <th width="30%"></th>
+    <th></th>
+   </tr>
+  </thead>
+  <tbody>
+   <tr>
+    <th scope="row" class="font-bold">@messages("ruling.startDate")</th>
+    <td>@Dates.format(ruling.effectiveStartDate)</td>
+   </tr>
+   <tr>
+    <th scope="row" class="font-bold">@messages("ruling.expiryDate")</th>
+    <td>@Dates.format(ruling.effectiveEndDate)</td>
+   </tr>
+   <tr>
+    <th scope="row" class="font-bold">@messages("ruling.commodityCode")</th>
+    <td>
+     <a href="@GlobalTariff.link(ruling.bindingCommodityCode)" target="_blank">
+      @ruling.bindingCommodityCode @messages("search.results.ruling.commodityCode.newTab")
+     </a>
+    </td>
+   </tr>
+   <tr>
+    <th scope="row" class="font-bold">@messages("ruling.description")</th>
+    <td>@ruling.goodsDescription</td>
+   </tr>
+   @if(ruling.keywords.nonEmpty) {
+    <tr>
+     <th scope="row" class="font-bold">@messages("ruling.keywords")</th>
+     <td>
+     @ruling.keywords.map { keyword =>
+      <span class="govuk-tag govuk-tag--grey">@keyword</span>
+     }
+     </td>
+    </tr>
+   }
+   @if(ruling.attachments.nonEmpty) {
+    <tr>
+     <th scope="row" class="font-bold">@messages("ruling.attachments")</th>
+     <td></td>
+    </tr>
+   }
+   <tr>
+    <th scope="row" class="font-bold">@messages("ruling.justification")</th>
+    <td>@ruling.justification</td>
+   </tr>
+  </tbody>
+ </table>
 
- <h3>@messages("ruling.justification")</h3>
- <p id="ruling-justification">@ruling.justification</p>
+ <p>
+  <h2 class="heading-medium">@messages("ruling.feedback.heading")</h2>
+  <span><a href="#">@messages("ruling.feedback.link")</a> @messages("ruling.feedback.paragraph")</span>
+ </p>
 
- <h3 class="mt-4">@messages("ruling.description")</h3>
- <p id="ruling-description">@ruling.goodsDescription</p>
-
- <a id="ruling-exit" class="button mt-2" href="@routes.SearchController.get()" role="button">Exit</a>
 }

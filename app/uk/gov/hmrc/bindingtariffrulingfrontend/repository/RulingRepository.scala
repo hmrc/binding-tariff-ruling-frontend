@@ -102,12 +102,12 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
 
   override def get(search: SimpleSearch): Future[Paged[Ruling]] = {
     val startOfToday = LocalDate.now().atStartOfDay
-    val zoneOffset = ZoneId.of("Europe/London").getRules().getOffset(startOfToday)
-    val today = Json.toJson(startOfToday.toInstant(zoneOffset))(Ruling.Mongo.formatInstant)
+    val zoneOffset   = ZoneId.of("Europe/London").getRules().getOffset(startOfToday)
+    val today        = Json.toJson(startOfToday.toInstant(zoneOffset))(Ruling.Mongo.formatInstant)
 
-    val dateFilter = gt("effectiveEndDate", today)
-    val textSearch = search.query.map(text(_)).getOrElse(Json.obj())
-    val imageFilter =  if (search.imagesOnly) nonEmpty("attachments") else Json.obj()
+    val dateFilter  = gt("effectiveEndDate", today)
+    val textSearch  = search.query.map(text(_)).getOrElse(Json.obj())
+    val imageFilter = if (search.imagesOnly) nonEmpty("attachments") else Json.obj()
 
     val allSearches: JsObject = dateFilter ++ textSearch ++ imageFilter
 

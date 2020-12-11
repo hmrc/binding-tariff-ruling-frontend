@@ -19,6 +19,10 @@
   text-align: right;
 }
 
+.mt-0 {
+  margin-top: 0 !important;
+}
+
 .mt-1 {
   margin-top: ($spacer * .25);
 }
@@ -114,4 +118,23 @@
 .mx-4 {
   margin-left: $spacer;
   margin-right: $spacer;
+}
+
+.heading-xlarge h1 {
+  font-weight: 700;
+}
+.heading-xlarge .heading-secondary {
+  color: #505a5f;
+  margin: 0px;
+}
+
+a.button-gray, button.button-gray, .button-gray:visited {
+  background-color: #dee0e2;
+  color: $black !important;
+  box-shadow: 0 2px 0 $gray-very-dark;
+
+  &:hover, &:focus {
+    background-color: $gray-dark;
+    color: $black;
+  }
 }

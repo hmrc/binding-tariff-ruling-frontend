@@ -21,5 +21,5 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
 object GlobalTariff {
   def link(commodityCode: String)(implicit appConfig: AppConfig): Call =
-    Call("GET", s"${appConfig.ukGlobalTariffHost}/tariff?q=${commodityCode}")
+    Call("GET", s"${appConfig.ukGlobalTariffHost}/tariff?q=$commodityCode")
 }
