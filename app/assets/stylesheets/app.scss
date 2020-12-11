@@ -120,6 +120,14 @@
   margin-right: $spacer;
 }
 
+.heading-xlarge h1 {
+  font-weight: 700;
+}
+.heading-xlarge .heading-secondary {
+  color: #505a5f;
+  margin: 0px;
+}
+
 a.button-gray, button.button-gray, .button-gray:visited {
   background-color: #dee0e2;
   color: $black !important;
