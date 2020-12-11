@@ -47,7 +47,9 @@ class FileStoreConnector @Inject() (
   }
 
   def get(attachmentId: String)(implicit headerCarrier: HeaderCarrier): Future[Option[FileMetadata]] =
-    http.GET[Option[FileMetadata]](s"${appConfig.bindingTariffFileStoreUrl}/file/$attachmentId")
+    http
+      .GET[Option[FileMetadata]](s"${appConfig.bindingTariffFileStoreUrl}/file/$attachmentId")
+      .map(_.filter(_.published))
 
   def get(attachmentIds: Set[String])(implicit headerCarrier: HeaderCarrier): Future[Metadata] =
     if (attachmentIds.isEmpty)
@@ -60,6 +62,6 @@ class FileStoreConnector @Inject() (
         }
         .runFold(noMetadata) {
           case (metadata, newEntries) =>
-            metadata ++ newEntries.map(entry => entry.id -> entry).toMap
+            metadata ++ newEntries.filter(_.published).map(entry => entry.id -> entry).toMap
         }
 }

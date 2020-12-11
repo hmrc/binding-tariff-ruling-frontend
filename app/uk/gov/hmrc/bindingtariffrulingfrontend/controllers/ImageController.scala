@@ -47,7 +47,6 @@ class ImageController @Inject() (
         meta     <- OptionT(fileStoreService.get(imageId))
         url      <- OptionT.fromOption[Future](meta.url)
         fileName <- OptionT.fromOption[Future](meta.fileName)
-        if meta.published
       } yield Ok(views.html.image(rulingReference, url, fileName))
 
       fileStoreResponse.getOrElse(NotFound(views.html.image_not_found(rulingReference))).recover {

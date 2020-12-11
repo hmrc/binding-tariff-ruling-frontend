@@ -114,20 +114,6 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
     }
 
-    "return 404 when the file is not published" in {
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(
-        Some(metadata.copy(published = false))
-      )
-      val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
-
-      status(result)      shouldBe Status.NOT_FOUND
-      contentType(result) shouldBe Some("text/html")
-      charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("image_not_found-heading")
-
-      verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
-    }
-
     "return 403 when disallowed" in {
       val result = await(controller(allowlist = AllowListEnabled()).get(rulingReference, fileId)(getRequestWithCSRF()))
       status(result) shouldBe Status.FORBIDDEN

@@ -96,13 +96,6 @@ class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer with Befor
             Some("http://localhost:4572/digital-tariffs-local/006491c2-a60b-46cc-9e73-5e180d3bf1ce"),
             published = true
           ),
-          "67e8b488-d5a1-4c53-abfb-e297ed479b72" -> FileMetadata(
-            "67e8b488-d5a1-4c53-abfb-e297ed479b72",
-            Some("my-file.txt"),
-            Some("application/binary"),
-            Some("http://localhost:9570/upscan/download/3931e8db-7b6f-42cc-8520-e9812643e8a1"),
-            published = false
-          ),
           "9a7a1787-4ec1-40d7-aa75-50cb276e3d28" -> FileMetadata(
             "9a7a1787-4ec1-40d7-aa75-50cb276e3d28",
             Some("FileUploadJPG.jpg"),
