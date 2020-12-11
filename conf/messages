@@ -1,5 +1,6 @@
 site.service_name = Search for Advance Tariff Rulings
 site.title.suffix = Search for Advance Tariff Rulings - GOV.UK
+site.heading.secondary = Advance Tariff Ruling
 
 search.heading = Search for Advance Tariff Rulings
 search.hint = You can search using a combination of words, commodity codes and reference numbers.
@@ -19,7 +20,6 @@ search.results.ruling.view = View ruling
 
 ruling.title = Information for ruling
 ruling.heading = Information for ruling {0}
-ruling.heading.secondary = Advance Tariff Ruling
 ruling.startDate = Start date
 ruling.expiryDate = Expiry date
 ruling.commodityCode = Commodity code
@@ -36,6 +36,9 @@ ruling.feedback.link = Complete a short survey
 
 ruling_not_found.heading = Ruling with reference {0} was not found
 ruling_not_found.heading.no.reference = Ruling reference not found
+
+image.title = Image for ruling
+image.heading = Image for ruling {0}
 
 error.summary.title = There''s a problem
 site.back = Back

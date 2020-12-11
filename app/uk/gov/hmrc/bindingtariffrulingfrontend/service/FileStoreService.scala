@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.Logging
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.FileStoreConnector
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Ruling, Paged}
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -28,6 +28,9 @@ import scala.concurrent.Future
 @Singleton
 class FileStoreService @Inject() (connector: FileStoreConnector) extends Logging {
   type Metadata = Map[String, FileMetadata]
+
+  def get(attachmentId: String)(implicit headerCarrier: HeaderCarrier): Future[Option[FileMetadata]] =
+    connector.get(attachmentId)
 
   def get(attachmentIds: Seq[String])(implicit headerCarrier: HeaderCarrier): Future[Metadata] =
     connector.get(attachmentIds.toSet)

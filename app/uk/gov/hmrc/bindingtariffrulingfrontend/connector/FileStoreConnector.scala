@@ -46,6 +46,9 @@ class FileStoreConnector @Inject() (
     s"${appConfig.bindingTariffFileStoreUrl}/file$query"
   }
 
+  def get(attachmentId: String)(implicit headerCarrier: HeaderCarrier): Future[Option[FileMetadata]] =
+    http.GET[Option[FileMetadata]](s"${appConfig.bindingTariffFileStoreUrl}/file/$attachmentId")
+
   def get(attachmentIds: Set[String])(implicit headerCarrier: HeaderCarrier): Future[Metadata] =
     if (attachmentIds.isEmpty)
       Future.successful(Map.empty)

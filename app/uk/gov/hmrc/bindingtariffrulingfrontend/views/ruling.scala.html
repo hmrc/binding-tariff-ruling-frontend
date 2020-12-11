@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import play.twirl.api.HtmlFormat
 @import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 @import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
@@ -22,15 +21,17 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.utils.{Dates, GlobalTariff}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 
+@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.back_link
+
 @(ruling: Ruling, fileMetadata: Map[String, FileMetadata])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @main_template(title = Some(messages("ruling.title")), bodyClasses = None) {
 
- <a id="ruling-back" href="@routes.SearchController.get()" class="link-back">@messages("site.back")</a>
+@back_link()
 
  <div class="heading-xlarge">
   <span class="heading-secondary">
-   @messages("ruling.heading.secondary")
+   @messages("site.heading.secondary")
   </span>
   <h1 id="ruling-heading" class="mt-0 heading-xlarge">
    @messages("ruling.heading", ruling.reference)
@@ -86,7 +87,9 @@
             @fileMetadata.get(id).map { meta =>
               @meta.fileName.map { fileName =>
                 @meta.url.map { url =>
-                  <img class="image-thumbnail-large" alt="@fileName" src="@url" />
+                    <a href="@routes.ImageController.get(ruling.reference, id)">
+                        <img class="image-thumbnail-large" alt="@fileName" src="@url" />
+                    </a>
                 }
               }.getOrElse {
                 HtmlFormat.empty
