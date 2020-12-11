@@ -20,7 +20,6 @@ import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowedAction
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
@@ -41,29 +40,21 @@ class SearchController @Inject() (
     extends FrontendController(mcc)
     with I18nSupport {
 
-  type Metadata = Map[String, FileMetadata]
-  private lazy val noMetadata: Metadata = Map.empty
-
   def get(query: Option[String], imagesOnly: Boolean, page: Int): Action[AnyContent] =
     (Action andThen allowlist).async { implicit request =>
       SimpleSearch.form.bindFromRequest
         .fold(
-          errors => successful(Ok(views.html.search(errors, None, None, noMetadata))),
+          errors => successful(Ok(views.html.search(errors))),
           search =>
             search.query
               .map { query =>
                 for {
                   paged        <- rulingService.get(search)
                   fileMetadata <- fileStoreService.get(paged)
-                } yield Ok(views.html.search(SimpleSearch.form.fill(search), Some(search), Some(paged), fileMetadata))
+                } yield Ok(views.html.search(SimpleSearch.form.fill(search), Some(paged), fileMetadata))
               }
               .getOrElse {
-                successful(
-                  Ok(
-                    views.html
-                      .search(SimpleSearch.form.fill(search), Some(search), None, noMetadata)
-                  )
-                )
+                successful(Ok(views.html.search(SimpleSearch.form.fill(search))))
               }
         )
     }

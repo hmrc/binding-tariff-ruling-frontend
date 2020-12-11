@@ -23,9 +23,8 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 
 @(form: Form[SimpleSearch],
-  search: Option[SimpleSearch],
-  searchResults: Option[Paged[Ruling]],
-  fileMetadata: Map[String, FileMetadata]
+  searchResults: Option[Paged[Ruling]] = None,
+  fileMetadata: Map[String, FileMetadata] = Map.empty
 )(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @heading = {
@@ -53,7 +52,7 @@
       pager = results
     )
 
-    @search_results(search, results, fileMetadata)
+    @search_results(form.value, results, fileMetadata)
 
     @pagination(
       id = "search-pagination_bottom",
