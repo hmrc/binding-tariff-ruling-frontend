@@ -24,7 +24,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 class AppConfig @Inject() (val configuration: Configuration) extends ServicesConfig(configuration) {
 
   private lazy val contactHost             = configuration.getOptional[String](s"contact-frontend.host").getOrElse("")
-  private val contactFormServiceIdentifier = "BindingTariffRulings"
+  private val contactFormServiceIdentifier = "binding-tariff-ruling-frontend"
 
   lazy val assetsPrefix: String                   = loadConfig(s"assets.url") + loadConfig(s"assets.version")
   lazy val analyticsToken: String                 = loadConfig(s"google-analytics.token")

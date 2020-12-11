@@ -38,4 +38,4 @@ ruling_not_found.heading = Ruling with reference {0} was not found
 ruling_not_found.heading.no.reference = Ruling reference not found
 
 error.summary.title = There''s a problem
-site.back = back
+site.back = Back
