@@ -47,7 +47,8 @@ class RulingControllerSpec extends ControllerSpec {
       given(rulingService.get("id")) willReturn Future.successful(
         Some(Ruling("ref", "code", Instant.now, Instant.now, "justification", "goods description"))
       )
-      given(fileStoreService.get(any[Ruling])(any[HeaderCarrier])).willReturn(Future.successful(Map.empty[String, FileMetadata]))
+      given(fileStoreService.get(any[Ruling])(any[HeaderCarrier]))
+        .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       val result = await(controller().get("id")(getRequestWithCSRF()))
       status(result)      shouldBe Status.OK
@@ -56,11 +57,11 @@ class RulingControllerSpec extends ControllerSpec {
       bodyOf(result)      should include("ruling-heading")
     }
 
-    "return 200 - when not found" in {
+    "return 404 - when not found" in {
       given(rulingService.get("id")) willReturn Future.successful(None)
 
       val result = await(controller().get("id")(getRequestWithCSRF()))
-      status(result)      shouldBe Status.OK
+      status(result)      shouldBe Status.NOT_FOUND
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
       bodyOf(result)      should include("ruling_not_found-heading")

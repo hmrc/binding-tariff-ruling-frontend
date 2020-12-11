@@ -90,7 +90,13 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
       )
       .map(_.value.map(_.as[Ruling]).get)
 
-  override def get(reference: String): Future[Option[Ruling]] = collection.find(byReference(reference)).one[Ruling]
+  override def get(reference: String): Future[Option[Ruling]] =
+    collection
+      .find(
+        selector   = byReference(reference),
+        projection = Option.empty[JsObject]
+      )
+      .one[Ruling]
 
   override def delete(reference: String): Future[Unit] = collection.findAndRemove(byReference(reference)).map(_ => ())
 

@@ -50,7 +50,7 @@ class RulingController @Inject() (
       fileMetadata <- OptionT.liftF[Future, Metadata](fileStoreService.get(ruling))
     } yield Ok(views.html.ruling(ruling, fileMetadata))
 
-    maybeRulingDetails.getOrElse(Ok(views.html.ruling_not_found(id)))
+    maybeRulingDetails.getOrElse(NotFound(views.html.ruling_not_found(id)))
   }
 
   def post(id: String): Action[AnyContent] = (Action andThen authenticate).async { implicit request =>

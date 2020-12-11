@@ -20,45 +20,41 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
-import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AllowListDisabled, AllowListEnabled, AllowedAction}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 
 class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   private val rulingService    = mock[RulingService]
   private val fileStoreService = mock[FileStoreService]
 
+  override protected def afterEach(): Unit = {
+    super.afterEach()
+    reset(rulingService)
+    reset(fileStoreService)
+  }
+
+  private def asDocument(html: String): Document = Jsoup.parse(html)
+
   private def controller(allowlist: AllowedAction = AllowListDisabled()) =
     new SearchController(rulingService, fileStoreService, allowlist, mcc, realConfig)
 
   "GET /" should {
-    "return 200 without form" in {
-      val result = await(controller().get(query = None, imagesOnly = false, page = 1)(getRequestWithCSRF()))
-
-      status(result)                                                   shouldBe Status.OK
-      contentType(result)                                              shouldBe Some("text/html")
-      charset(result)                                                  shouldBe Some("utf-8")
-      bodyOf(result)                                                   should include("search-heading")
-      asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.heading")
-
-      verifyZeroInteractions(rulingService)
-    }
-
-    "return 200 with form" in {
+    "return 200 with a valid query" in {
       given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
-      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier])).willReturn(Future.successful(Map.empty[String, FileMetadata]))
+      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+        .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       val result = await(
         controller()
@@ -72,15 +68,46 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.heading")
 
       verify(rulingService).get(SimpleSearch(Some("query"), imagesOnly = false, 1))
+      verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
     }
 
-    "return 200 without form errors" in {
+    "return 200 with no search query" in {
+      val result = await(controller().get(query = None, imagesOnly = false, page = 1)(getRequestWithCSRF()))
+
+      status(result)                                                   shouldBe Status.OK
+      contentType(result)                                              shouldBe Some("text/html")
+      charset(result)                                                  shouldBe Some("utf-8")
+      bodyOf(result)                                                   should include("search-heading")
+      asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.heading")
+
+      verifyZeroInteractions(rulingService)
+      verifyZeroInteractions(fileStoreService)
+    }
+
+    "return 200 with an empty search query" in {
       val result = await(controller().get(query = Some(""), imagesOnly = false, page = 1)(getRequestWithCSRF()))
 
-      status(result)      shouldBe Status.OK
-      contentType(result) shouldBe Some("text/html")
-      charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("search-heading")
+      status(result)                                                   shouldBe Status.OK
+      contentType(result)                                              shouldBe Some("text/html")
+      charset(result)                                                  shouldBe Some("utf-8")
+      bodyOf(result)                                                   should include("search-heading")
+      asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.heading")
+
+      verifyZeroInteractions(rulingService)
+      verifyZeroInteractions(fileStoreService)
+    }
+
+    "return 400 when form is filled incorrectly" in {
+      val result = await(
+        controller()
+          .get(query = Some("query"), imagesOnly = false, page = 1)(getRequestWithCSRF("/?query=query&page=foo"))
+      )
+
+      status(result)                                                   shouldBe Status.BAD_REQUEST
+      contentType(result)                                              shouldBe Some("text/html")
+      charset(result)                                                  shouldBe Some("utf-8")
+      bodyOf(result)                                                   should include("search-heading")
+      asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.heading")
 
       verifyZeroInteractions(rulingService)
     }
@@ -92,13 +119,6 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
       status(result) shouldBe Status.FORBIDDEN
     }
-  }
-
-  def asDocument(html: String): Document = Jsoup.parse(html)
-
-  override protected def afterEach(): Unit = {
-    super.afterEach()
-    Mockito.reset(rulingService)
   }
 
 }

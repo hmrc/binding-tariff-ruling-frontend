@@ -16,17 +16,19 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import com.google.inject.Inject
-import javax.inject.Singleton
+import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.Case
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class BindingTariffClassificationConnector @Inject() (appConfig: AppConfig, client: AuthenticatedHttpClient) {
+class BindingTariffClassificationConnector @Inject() (appConfig: AppConfig, client: AuthenticatedHttpClient)(
+  implicit ec: ExecutionContext
+) {
 
   def get(reference: String)(implicit hc: HeaderCarrier): Future[Option[Case]] = {
     val url = s"${appConfig.bindingTariffClassificationUrl}/cases/$reference"

@@ -32,7 +32,7 @@ class MongoDbSpec extends BaseSpec {
       given(component.mongoConnector).willReturn(connector)
       given(connector.db).willReturn(() => mock[DefaultDB])
 
-      val mongodb = new MongoDb(component)
+      new MongoDb(component)
 
       verify(connector).db
     }

@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.{error_summary, input_search, pagination, result_summary, search_results}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
+@import uk.gov.hmrc.play.views.html._
 
 @(form: Form[SimpleSearch],
   searchResults: Option[Paged[Ruling]] = None,
@@ -35,7 +36,7 @@
 
   @error_summary(form.errors)
 
-  @helper.form(action = routes.SearchController.get()) {
+  @helpers.form(action = routes.SearchController.get()) {
     @input_search(
       queryField = form("query"),
       imagesField = form("images"),

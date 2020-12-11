@@ -32,6 +32,8 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTestServer {
 
   private val actorSystem = ActorSystem.create("testActorSystem")

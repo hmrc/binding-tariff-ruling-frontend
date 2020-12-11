@@ -47,13 +47,13 @@ class RulingMongoRepositoryTest
 
   override protected def collection: JSONCollection = repository.collection
 
-  val startOfToday = LocalDate.now().atStartOfDay
+  val startOfToday    = LocalDate.now().atStartOfDay
   val zoneOffsetToday = ZoneId.of("Europe/London").getRules().getOffset(startOfToday)
-  val today = startOfToday.toInstant(zoneOffsetToday)
+  val today           = startOfToday.toInstant(zoneOffsetToday)
 
-  val startOfTomorrow = LocalDate.now().plusDays(1).atStartOfDay
+  val startOfTomorrow    = LocalDate.now().plusDays(1).atStartOfDay
   val zoneOffsetTomorrow = ZoneId.of("Europe/London").getRules().getOffset(startOfTomorrow)
-  val tomorrow = startOfTomorrow.toInstant(zoneOffsetTomorrow)
+  val tomorrow           = startOfTomorrow.toInstant(zoneOffsetTomorrow)
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -134,7 +134,11 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document2)
       givenAnExistingDocument(document3)
 
-      await(repository.get(SimpleSearch(None, imagesOnly = false, 1, 100))).results shouldBe Seq(document1, document2, document3)
+      await(repository.get(SimpleSearch(None, imagesOnly = false, 1, 100))).results shouldBe Seq(
+        document1,
+        document2,
+        document3
+      )
     }
 
     "Retrieve One - by Reference - exact match" in {
@@ -165,7 +169,7 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document2)
 
       await(repository.get(SimpleSearch(Some("FOUNTAIN"), imagesOnly = false, 1, 100))).results shouldBe Seq(document1)
-      await(repository.get(SimpleSearch(Some("lapTOP"), imagesOnly = false, 1, 100))).results shouldBe Seq(document2)
+      await(repository.get(SimpleSearch(Some("lapTOP"), imagesOnly   = false, 1, 100))).results shouldBe Seq(document2)
     }
 
     "Retrieve Multiple - by Goods Description - word stems" in {
@@ -177,12 +181,16 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document2)
       givenAnExistingDocument(document3)
 
-      await(repository.get(SimpleSearch(Some("exact"), imagesOnly = false, 1, 100))).results shouldBe Seq(document1, document2)
+      await(repository.get(SimpleSearch(Some("exact"), imagesOnly = false, 1, 100))).results shouldBe Seq(
+        document1,
+        document2
+      )
     }
 
     "Retrieve One - by Goods Description - images only" in {
       // Given
-      val document1 = Ruling(reference = "ref1", "0", Instant.now, tomorrow, "justification", "exacting", images = Seq("id1, id2"))
+      val document1 =
+        Ruling(reference = "ref1", "0", Instant.now, tomorrow, "justification", "exacting", images = Seq("id1, id2"))
       val document2 = Ruling(reference = "ref2", "0", Instant.now, tomorrow, "justification", "exactly")
       val document3 = Ruling(reference = "ref3", "0", Instant.now, tomorrow, "justification", "fountain pen")
       givenAnExistingDocument(document1)

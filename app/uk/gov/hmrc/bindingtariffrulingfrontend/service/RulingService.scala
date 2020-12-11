@@ -67,9 +67,9 @@ class RulingService @Inject() (
         .filter(_.decision.flatMap(_.effectiveEndDate).isDefined)
 
       fileMetaData <- validCase
-        .map(_.attachments.map(_.id))
-        .map(fileStoreService.get(_))
-        .getOrElse(Future.successful(Map.empty[String, FileMetadata]))
+                       .map(_.attachments.map(_.id))
+                       .map(fileStoreService.get(_))
+                       .getOrElse(Future.successful(Map.empty[String, FileMetadata]))
 
       updatedRuling: UpdatedRuling = validCase.map(toRuling(_, fileMetaData))
 

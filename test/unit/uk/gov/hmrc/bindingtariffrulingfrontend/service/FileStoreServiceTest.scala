@@ -45,6 +45,14 @@ class FileStoreServiceTest extends BaseSpec with BeforeAndAfterEach {
     reset(connector)
   }
 
+  "FileStoreService.get with single id" should {
+    "delegate to connector" in {
+      val id = "id"
+      service.get(id)
+      verify(connector).get(id)
+    }
+  }
+
   "FileStoreService.get with ids" should {
     "delegate to connector" in {
       val ids = Seq("id1", "id2")

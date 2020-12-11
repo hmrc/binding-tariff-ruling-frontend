@@ -34,5 +34,4 @@ abstract class ViewSpec extends UnitSpec {
   protected def view(html: Html): Document =
     Jsoup.parse(html.toString())
 
-
 }

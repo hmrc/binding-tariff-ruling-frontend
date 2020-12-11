@@ -42,19 +42,6 @@ lazy val microservice = (project in file("."))
     resourceDirectory in Test := baseDirectory.value / "test" / "resources",
     addTestReportOption(Test, "test-reports")
   )
-  .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(ScalafmtPlugin.scalafmtConfigSettings))
-  .settings(inConfig(TemplateItTest)(Defaults.itSettings): _*)
-  .settings(
-    Keys.fork in IntegrationTest := true,
-    unmanagedSourceDirectories in IntegrationTest := Seq(
-      (baseDirectory in IntegrationTest).value / "test/it",
-      (baseDirectory in IntegrationTest).value / "test/util"
-    ),
-    resourceDirectory in IntegrationTest := baseDirectory.value / "test" / "resources",
-    addTestReportOption(IntegrationTest, "int-test-reports"),
-    parallelExecution in IntegrationTest := false
-  )
   .settings(
     resolvers += Resolver.bintrayRepo("hmrc", "releases"),
     resolvers += Resolver.jcenterRepo
@@ -73,7 +60,6 @@ lazy val microservice = (project in file("."))
   )
 
 lazy val TemplateTest   = config("tt") extend Test
-lazy val TemplateItTest = config("tit") extend IntegrationTest
 
 // Coverage configuration
 coverageMinimum := 66 // TODO improve this

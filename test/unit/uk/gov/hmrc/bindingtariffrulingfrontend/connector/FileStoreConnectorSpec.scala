@@ -47,6 +47,26 @@ class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer with Befor
       await(connector.get(Set.empty[String])) shouldBe Map.empty[String, FileMetadata]
     }
 
+    "call the filestore for a single ID" in {
+      stubFor(
+        get(urlEqualTo("/file/d4897c0a-b92d-4cf7-8990-f40fe158be68"))
+          .willReturn(
+            aResponse()
+              .withBody(fromFile("filestore-response-single.json"))
+          )
+      )
+
+      await(connector.get("d4897c0a-b92d-4cf7-8990-f40fe158be68")) shouldBe Some(
+        FileMetadata(
+          "d4897c0a-b92d-4cf7-8990-f40fe158be68",
+          Some("IMG_1721.JPG"),
+          Some("image/jpeg"),
+          Some("http://localhost:4572/digital-tariffs-local/d4897c0a-b92d-4cf7-8990-f40fe158be68"),
+          published = true
+        )
+      )
+    }
+
     "call the filestore for multiple IDs" in {
       stubFor(
         get(

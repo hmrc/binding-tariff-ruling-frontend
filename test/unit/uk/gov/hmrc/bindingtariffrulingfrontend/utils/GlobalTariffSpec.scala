@@ -21,7 +21,9 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 class GlobalTariffSpec extends BaseSpec {
   "GlobalTariff.link" should {
     "produce a link to UK Global Tariff" in {
-      GlobalTariff.link("8888")(realConfig).url shouldBe "https://www.check-future-uk-trade-tariffs.service.gov.uk/tariff?q=8888"
+      GlobalTariff
+        .link("8888")(realConfig)
+        .url shouldBe "https://www.check-future-uk-trade-tariffs.service.gov.uk/tariff?q=8888"
     }
   }
 }
