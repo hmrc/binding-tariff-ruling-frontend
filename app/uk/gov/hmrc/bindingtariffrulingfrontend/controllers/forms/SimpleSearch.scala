@@ -27,7 +27,7 @@ case class SimpleSearch(
   query: Option[String],
   imagesOnly: Boolean,
   override val pageIndex: Int,
-  override val pageSize: Int = 50
+  override val pageSize: Int = 25
 ) extends Pagination
 // scalastyle:on magic.number
 
@@ -50,7 +50,7 @@ object SimpleSearch {
         data
           .get(key)
           .map(standardiseText)
-          .filter(_.lengthCompare(0) > 0)
+          .filter(_.nonEmpty)
       )
 
     override def unbind(key: String, value: Option[String]): Map[String, String] =

@@ -16,21 +16,12 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.utils
 
-import java.time.{LocalDate, ZoneOffset}
-
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
-class DatesSpec extends BaseSpec {
-
-  "Format" should {
-
-    "convert instant to string" in {
-      val date   = LocalDate.of(2018, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant
-      val output = Dates.format(date)
-
-      output shouldBe "01/01/2018"
+class GlobalTariffSpec extends BaseSpec {
+  "GlobalTariff.link" should {
+    "produce a link to UK Global Tariff" in {
+      GlobalTariff.link("8888")(realConfig).url shouldBe "https://www.check-future-uk-trade-tariffs.service.gov.uk/tariff?q=8888"
     }
-
   }
-
 }

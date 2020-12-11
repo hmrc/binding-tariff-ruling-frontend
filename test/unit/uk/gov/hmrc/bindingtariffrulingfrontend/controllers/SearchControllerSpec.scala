@@ -80,7 +80,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verifyZeroInteractions(rulingService)
     }
 
-    "return 403 when allowed" in {
+    "return 403 when disallowed" in {
       val result = await(
         controller(allowlist = AllowListEnabled()).get(query = None, imagesOnly = false, page = 1)(getRequestWithCSRF())
       )

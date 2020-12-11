@@ -1,5 +1,7 @@
 @import 'search';
 @import 'variables';
+@import 'partials/tags';
+@import 'partials/pagination';
 
 .display-inline {
   display: inline-block;
@@ -7,6 +9,10 @@
 
 .font-bold {
   font-weight: bold;
+}
+
+.valign-top {
+  vertical-align: top;
 }
 
 .align-right {

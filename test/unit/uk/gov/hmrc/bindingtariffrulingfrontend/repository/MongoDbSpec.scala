@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.utils
+package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
-import java.time.{LocalDate, ZoneOffset}
-
+import org.mockito.BDDMockito._
+import org.mockito.Mockito._
+import play.modules.reactivemongo.ReactiveMongoComponent
+import reactivemongo.api.DefaultDB
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
+import uk.gov.hmrc.mongo.MongoConnector
 
-class DatesSpec extends BaseSpec {
+class MongoDbSpec extends BaseSpec {
+  "MongoDb" should {
+    "delegate to connector" in {
+      val connector = mock[MongoConnector]
+      val component = mock[ReactiveMongoComponent]
 
-  "Format" should {
+      given(component.mongoConnector).willReturn(connector)
+      given(connector.db).willReturn(() => mock[DefaultDB])
 
-    "convert instant to string" in {
-      val date   = LocalDate.of(2018, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant
-      val output = Dates.format(date)
+      val mongodb = new MongoDb(component)
 
-      output shouldBe "01/01/2018"
+      verify(connector).db
     }
-
   }
-
 }

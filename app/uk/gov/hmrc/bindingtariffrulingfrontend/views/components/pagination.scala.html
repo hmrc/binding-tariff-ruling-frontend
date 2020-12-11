@@ -17,80 +17,48 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.components.PaginationUtil
 @(id: String = "pagination",
-        singularName: String = "result",
-        pluralName: String = "results",
-        pager: Paged[_],
-        onChange: Int => Call,
-        containerClass: Option[String] = None,
-        counterClass: Option[String] = None,
-        linksClass: Option[String] = None
-)
+  pager: Paged[_],
+  onChange: Int => Call,
+)(implicit messages: Messages)
 
-<div id="@id" class="grid-row @containerClass.getOrElse("")">
+@if(pager.pageCount > 1) {
+  <nav class="moj-pagination mt-2" id="pagination-label">
+    <p class="visually-hidden" aria-labelledby="pagination-label">Pagination navigation</p>
 
- <div class="column-one-half">
-  @if(pager.nonEmpty) {
-   @if(pager.pageCount == 1) {
-    <div id="@id-one" class="@counterClass.getOrElse("")">
-     <span>Showing</span>
-     <span id="@id-total" class="bold">@{pager.resultCount}</span>
-     <span>
-     @if(pager.resultCount == 1){
-      @singularName
-     } else {
-      @pluralName
-     }
-     </span>
-    </div>
-   } else {
-    <div id="@id-some" class="@counterClass.getOrElse("")">
-     <span>Showing</span>
-     <span id="@id-start">@{(pager.pageIndex-1) * pager.pageSize + 1}</span>
-     <span>-</span>
-     <span id="@id-end">@{(pager.pageIndex-1) * pager.pageSize + pager.size}</span>
-     <span>of</span>
-     <span id="@id-total" class="bold">@{pager.resultCount}</span>
-     <span>
-     @if(pager.resultCount == 1){
-      @singularName
-     } else {
-      @pluralName
-     }
-     </span>
-    </div>
-   }
-  } else {
-   <div id="@id-none">
-    <span>Showing</span>
-    <span>no @{pluralName}</span>
-   </div>
-  }
+    <ul class="moj-pagination__list">
+      @if(pager.pageIndex > 1) {
+        <li id="@id-page_back" class="moj-pagination__item  moj-pagination__item--prev">
+          <a href="@onChange(pager.pageIndex - 1)" class="moj-pagination__link" href="">
+            Previous<span class="visually-hidden"> set of pages</span>
+          </a>
+        </li>
+      }
 
- </div>
+      @for(pageIndex <- PaginationUtil.surroundingPages(pager.pageIndex, pager.pageCount, 5)) {
+        @if(pageIndex == pager.pageIndex) {
+          <li id="@id-page_current" class="moj-pagination__item moj-pagination__item--active">@pageIndex</li>
+        } else {
+          <li id="@id-page_@pageIndex" class="moj-pagination__item">
+            <a class="moj-pagination__link" href="@onChange(pageIndex)">@pageIndex</a>
+          </li>
+        }
+      }
 
- @if(pager.pageCount > 1) {
-  <div id="@id-links" class="column-one-half align-right @linksClass.getOrElse("")">
-  @defining(pager.pageCount) { pageCount: Int =>
-   @* Previous Page *@
-   @if(pager.pageIndex > 1) {
-    <a id="@id-page_back" class="mr-0_5" href="@onChange(pager.pageIndex - 1)">Previous</a>
-   }
+      @if(pager.pageIndex < pager.pageCount) {
+        <li id="@id-page_next" class="moj-pagination__item  moj-pagination__item--next">
+          <a href="@onChange(pager.pageIndex + 1)" class="moj-pagination__link" href="">
+            Next<span class="visually-hidden"> set of pages</span>
+          </a>
+        </li>
+      }
+    </ul>
 
-   @* Surrounding 5 Pages *@
-   @for(pageIndex <- PaginationUtil.surroundingPages(pager.pageIndex, pager.pageCount, 5)) {
-    @if(pageIndex == pager.pageIndex) {
-     <span id="@id-page_current" class="mx-0_5">@pageIndex</span>
-    } else {
-     <a id="@id-page_@pageIndex" class="mx-0_5" href="@onChange(pageIndex)">@pageIndex</a>
-    }
-   }
-
-   @* Next Page *@
-   @if(pager.pageIndex < pageCount) {
-    <a id="@id-page_next" class="ml-0_5" href="@onChange(pager.pageIndex + 1)">Next</a>
-   }
-
-  }
-  </div>
- }
-</div>
+    <p class="moj-pagination__results">
+      @defining((pager.pageIndex - 1) * pager.pageSize + 1) { from =>
+        @defining((pager.pageIndex - 1) * pager.pageSize + pager.size) { to =>
+          @Html(messages("search.pagination.label", from, to, pager.resultCount))
+        }
+      }
+    </p>
+  </nav>
+}

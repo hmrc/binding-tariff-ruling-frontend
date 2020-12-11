@@ -32,7 +32,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.model
  * limitations under the License.
  */
 
-case class Paged[T](results: Seq[T], pageIndex: Int, pageSize: Int, resultCount: Int) {
+case class Paged[T](results: Seq[T], pageIndex: Int, pageSize: Int, resultCount: Long) {
   def map[X](f: T => X): Paged[X] = this.copy(results = results.map(f))
   def size: Int                   = results.size
   def pageCount: Int              = Math.ceil(resultCount.toDouble / pageSize).toInt

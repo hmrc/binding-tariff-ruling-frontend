@@ -16,21 +16,10 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.utils
 
-import java.time.{LocalDate, ZoneOffset}
+import play.api.mvc.Call
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
-import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
-
-class DatesSpec extends BaseSpec {
-
-  "Format" should {
-
-    "convert instant to string" in {
-      val date   = LocalDate.of(2018, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant
-      val output = Dates.format(date)
-
-      output shouldBe "01/01/2018"
-    }
-
-  }
-
+object GlobalTariff {
+  def link(commodityCode: String)(implicit appConfig: AppConfig): Call =
+    Call("GET", s"${appConfig.ukGlobalTariffHost}/tariff?q=${commodityCode}")
 }
