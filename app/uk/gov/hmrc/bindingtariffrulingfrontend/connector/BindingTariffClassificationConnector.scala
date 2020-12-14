@@ -34,8 +34,7 @@ class BindingTariffClassificationConnector @Inject() (
   val metrics: Metrics
 )(
   implicit ec: ExecutionContext
-) extends InjectAuthHeader
-    with HasMetrics {
+) extends HasMetrics {
 
   def get(reference: String)(implicit hc: HeaderCarrier): Future[Option[Case]] =
     withMetricsTimerAsync("get-case") { _ =>
