@@ -134,7 +134,7 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
                 limit       = None,
                 skip        = 0,
                 hint        = None,
-                readConcern = ReadConcern.Available
+                readConcern = ReadConcern.Majority
               )
 
     } yield Paged(results, search.pageIndex, search.pageSize, count)
