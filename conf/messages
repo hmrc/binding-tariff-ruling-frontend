@@ -3,6 +3,11 @@ site.title.suffix = Search for Advance Tariff Rulings - GOV.UK
 site.heading.secondary = Advance Tariff Ruling
 site.back = Back
 
+site.notfound.heading = Page not found
+site.notfound.title = Page not found
+site.notfound.checkcorrect = If you typed the web address, check it is correct.
+site.notfound.checkcomplete = If you pasted the web address, check you copied the entire address.
+
 search.heading = Search for Advance Tariff Rulings
 search.hint = You can search using a combination of words, commodity codes and reference numbers.
 search.form.submit = Search rulings
@@ -35,13 +40,7 @@ ruling.feedback.heading = Tell us about your experience of the Search for Advanc
 ruling.feedback.paragraph = to help us understand if this service has helped you to find the ruling you were looking for.
 ruling.feedback.link = Complete a short survey
 
-ruling.notfound.heading = Ruling with reference {0} was not found
-ruling.notfound.title = Ruling reference not found
-
 image.title = Image for ruling
 image.heading = Image for ruling {0}
-
-image.notfound.heading = Image for ruling {0} was not found
-image.notfound.title = Image for ruling not found
 
 error.summary.title = There''s a problem

@@ -15,15 +15,17 @@
  *@
 
 @import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-@import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
-@import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.back_link
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
-@import uk.gov.hmrc.bindingtariffrulingfrontend.utils.Dates
 
-@(id: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@main_template(title = Some(messages("ruling.notfound.title")), bodyClasses = None) {
+@main_template(title = Some(messages("site.notfound.title")), bodyClasses = None) {
   @back_link()
-  <h1 id="ruling_not_found-heading">@messages("ruling.notfound.heading", id)</h1>
+
+  <h1 id="not_found-heading" class="heading-xlarge">@messages("site.notfound.heading")</h1>
+
+  <p>@messages("site.notfound.checkcorrect")</p>
+
+  <p>@messages("site.notfound.checkcomplete")</p>
 }

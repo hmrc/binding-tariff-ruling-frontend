@@ -49,7 +49,7 @@ class ImageController @Inject() (
         fileName <- OptionT.fromOption[Future](meta.fileName)
       } yield Ok(views.html.image(rulingReference, url, fileName))
 
-      fileStoreResponse.getOrElse(NotFound(views.html.image_not_found(rulingReference))).recover {
+      fileStoreResponse.getOrElse(NotFound(views.html.not_found_template())).recover {
         case NonFatal(e) =>
           logger.error("Exception while calling binding-tariff-filestore", e)
           BadGateway

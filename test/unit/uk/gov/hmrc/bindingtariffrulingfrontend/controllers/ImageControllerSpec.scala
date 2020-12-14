@@ -73,7 +73,7 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.NOT_FOUND
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("image_not_found-heading")
+      bodyOf(result)      should include("not_found-heading")
 
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
     }
@@ -95,7 +95,7 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.NOT_FOUND
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("image_not_found-heading")
+      bodyOf(result)      should include("not_found-heading")
 
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
     }
@@ -109,7 +109,7 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.NOT_FOUND
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("image_not_found-heading")
+      bodyOf(result)      should include("not_found-heading")
 
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
     }

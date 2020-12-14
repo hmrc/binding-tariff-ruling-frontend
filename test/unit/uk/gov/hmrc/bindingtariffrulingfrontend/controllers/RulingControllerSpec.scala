@@ -64,7 +64,7 @@ class RulingControllerSpec extends ControllerSpec {
       status(result)      shouldBe Status.NOT_FOUND
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("ruling_not_found-heading")
+      bodyOf(result)      should include("not_found-heading")
     }
 
     "return 403 when not allowed" in {
