@@ -16,21 +16,28 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
+import akka.util.ByteString
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.mockito.BDDMockito._
 import org.scalatest.BeforeAndAfter
+import play.api.libs.ws.WSClient
 import scala.collection.immutable.ListSet
-import scala.io.Source
-import uk.gov.hmrc.bindingtariffrulingfrontend.WiremockTestServer
+import uk.gov.hmrc.bindingtariffrulingfrontend.{TestMetrics, WiremockTestServer}
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
+import java.nio.charset.StandardCharsets
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer with BeforeAndAfter {
   val appConfig: AppConfig = mock[AppConfig]
   val httpClient           = app.injector.instanceOf[AuthenticatedHttpClient]
+  val metrics              = new TestMetrics
+  val wsClient             = app.injector.instanceOf[WSClient]
   given(appConfig.maxUriLength).willReturn(2048L)
-  val connector = new FileStoreConnector(appConfig, httpClient)
+  val connector = new FileStoreConnector(appConfig, httpClient, wsClient, metrics)
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -39,7 +46,7 @@ class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer with Befor
 
   def fromFile(path: String): String = {
     val url = getClass.getClassLoader.getResource(path)
-    Source.fromURL(url, "UTF-8").getLines().mkString
+    scala.io.Source.fromURL(url, "UTF-8").getLines().mkString
   }
 
   "FileStoreConnector.get" should {
@@ -106,6 +113,30 @@ class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer with Befor
         )
       )
 
+    }
+
+    "download a file from the given URL" in {
+      val content = "Some content".getBytes(StandardCharsets.UTF_8)
+
+      stubFor(
+        get(urlEqualTo("/digital-tariffs-local/b4a5374f-9b47-40be-a509-cc7b349d67d5"))
+          .willReturn(
+            aResponse()
+              .withBody(content)
+          )
+      )
+
+      await(
+        connector
+          .downloadFile(s"$wireMockUrl/digital-tariffs-local/b4a5374f-9b47-40be-a509-cc7b349d67d5")
+          .flatMap(maybeSource =>
+            maybeSource.fold(Future.successful(ByteString.empty)) { source =>
+              source.runFold(ByteString.empty) {
+                case (bytes, nextBytes) => bytes ++ nextBytes
+              }
+            }
+          )
+      ) shouldBe ByteString(content)
     }
   }
 }

@@ -86,11 +86,11 @@
         @ruling.images.map { id =>
             @fileMetadata.get(id).map { meta =>
               @meta.fileName.map { fileName =>
-                @meta.url.map { url =>
-                    <a href="@routes.ImageController.get(ruling.reference, id)">
-                        <img class="image-thumbnail-large" alt="@fileName" src="@url" />
-                    </a>
-                }
+                <a href="@routes.ImageController.get(ruling.reference, id)">
+                    <img class="image-thumbnail-large"
+                         alt="@fileName"
+                         src="@routes.AttachmentController.get(ruling.reference, id)" />
+                </a>
               }.getOrElse {
                 HtmlFormat.empty
               }

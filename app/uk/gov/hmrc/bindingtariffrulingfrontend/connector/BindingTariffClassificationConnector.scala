@@ -19,20 +19,28 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.Case
+import uk.gov.hmrc.bindingtariffrulingfrontend.metrics.HasMetrics
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext
+import com.kenshoo.play.metrics.Metrics
 
 @Singleton
-class BindingTariffClassificationConnector @Inject() (appConfig: AppConfig, client: AuthenticatedHttpClient)(
+class BindingTariffClassificationConnector @Inject() (
+  appConfig: AppConfig,
+  client: AuthenticatedHttpClient,
+  val metrics: Metrics
+)(
   implicit ec: ExecutionContext
-) {
+) extends InjectAuthHeader
+    with HasMetrics {
 
-  def get(reference: String)(implicit hc: HeaderCarrier): Future[Option[Case]] = {
-    val url = s"${appConfig.bindingTariffClassificationUrl}/cases/$reference"
-    client.GET[Option[Case]](url)
-  }
+  def get(reference: String)(implicit hc: HeaderCarrier): Future[Option[Case]] =
+    withMetricsTimerAsync("get-case") { _ =>
+      val url = s"${appConfig.bindingTariffClassificationUrl}/cases/$reference"
+      client.GET[Option[Case]](url)
+    }
 
 }

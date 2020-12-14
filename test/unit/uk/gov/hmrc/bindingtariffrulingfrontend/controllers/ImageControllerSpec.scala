@@ -86,23 +86,9 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
     }
 
-    "return 404 when the file metadata contains no url" in {
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(
-        Some(metadata.copy(url = None))
-      )
-      val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
-
-      status(result)      shouldBe Status.NOT_FOUND
-      contentType(result) shouldBe Some("text/html")
-      charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("not_found-heading")
-
-      verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
-    }
-
     "return 404 when the file metadata contains no filename" in {
       given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(
-        Some(metadata.copy(url = None))
+        Some(metadata.copy(fileName = None))
       )
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 

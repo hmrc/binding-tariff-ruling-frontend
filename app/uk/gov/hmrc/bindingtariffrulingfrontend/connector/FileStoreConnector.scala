@@ -16,11 +16,15 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import akka.stream.scaladsl.Source
 import akka.stream.Materializer
+import akka.stream.scaladsl.Source
+import akka.util.ByteString
+import com.kenshoo.play.metrics.Metrics
 import javax.inject.{Inject, Singleton}
+import play.api.libs.ws.WSClient
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
+import uk.gov.hmrc.bindingtariffrulingfrontend.metrics.HasMetrics
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpReads.Implicits._
 
@@ -29,8 +33,12 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class FileStoreConnector @Inject() (
   appConfig: AppConfig,
-  http: AuthenticatedHttpClient
-)(implicit mat: Materializer) {
+  http: AuthenticatedHttpClient,
+  ws: WSClient,
+  val metrics: Metrics
+)(implicit mat: Materializer)
+    extends InjectAuthHeader
+    with HasMetrics {
 
   implicit val ec: ExecutionContext =
     mat.executionContext
@@ -47,21 +55,43 @@ class FileStoreConnector @Inject() (
   }
 
   def get(attachmentId: String)(implicit headerCarrier: HeaderCarrier): Future[Option[FileMetadata]] =
-    http
-      .GET[Option[FileMetadata]](s"${appConfig.bindingTariffFileStoreUrl}/file/$attachmentId")
-      .map(_.filter(_.published))
+    withMetricsTimerAsync("get-attachment-metadata") { _ =>
+      http
+        .GET[Option[FileMetadata]](s"${appConfig.bindingTariffFileStoreUrl}/file/$attachmentId")
+        .map(_.filter(_.published))
+    }
 
   def get(attachmentIds: Set[String])(implicit headerCarrier: HeaderCarrier): Future[Metadata] =
-    if (attachmentIds.isEmpty)
-      Future.successful(Map.empty)
-    else
-      Source(attachmentIds)
-        .grouped(BatchSize)
-        .mapAsyncUnordered(Runtime.getRuntime().availableProcessors()) { ids =>
-          http.GET[Seq[FileMetadata]](makeQuery(ids))
-        }
-        .runFold(noMetadata) {
-          case (metadata, newEntries) =>
-            metadata ++ newEntries.filter(_.published).map(entry => entry.id -> entry).toMap
-        }
+    withMetricsTimerAsync("get-attachment-metadata-multiple") { _ =>
+      if (attachmentIds.isEmpty)
+        Future.successful(Map.empty)
+      else
+        Source(attachmentIds)
+          .grouped(BatchSize)
+          .mapAsyncUnordered(Runtime.getRuntime().availableProcessors()) { ids =>
+            http.GET[Seq[FileMetadata]](makeQuery(ids))
+          }
+          .runFold(noMetadata) {
+            case (metadata, newEntries) =>
+              metadata ++ newEntries.filter(_.published).map(entry => entry.id -> entry).toMap
+          }
+    }
+
+  def downloadFile(url: String)(implicit hc: HeaderCarrier): Future[Option[Source[ByteString, _]]] =
+    withMetricsTimerAsync("download-file") { _ =>
+      val fileStoreResponse = ws
+        .url(url)
+        .withHttpHeaders(hc.headers: _*)
+        .withHttpHeaders(authHeaders(appConfig.authorization))
+        .get()
+
+      fileStoreResponse.flatMap { response =>
+        if (response.status / 100 == 2)
+          Future.successful(Some(response.bodyAsSource))
+        else if (response.status / 100 > 4)
+          Future.failed(new RuntimeException(s"Unable to retrieve file $url from filestore"))
+        else
+          Future.successful(None)
+      }
+    }
 }

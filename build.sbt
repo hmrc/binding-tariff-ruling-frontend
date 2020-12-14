@@ -62,6 +62,6 @@ lazy val microservice = (project in file("."))
 lazy val TemplateTest   = config("tt") extend Test
 
 // Coverage configuration
-coverageMinimum := 66 // TODO improve this
+coverageMinimum := 72
 coverageFailOnMinimum := true
 coverageExcludedPackages := "<empty>;com.kenshoo.play.metrics.*;prod.*;testOnlyDoNotUseInAppConf.*;app.*;uk.gov.hmrc.BuildInfo"

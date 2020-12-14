@@ -10,3 +10,4 @@ DELETE     /ruling/:id                          @uk.gov.hmrc.bindingtariffruling
 DELETE     /ruling                              @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.RulingController.deleteAll()
 
 GET        /ruling/:reference/image/:id         @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.ImageController.get(reference: String, id: String)
+GET        /ruling/:reference/attachment/:id    @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.AttachmentController.get(reference: String, id: String)
