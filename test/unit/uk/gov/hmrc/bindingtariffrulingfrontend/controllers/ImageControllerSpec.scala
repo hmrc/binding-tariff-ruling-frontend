@@ -34,7 +34,7 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   private val fileStoreService = mock[FileStoreService]
 
-  private def controller(allowlist: AllowedAction = AllowListDisabled()) =
+  private def controller(allowlist: AllowListAction = AllowListDisabled()) =
     new ImageController(fileStoreService, allowlist, mcc, realConfig)
 
   override protected def afterEach(): Unit = {
@@ -100,9 +100,9 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
     }
 
-    "return 403 when disallowed" in {
+    "return 303 when disallowed" in {
       val result = await(controller(allowlist = AllowListEnabled()).get(rulingReference, fileId)(getRequestWithCSRF()))
-      status(result) shouldBe Status.FORBIDDEN
+      status(result) shouldBe Status.SEE_OTHER
     }
   }
 

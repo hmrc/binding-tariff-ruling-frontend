@@ -22,7 +22,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AdminAction, AllowedAction, AuthenticatedAction}
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AdminAction, AllowListAction, AuthenticatedAction}
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -34,7 +34,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class RulingController @Inject() (
   rulingService: RulingService,
   fileStoreService: FileStoreService,
-  allowlist: AllowedAction,
+  allowlist: AllowListAction,
   authenticate: AuthenticatedAction,
   verifyAdmin: AdminAction,
   mcc: MessagesControllerComponents,

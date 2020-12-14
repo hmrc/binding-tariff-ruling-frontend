@@ -25,19 +25,23 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AllowListDisabled, AllowListEnabled, AllowedAction}
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AllowListAction, AllowListDisabled, AllowListEnabled}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
+import uk.gov.hmrc.bindingtariffrulingfrontend.filters.RateLimitFilter
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
 class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
+  private val appConfig        = mock[AppConfig]
   private val rulingService    = mock[RulingService]
   private val fileStoreService = mock[FileStoreService]
+  private val rateLimit        = new RateLimitFilter(appConfig)
 
   override protected def afterEach(): Unit = {
     super.afterEach()
@@ -47,8 +51,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   private def asDocument(html: String): Document = Jsoup.parse(html)
 
-  private def controller(allowlist: AllowedAction = AllowListDisabled()) =
-    new SearchController(rulingService, fileStoreService, allowlist, mcc, realConfig)
+  private def controller(allowlist: AllowListAction = AllowListDisabled()) =
+    new SearchController(rulingService, fileStoreService, allowlist, rateLimit, mcc, realConfig)
 
   "GET /" should {
     "return 200 with a valid query" in {
@@ -112,12 +116,28 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verifyZeroInteractions(rulingService)
     }
 
-    "return 403 when disallowed" in {
+    "return 303 when disallowed" in {
       val result = await(
         controller(allowlist = AllowListEnabled()).get(query = None, imagesOnly = false, page = 1)(getRequestWithCSRF())
       )
 
-      status(result) shouldBe Status.FORBIDDEN
+      status(result) shouldBe Status.SEE_OTHER
+    }
+
+    "return 429 when too many requests are made" in {
+      given(appConfig.rateLimiterEnabled) willReturn true
+      given(appConfig.rateLimitBucketSize) willReturn 5
+      given(appConfig.rateLimitRatePerSecond) willReturn 2
+      val results = for (_ <- 0 until 100) yield controller().get(Some("foo"), false, 1)(getRequestWithCSRF())
+      val statuses = await(Future.sequence(results)).map(status)
+      atLeast(1, statuses) shouldBe Status.TOO_MANY_REQUESTS
+    }
+
+    "return 200 when rate limiting is disabled" in {
+      given(appConfig.rateLimiterEnabled) willReturn false
+      val results = for (_ <- 0 until 100) yield controller().get(Some("foo"), false, 1)(getRequestWithCSRF())
+      val statuses = await(Future.sequence(results)).map(status)
+      all(statuses) shouldBe Status.OK
     }
   }
 

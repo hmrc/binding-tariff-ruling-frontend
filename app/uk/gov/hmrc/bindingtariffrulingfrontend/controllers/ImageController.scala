@@ -17,23 +17,23 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import cats.data.OptionT
+import javax.inject.{Inject, Singleton}
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowedAction
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowListAction
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 @Singleton
 class ImageController @Inject() (
   fileStoreService: FileStoreService,
-  allowlist: AllowedAction,
+  allowlist: AllowListAction,
   mcc: MessagesControllerComponents,
   implicit val appConfig: AppConfig
 )(implicit ec: ExecutionContext)

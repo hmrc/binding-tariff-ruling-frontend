@@ -17,24 +17,17 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
 
 import javax.inject.Inject
-import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.filters.AllowListFilter
+import play.api.mvc.{ActionFunction, Request, Result}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.Future.successful
-import scala.concurrent.ExecutionContext.Implicits.global
 
-class AllowedAction @Inject() (appConfig: AppConfig) extends ActionRefiner[Request, Request] {
-
-  override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] =
-    appConfig.allowlist match {
-      case Some(addresses: Set[String]) =>
-        request.headers.get("True-Client-IP") match {
-          case Some(ip: String) if addresses.contains(ip) => successful(Right(request))
-          case _                                          => successful(Left(Results.Forbidden))
-        }
-      case _ => successful(Right(request))
-    }
-
-  override protected def executionContext: ExecutionContext = global
+class AllowListAction @Inject() (
+  appConfig: AppConfig,
+  val allowList: AllowListFilter
+)(implicit val executionContext: ExecutionContext)
+    extends ActionFunction[Request, Request] {
+  override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] =
+    if (appConfig.allowListEnabled) allowList(_ => block(request))(request) else block(request)
 }

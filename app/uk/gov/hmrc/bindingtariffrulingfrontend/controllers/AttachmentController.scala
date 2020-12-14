@@ -21,7 +21,7 @@ import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowedAction
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowListAction
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
@@ -33,7 +33,7 @@ import scala.util.control.NonFatal
 @Singleton
 class AttachmentController @Inject() (
   fileStoreService: FileStoreService,
-  allowlist: AllowedAction,
+  allowlist: AllowListAction,
   mcc: MessagesControllerComponents,
   implicit val appConfig: AppConfig
 )(implicit ec: ExecutionContext)
@@ -49,9 +49,11 @@ class AttachmentController @Inject() (
         mimeType <- OptionT.fromOption[Future](meta.mimeType)
         fileName <- OptionT.fromOption[Future](meta.fileName)
         content  <- OptionT(fileStoreService.downloadFile(url))
-      } yield Ok.streamed(content, None, contentType = Some(mimeType)).withHeaders(
-        "Content-Disposition" -> s"filename=${fileName}"
-      )
+      } yield Ok
+        .streamed(content, None, contentType = Some(mimeType))
+        .withHeaders(
+          "Content-Disposition" -> s"filename=$fileName"
+        )
 
       fileStoreResponse.getOrElse(NotFound(views.html.not_found_template())).recover {
         case NonFatal(e) =>

@@ -33,11 +33,13 @@ import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import java.nio.charset.StandardCharsets
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   private val fileStoreService = mock[FileStoreService]
 
-  private def controller(allowlist: AllowedAction = AllowListDisabled()) =
+  private def controller(allowlist: AllowListAction = AllowListDisabled()) =
     new AttachmentController(fileStoreService, allowlist, mcc, realConfig)
 
   override protected def afterEach(): Unit = {
@@ -58,10 +60,12 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     )
 
     "return 200 when given a valid attachment id" in {
-      val url = metadata.url.get
+      val url     = metadata.url.get
       val pngData = "png data".getBytes(StandardCharsets.UTF_8)
       given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(Some(metadata))
-      given(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier])) willReturn Future.successful(Some(Source.single(ByteString(pngData))))
+      given(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier])) willReturn Future.successful(
+        Some(Source.single(ByteString(pngData)))
+      )
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)         shouldBe Status.OK
@@ -94,7 +98,6 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
       verify(fileStoreService, times(0)).downloadFile(any[String])(any[HeaderCarrier])
     }
-
 
     "return 404 when the filestore service does not respond normally to downloadFile" in {
       val url = metadata.url.get
@@ -168,9 +171,9 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verify(fileStoreService).downloadFile(refEq(url))(any[HeaderCarrier])
     }
 
-    "return 403 when disallowed" in {
+    "return 303 when disallowed" in {
       val result = await(controller(allowlist = AllowListEnabled()).get(rulingReference, fileId)(getRequestWithCSRF()))
-      status(result) shouldBe Status.FORBIDDEN
+      status(result) shouldBe Status.SEE_OTHER
     }
   }
 

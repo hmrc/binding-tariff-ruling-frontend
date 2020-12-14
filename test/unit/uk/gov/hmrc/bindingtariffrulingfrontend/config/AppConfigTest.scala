@@ -64,11 +64,8 @@ class AppConfigTest extends BaseSpec {
 
   "Build allowlist" in {
     appConfig(
-      "filters.allowlist.enabled" -> "true",
-      "filters.allowlist.ips"     -> "ip1, ip2"
-    ).allowlist shouldBe Some(Set("ip1", "ip2"))
-
-    appConfig("filters.allowlist.enabled" -> "false").allowlist shouldBe None
+      "filters.allowlist.ips" -> "ip1, ip2"
+    ).allowList shouldBe Set("ip1", "ip2")
   }
 
   "Build Classification Backend URL" in {

@@ -22,33 +22,51 @@ import play.api.mvc.{Request, Result, Results}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.filters.AllowListFilter
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class AllowedActionTest extends BaseSpec {
+class AllowListActionSpec extends BaseSpec {
 
   private val block  = mock[Request[_] => Future[Result]]
   private val config = mock[AppConfig]
-  private val action = new AllowedAction(config)
+  private val filter = new AllowListFilter(config)
+  private val action = new AllowListAction(config, filter)
 
   "Allowed Action" should {
-    "Filter unauthenticated" in {
+    "redirect unrecognised IPs" in {
       given(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      given(config.allowlist) willReturn Some(Set[String]())
+      given(config.allowListEnabled) willReturn true
+      given(config.allowListDestination) willReturn "https://gov.uk"
+      given(config.allowList) willReturn Set.empty[String]
 
-      await(action.invokeBlock(FakeRequest(), block)) shouldBe Results.Forbidden
+      await(action.invokeBlock(FakeRequest().withHeaders("True-Client-IP" -> "ip"), block)) shouldBe Results.Redirect(
+        "https://gov.uk"
+      )
     }
 
-    "Filter authenticated" in {
+    "return error when no request header is set" in {
       given(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      given(config.allowlist) willReturn Some(Set("ip"))
+      given(config.allowListEnabled) willReturn true
+      given(config.allowListDestination) willReturn "https://gov.uk"
+      given(config.allowList) willReturn Set.empty[String]
+
+      await(action.invokeBlock(FakeRequest(), block)) shouldBe Results.NotImplemented
+    }
+
+    "return OK when the IP is recognised" in {
+      given(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
+      given(config.allowListEnabled) willReturn true
+      given(config.allowList) willReturn Set("ip")
 
       await(action.invokeBlock(FakeRequest().withHeaders("True-Client-IP" -> "ip"), block)) shouldBe Results.Ok
     }
 
-    "Not Filter when disabled" in {
+    "return OK when the allowlist is disabled" in {
       given(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      given(config.allowlist) willReturn None
+      given(config.allowListEnabled) willReturn false
+      given(config.allowList) willReturn Set.empty[String]
 
       await(action.invokeBlock(FakeRequest(), block)) shouldBe Results.Ok
     }

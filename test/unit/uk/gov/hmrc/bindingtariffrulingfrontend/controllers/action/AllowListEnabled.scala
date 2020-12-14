@@ -16,17 +16,24 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
 
+import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, Materializer}
 import org.mockito.Mockito
-import play.api.mvc.{Request, Result, Results}
+import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.filters.AllowListFilter
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class AllowListEnabled extends AllowedAction(Mockito.mock(classOf[AppConfig])) {
-  protected override def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] =
-    Future.successful(Left(Results.Forbidden))
+class AllowListEnabled(appConfig: AppConfig)(implicit mat: Materializer, ec: ExecutionContext)
+    extends AllowListAction(appConfig, new AllowListFilter(appConfig)) {
+  override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] =
+    Future.successful(allowList.response)
 }
 
 object AllowListEnabled {
-  def apply(): AllowListEnabled = new AllowListEnabled()
+  val system       = ActorSystem.create("testActorSystem")
+  val materializer = ActorMaterializer.create(system)
+  def apply(): AllowListEnabled =
+    new AllowListEnabled(Mockito.mock(classOf[AppConfig]))(materializer, materializer.executionContext)
 }
