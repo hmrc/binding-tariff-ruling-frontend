@@ -14,12 +14,12 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 @import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-
+@import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.back_link
+@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 
-@(reference: String, url: String, fileName: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(reference: String, imageId: String, fileName: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @main_template(title = Some(messages("image.title")), bodyClasses = None) {
 
@@ -36,9 +36,11 @@
 
   <div class="grid-row">
       <div class="column-full">
+        @defining(routes.AttachmentController.get(reference, imageId)) { url =>
           <a href="@url" target="_blank" >
             <img src="@url" alt="@fileName" title="@fileName" />
           </a>
+        }
       </div>
   </div>
 }

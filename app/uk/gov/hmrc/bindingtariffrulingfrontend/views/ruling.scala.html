@@ -86,11 +86,11 @@
         @ruling.images.map { id =>
             @fileMetadata.get(id).map { meta =>
               @meta.fileName.map { fileName =>
-                @meta.url.map { url =>
-                    <a href="@routes.ImageController.get(ruling.reference, id)">
-                        <img class="image-thumbnail-large" alt="@fileName" src="@url" />
-                    </a>
-                }
+                <a href="@routes.ImageController.get(ruling.reference, id)">
+                    <img class="image-thumbnail-large"
+                         alt="@fileName"
+                         src="@routes.AttachmentController.get(ruling.reference, id)" />
+                </a>
               }.getOrElse {
                 HtmlFormat.empty
               }
@@ -107,11 +107,9 @@
           @ruling.attachments.map { id =>
             @fileMetadata.get(id).map { meta =>
               @meta.fileName.map { fileName =>
-                @meta.url.map { url =>
-                  <li class="mb-1">
-                    <a href="@url">@fileName</a>
-                  </li>
-                }
+                <li class="mb-1">
+                  <a href="@routes.AttachmentController.get(ruling.reference, id)">@fileName</a>
+                </li>
               }.getOrElse {
                 HtmlFormat.empty
               }

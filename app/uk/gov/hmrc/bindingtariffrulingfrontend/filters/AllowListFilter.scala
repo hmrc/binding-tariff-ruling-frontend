@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
+package uk.gov.hmrc.bindingtariffrulingfrontend.filters
 
-import org.mockito.Mockito
-import play.api.mvc.{Request, Result}
+import akka.stream.Materializer
+import javax.inject.{Inject, Singleton}
+import play.api.mvc.Call
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.allowlist.AkamaiAllowlistFilter
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-
-class AllowListDisabled() extends AllowListAction(Mockito.mock(classOf[AppConfig]), null) {
-  override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] =
-    block(request)
-}
-
-object AllowListDisabled {
-  def apply(): AllowListDisabled = new AllowListDisabled()
+@Singleton
+class AllowListFilter @Inject() (appConfig: AppConfig)(implicit val mat: Materializer) extends AkamaiAllowlistFilter {
+  override def allowlist: Seq[String] = appConfig.allowList.toSeq
+  override def destination: Call      = Call("GET", appConfig.allowListDestination)
 }

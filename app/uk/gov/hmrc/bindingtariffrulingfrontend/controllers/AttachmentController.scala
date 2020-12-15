@@ -17,7 +17,6 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import cats.data.OptionT
-import javax.inject.{Inject, Singleton}
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -27,11 +26,12 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 @Singleton
-class ImageController @Inject() (
+class AttachmentController @Inject() (
   fileStoreService: FileStoreService,
   allowlist: AllowListAction,
   mcc: MessagesControllerComponents,
@@ -41,12 +41,19 @@ class ImageController @Inject() (
     with I18nSupport
     with Logging {
 
-  def get(rulingReference: String, imageId: String): Action[AnyContent] = (Action andThen allowlist).async {
+  def get(rulingReference: String, fileId: String): Action[AnyContent] = (Action andThen allowlist).async {
     implicit request =>
       val fileStoreResponse = for {
-        meta     <- OptionT(fileStoreService.get(imageId))
+        meta     <- OptionT(fileStoreService.get(fileId))
+        url      <- OptionT.fromOption[Future](meta.url)
+        mimeType <- OptionT.fromOption[Future](meta.mimeType)
         fileName <- OptionT.fromOption[Future](meta.fileName)
-      } yield Ok(views.html.image(rulingReference, imageId, fileName))
+        content  <- OptionT(fileStoreService.downloadFile(url))
+      } yield Ok
+        .streamed(content, None, contentType = Some(mimeType))
+        .withHeaders(
+          "Content-Disposition" -> s"filename=$fileName"
+        )
 
       fileStoreResponse.getOrElse(NotFound(views.html.not_found_template())).recover {
         case NonFatal(e) =>

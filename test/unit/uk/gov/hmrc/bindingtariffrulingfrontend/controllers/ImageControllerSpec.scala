@@ -34,7 +34,7 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   private val fileStoreService = mock[FileStoreService]
 
-  private def controller(allowlist: AllowedAction = AllowListDisabled()) =
+  private def controller(allowlist: AllowListAction = AllowListDisabled()) =
     new ImageController(fileStoreService, allowlist, mcc, realConfig)
 
   override protected def afterEach(): Unit = {
@@ -86,23 +86,9 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
     }
 
-    "return 404 when the file metadata contains no url" in {
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(
-        Some(metadata.copy(url = None))
-      )
-      val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
-
-      status(result)      shouldBe Status.NOT_FOUND
-      contentType(result) shouldBe Some("text/html")
-      charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("not_found-heading")
-
-      verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
-    }
-
     "return 404 when the file metadata contains no filename" in {
       given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(
-        Some(metadata.copy(url = None))
+        Some(metadata.copy(fileName = None))
       )
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
@@ -114,9 +100,9 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
     }
 
-    "return 403 when disallowed" in {
+    "return 303 when disallowed" in {
       val result = await(controller(allowlist = AllowListEnabled()).get(rulingReference, fileId)(getRequestWithCSRF()))
-      status(result) shouldBe Status.FORBIDDEN
+      status(result) shouldBe Status.SEE_OTHER
     }
   }
 

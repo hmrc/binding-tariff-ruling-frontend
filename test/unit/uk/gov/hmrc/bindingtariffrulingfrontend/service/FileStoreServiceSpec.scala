@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.FileStoreConnector
@@ -23,8 +24,9 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import java.time.Instant
 import org.scalatest.BeforeAndAfterEach
+import uk.gov.hmrc.http.HeaderCarrier
 
-class FileStoreServiceTest extends BaseSpec with BeforeAndAfterEach {
+class FileStoreServiceSpec extends BaseSpec with BeforeAndAfterEach {
   val connector = mock[FileStoreConnector]
   val service   = new FileStoreService(connector)
 
@@ -76,6 +78,14 @@ class FileStoreServiceTest extends BaseSpec with BeforeAndAfterEach {
       service.get(rulings)
       val ids = Seq("file1", "file2", "image1", "image2")
       verify(connector).get(Seq.fill(5)(ids).flatten.toSet)
+    }
+  }
+
+  "FileStoreService.downloadFile" should {
+    "delegate to connector" in {
+      val url = "http://localhost:4572/foo"
+      service.downloadFile("http://localhost:4572/foo")
+      verify(connector).downloadFile(refEq(url))(any[HeaderCarrier])
     }
   }
 }

@@ -36,7 +36,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
 
 import scala.concurrent.Future
 
-class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
+class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
   private val connector        = mock[BindingTariffClassificationConnector]
   private val repository       = mock[RulingRepository]

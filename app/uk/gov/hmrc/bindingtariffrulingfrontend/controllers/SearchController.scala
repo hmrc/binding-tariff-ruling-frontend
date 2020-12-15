@@ -22,21 +22,22 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowedAction
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowListAction
+import uk.gov.hmrc.bindingtariffrulingfrontend.filters.RateLimitFilter
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SearchController @Inject() (
   rulingService: RulingService,
   fileStoreService: FileStoreService,
-  allowlist: AllowedAction,
+  allowList: AllowListAction,
+  rateLimit: RateLimitFilter,
   mcc: MessagesControllerComponents,
   implicit val appConfig: AppConfig
 )(implicit ec: ExecutionContext)
@@ -56,7 +57,7 @@ class SearchController @Inject() (
     Future.successful(Ok(views.html.search(form, rulings, fileMetadata)))
 
   def get(query: Option[String], imagesOnly: Boolean, page: Int): Action[AnyContent] =
-    (Action andThen allowlist).async { implicit request =>
+    (Action andThen allowList andThen rateLimit).async { implicit request =>
       val form = SimpleSearch.form.bindFromRequest()
 
       form.fold(

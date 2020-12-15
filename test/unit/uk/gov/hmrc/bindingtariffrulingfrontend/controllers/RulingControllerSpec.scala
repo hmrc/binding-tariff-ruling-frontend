@@ -36,9 +36,9 @@ class RulingControllerSpec extends ControllerSpec {
   private val fileStoreService = mock[FileStoreService]
 
   private def controller(
-    allowlist: AllowedAction  = AllowListDisabled(),
-    auth: AuthenticatedAction = SuccessfulAuth(),
-    admin: AdminAction        = AdminEnabled()
+    allowlist: AllowListAction = AllowListDisabled(),
+    auth: AuthenticatedAction  = SuccessfulAuth(),
+    admin: AdminAction         = AdminEnabled()
   ) =
     new RulingController(rulingService, fileStoreService, allowlist, auth, admin, mcc, realConfig)
 
@@ -67,11 +67,10 @@ class RulingControllerSpec extends ControllerSpec {
       bodyOf(result)      should include("not_found-heading")
     }
 
-    "return 403 when not allowed" in {
+    "return 303 when not allowed" in {
       val result = await(controller(allowlist = AllowListEnabled()).get("id")(getRequestWithCSRF()))
-      status(result) shouldBe Status.FORBIDDEN
+      status(result) shouldBe Status.SEE_OTHER
     }
-
   }
 
   "POST /" should {

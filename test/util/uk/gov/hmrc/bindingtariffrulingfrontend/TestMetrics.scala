@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
+package uk.gov.hmrc.bindingtariffrulingfrontend
 
-import org.mockito.Mockito
-import play.api.mvc.{Request, Result}
-import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import com.kenshoo.play.metrics.Metrics
+import com.codahale.metrics.MetricRegistry
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-
-class AllowListDisabled() extends AllowListAction(Mockito.mock(classOf[AppConfig]), null) {
-  override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] =
-    block(request)
-}
-
-object AllowListDisabled {
-  def apply(): AllowListDisabled = new AllowListDisabled()
+class TestMetrics extends Metrics {
+  override def defaultRegistry: MetricRegistry = new MetricRegistry
+  override def toJson: String                  = ""
 }

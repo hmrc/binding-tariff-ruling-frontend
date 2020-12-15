@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
+import akka.stream.scaladsl.Source
+import akka.util.ByteString
 import javax.inject.{Inject, Singleton}
 import play.api.Logging
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.FileStoreConnector
@@ -42,4 +44,7 @@ class FileStoreService @Inject() (connector: FileStoreConnector) extends Logging
     val attachmentIds = paged.results.flatMap(result => result.attachments ++ result.images)
     get(attachmentIds)
   }
+
+  def downloadFile(url: String)(implicit hc: HeaderCarrier): Future[Option[Source[ByteString, _]]] =
+    connector.downloadFile(url)
 }
