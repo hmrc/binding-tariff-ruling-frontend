@@ -14,12 +14,14 @@
  * limitations under the License.
  *@
 
+@import play.twirl.api.HtmlFormat
 @import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+@import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.utils.{Dates, GlobalTariff}
-@(search: Option[SimpleSearch], results: Paged[Ruling])(implicit messages: Messages, appConfig: AppConfig)
+@(search: Option[SimpleSearch], results: Paged[Ruling], fileMetadata: Map[String, FileMetadata])(implicit messages: Messages, appConfig: AppConfig)
 
 @if(results.nonEmpty) {
     <table id="search_results-table">
@@ -52,9 +54,21 @@
                                 @result.bindingCommodityCode @messages("search.results.ruling.commodityCode.newTab")
                             </a>
                         </div>
-                        <!-- <div class="mb-1">
-                            Images go here
-                        </div> -->
+                        <div class="mb-1">
+                            @result.images.map { id =>
+                                @fileMetadata.get(id).map { meta =>
+                                    @meta.fileName.map { fileName =>
+                                        @meta.url.map { url =>
+                                            <a href="@routes.ImageController.get(result.reference, id)">
+                                                <img class="image-thumbnail" alt="@fileName" src="@url" />
+                                            </a>
+                                        }
+                                    }.getOrElse {
+                                        HtmlFormat.empty
+                                    }
+                                }
+                            }
+                        </div>
                     </td>
                     <td class="valign-top" id="search_results-table-row_@index-end_date">
                         @Dates.format(result.effectiveEndDate)

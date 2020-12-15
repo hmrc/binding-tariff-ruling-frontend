@@ -21,27 +21,27 @@ import play.api.data.Forms._
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Pagination
 import play.api.data.FormError
 import play.api.data.format.Formatter
+import SimpleSearch._
 
-// scalastyle:off magic.number
 case class SimpleSearch(
   query: Option[String],
   imagesOnly: Boolean,
   override val pageIndex: Int,
-  override val pageSize: Int = 25
+  override val pageSize: Int = DefaultPageSize
 ) extends Pagination
-// scalastyle:on magic.number
 
 object SimpleSearch {
+  private val DefaultPageSize = 25
 
   val form: Form[SimpleSearch] = Form(
     mapping(
       "query"  -> of(optionalStringFormatter),
       "images" -> boolean,
       "page"   -> optional(number).transform(_.getOrElse(1), (page: Int) => Some(page))
-    )((q: Option[String], i: Boolean, p: Int) => SimpleSearch(q, i, p))(s => Some((s.query, s.imagesOnly, s.pageIndex)))
+    )(SimpleSearch.apply(_, _, _))(s => Some((s.query, s.imagesOnly, s.pageIndex)))
   )
 
-  private def standardiseText(s: String): String =
+  private def normaliseWhiteSpace(s: String): String =
     s.replaceAll("""\s{1,}""", " ").trim
 
   private lazy val optionalStringFormatter: Formatter[Option[String]] = new Formatter[Option[String]] {
@@ -49,7 +49,7 @@ object SimpleSearch {
       Right(
         data
           .get(key)
-          .map(standardiseText)
+          .map(normaliseWhiteSpace)
           .filter(_.nonEmpty)
       )
 

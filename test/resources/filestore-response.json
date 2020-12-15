@@ -1,0 +1,32 @@
+[
+    {
+        "url": "http://localhost:4572/digital-tariffs-local/006491c2-a60b-46cc-9e73-5e180d3bf1ce",
+        "lastUpdated": "2020-11-25T17:37:04.051Z",
+        "published": true,
+        "scanStatus": "READY",
+        "fileName": "FileUploadPDF.pdf",
+        "mimeType": "application/pdf",
+        "id": "006491c2-a60b-46cc-9e73-5e180d3bf1ce",
+        "publishable": true
+    },
+    {
+        "url": "http://localhost:9570/upscan/download/3931e8db-7b6f-42cc-8520-e9812643e8a1",
+        "lastUpdated": "2020-11-25T17:36:36.554Z",
+        "published": false,
+        "scanStatus": "READY",
+        "fileName": "my-file.txt",
+        "mimeType": "application/binary",
+        "id": "67e8b488-d5a1-4c53-abfb-e297ed479b72",
+        "publishable": false
+    },
+    {
+        "url": "http://localhost:4572/digital-tariffs-local/9a7a1787-4ec1-40d7-aa75-50cb276e3d28",
+        "lastUpdated": "2020-11-25T17:37:03.071Z",
+        "published": true,
+        "scanStatus": "READY",
+        "fileName": "FileUploadJPG.jpg",
+        "mimeType": "image/jpeg",
+        "id": "9a7a1787-4ec1-40d7-aa75-50cb276e3d28",
+        "publishable": true
+    }
+]

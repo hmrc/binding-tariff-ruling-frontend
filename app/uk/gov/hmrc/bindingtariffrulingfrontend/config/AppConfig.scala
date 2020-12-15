@@ -17,7 +17,7 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.config
 
 import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.{ConfigLoader, Configuration}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
@@ -26,25 +26,25 @@ class AppConfig @Inject() (val configuration: Configuration) extends ServicesCon
   private lazy val contactHost             = configuration.getOptional[String](s"contact-frontend.host").getOrElse("")
   private val contactFormServiceIdentifier = "binding-tariff-ruling-frontend"
 
-  lazy val assetsPrefix: String                   = loadConfig(s"assets.url") + loadConfig(s"assets.version")
-  lazy val analyticsToken: String                 = loadConfig(s"google-analytics.token")
-  lazy val analyticsHost: String                  = loadConfig(s"google-analytics.host")
-  lazy val authorization: String                  = loadConfig("auth.api-token")
+  lazy val assetsPrefix: String                   = loadConfig[String](s"assets.url") + loadConfig[String](s"assets.version")
+  lazy val analyticsToken: String                 = loadConfig[String](s"google-analytics.token")
+  lazy val analyticsHost: String                  = loadConfig[String](s"google-analytics.host")
+  lazy val authorization: String                  = loadConfig[String]("auth.api-token")
   lazy val bindingTariffClassificationUrl: String = baseUrl("binding-tariff-classification")
+  lazy val bindingTariffFileStoreUrl: String      = baseUrl("binding-tariff-filestore")
   lazy val adminEnabled: Boolean                  = getBoolean("admin-mode")
-  lazy val ukGlobalTariffHost: String             = loadConfig("uk-global-tariff.host")
+  lazy val ukGlobalTariffHost: String             = loadConfig[String]("uk-global-tariff.host")
 
-  lazy val allowlist: Option[Set[String]] = {
-    if (getBoolean("filters.allowlist.enabled")) {
-      Some[Set[String]](
-        getString("filters.allowlist.ips")
-          .split(",")
-          .map(_.trim)
-          .filter(_.nonEmpty)
-          .toSet
-      )
-    } else None
-  }
+  lazy val maxUriLength: Long = configuration.underlying.getBytes("akka.http.parsing.max-uri-length")
+
+  lazy val allowListEnabled     = loadConfig[Boolean]("filters.allowlist.enabled")
+  lazy val allowListDestination = loadConfig[String]("filters.allowlist.destination")
+  lazy val allowList: Set[String] =
+    loadConfig[String]("filters.allowlist.ips")
+      .split(",")
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .toSet
 
   lazy val reportAProblemPartialUrl: String =
     s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
@@ -55,7 +55,10 @@ class AppConfig @Inject() (val configuration: Configuration) extends ServicesCon
   lazy val betaFeedbackUnauthenticatedUrl =
     s"$contactHost/contact/beta-feedback-unauthenticated?service=$contactFormServiceIdentifier"
 
-  private def loadConfig(key: String) =
-    configuration.getOptional[String](key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
+  lazy val rateLimitBucketSize: Int    = loadConfig[Int]("filters.rateLimit.bucketSize")
+  lazy val rateLimitRatePerSecond: Int = loadConfig[Int]("filters.rateLimit.ratePerSecond")
+  lazy val rateLimiterEnabled: Boolean = loadConfig[Boolean]("filters.rateLimit.enabled")
 
+  private def loadConfig[A](key: String)(implicit loader: ConfigLoader[A]) =
+    configuration.getOptional[A](key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
 }

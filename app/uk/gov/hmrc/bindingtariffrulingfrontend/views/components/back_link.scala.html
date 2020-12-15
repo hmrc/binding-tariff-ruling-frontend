@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,18 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.utils
+@()(implicit messages: Messages)
 
-import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
-
-class GlobalTariffSpec extends BaseSpec {
-  "GlobalTariff.link" should {
-    "produce a link to UK Global Tariff" in {
-      GlobalTariff
-        .link("8888")(realConfig)
-        .url shouldBe "https://www.check-future-uk-trade-tariffs.service.gov.uk/tariff?q=8888"
-    }
-  }
-}
+<div class="js-visible">
+  <p class="back-link-text"><a id="back-link" class="link-back" href="#">@messages("site.back")</a></p>
+</div>

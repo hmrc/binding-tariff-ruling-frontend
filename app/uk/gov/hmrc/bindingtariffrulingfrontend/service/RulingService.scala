@@ -27,10 +27,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 
 class RulingService @Inject() (
   repository: RulingRepository,
   auditService: AuditService,
+  fileStoreService: FileStoreService,
   bindingTariffClassificationConnector: BindingTariffClassificationConnector
 ) {
 
@@ -54,15 +56,25 @@ class RulingService @Inject() (
 
     val rulingUpdate: Future[RulingUpdate] = for {
       existingRuling: ExistingRuling <- repository.get(reference)
-      updatedCase: Option[Case]      <- bindingTariffClassificationConnector.get(reference)
-      updatedRuling: UpdatedRuling = updatedCase
+
+      updatedCase: Option[Case] <- bindingTariffClassificationConnector.get(reference)
+
+      validCase = updatedCase
         .filter(_.application.`type` == ApplicationType.BTI)
         .filter(_.status == CaseStatus.COMPLETED)
         .filter(_.decision.isDefined)
         .filter(_.decision.flatMap(_.effectiveStartDate).isDefined)
         .filter(_.decision.flatMap(_.effectiveEndDate).isDefined)
-        .map(toRuling)
+
+      fileMetaData <- validCase
+                       .map(_.attachments.map(_.id))
+                       .map(fileStoreService.get(_))
+                       .getOrElse(Future.successful(Map.empty[String, FileMetadata]))
+
+      updatedRuling: UpdatedRuling = validCase.map(toRuling(_, fileMetaData))
+
       result: RulingUpdate = (existingRuling, updatedRuling)
+
     } yield result
 
     rulingUpdate flatMap {
@@ -87,11 +99,15 @@ class RulingService @Inject() (
 
   }
 
-  private def toRuling(c: Case): Ruling = {
-    val keywords: Set[String]    = c.keywords
-    val attachments: Seq[String] = c.attachments.filter(_.public).map(_.id)
-    val reference: String        = c.reference
-    val decision: Decision       = c.decision.get
+  private def toRuling(cse: Case, fileMetaData: Map[String, FileMetadata]): Ruling = {
+    val keywords: Set[String] = cse.keywords
+    val reference: String     = cse.reference
+    val decision: Decision    = cse.decision.get
+
+    val (images, attachments) = cse.attachments
+      .filter(_.public)
+      .flatMap(att => fileMetaData.get(att.id))
+      .partition(_.isImage)
 
     Ruling(
       reference            = reference,
@@ -101,7 +117,8 @@ class RulingService @Inject() (
       justification        = decision.justification,
       goodsDescription     = decision.goodsDescription,
       keywords             = keywords,
-      attachments          = attachments
+      attachments          = attachments.map(_.id),
+      images               = images.map(_.id)
     )
   }
 

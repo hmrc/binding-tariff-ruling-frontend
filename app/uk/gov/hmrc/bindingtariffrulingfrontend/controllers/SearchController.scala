@@ -17,42 +17,62 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import javax.inject.{Inject, Singleton}
+import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowedAction
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowListAction
+import uk.gov.hmrc.bindingtariffrulingfrontend.filters.RateLimitFilter
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
-import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
+import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future.successful
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SearchController @Inject() (
   rulingService: RulingService,
-  allowlist: AllowedAction,
+  fileStoreService: FileStoreService,
+  allowList: AllowListAction,
+  rateLimit: RateLimitFilter,
   mcc: MessagesControllerComponents,
   implicit val appConfig: AppConfig
-) extends FrontendController(mcc)
+)(implicit ec: ExecutionContext)
+    extends FrontendController(mcc)
     with I18nSupport {
 
+  type Metadata = Map[String, FileMetadata]
+
+  private def badRequest(form: Form[SimpleSearch])(implicit request: Request[_]): Future[Result] =
+    Future.successful(BadRequest(views.html.search(form)))
+
+  private def renderView(
+    form: Form[SimpleSearch],
+    rulings: Option[Paged[Ruling]] = None,
+    fileMetadata: Metadata         = Map.empty
+  )(implicit request: Request[_]) =
+    Future.successful(Ok(views.html.search(form, rulings, fileMetadata)))
+
   def get(query: Option[String], imagesOnly: Boolean, page: Int): Action[AnyContent] =
-    (Action andThen allowlist).async { implicit request =>
-      SimpleSearch.form.bindFromRequest
-        .fold(
-          errors => successful(Ok(views.html.search(errors, None, None))),
-          search =>
-            search.query
-              .map { query =>
-                rulingService.get(search).map { results =>
-                  Ok(views.html.search(SimpleSearch.form.fill(search), Some(search), Some(results)))
-                }
-              }
-              .getOrElse {
-                successful(Ok(views.html.search(SimpleSearch.form.fill(search), Some(search), None)))
-              }
-        )
+    (Action andThen allowList andThen rateLimit).async { implicit request =>
+      val form = SimpleSearch.form.bindFromRequest()
+
+      form.fold(
+        badRequest,
+        search =>
+          search.query match {
+            case None =>
+              renderView(form)
+            case Some(_) =>
+              for {
+                paged        <- rulingService.get(search)
+                fileMetadata <- fileStoreService.get(paged)
+                html         <- renderView(form, Some(paged), fileMetadata)
+              } yield html
+          }
+      )
     }
 }

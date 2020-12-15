@@ -11,6 +11,16 @@
   font-weight: bold;
 }
 
+.image-thumbnail {
+  @extend .mr-1;
+  height: 72px;
+}
+
+.image-thumbnail-large {
+  @extend .mr-1;
+  height: 144px;
+}
+
 .valign-top {
   vertical-align: top;
 }

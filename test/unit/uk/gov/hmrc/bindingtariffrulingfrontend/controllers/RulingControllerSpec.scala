@@ -24,27 +24,31 @@ import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action._
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
-import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
+import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 
 class RulingControllerSpec extends ControllerSpec {
 
-  private val rulingService = mock[RulingService]
+  private val rulingService    = mock[RulingService]
+  private val fileStoreService = mock[FileStoreService]
 
   private def controller(
-    allowlist: AllowedAction  = AllowListDisabled(),
-    auth: AuthenticatedAction = SuccessfulAuth(),
-    admin: AdminAction        = AdminEnabled()
+    allowlist: AllowListAction = AllowListDisabled(),
+    auth: AuthenticatedAction  = SuccessfulAuth(),
+    admin: AdminAction         = AdminEnabled()
   ) =
-    new RulingController(rulingService, allowlist, auth, admin, mcc, realConfig)
+    new RulingController(rulingService, fileStoreService, allowlist, auth, admin, mcc, realConfig)
 
   "GET /" should {
     "return 200" in {
       given(rulingService.get("id")) willReturn Future.successful(
         Some(Ruling("ref", "code", Instant.now, Instant.now, "justification", "goods description"))
       )
+      given(fileStoreService.get(any[Ruling])(any[HeaderCarrier]))
+        .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       val result = await(controller().get("id")(getRequestWithCSRF()))
       status(result)      shouldBe Status.OK
@@ -53,21 +57,20 @@ class RulingControllerSpec extends ControllerSpec {
       bodyOf(result)      should include("ruling-heading")
     }
 
-    "return 200 - when not found" in {
+    "return 404 - when not found" in {
       given(rulingService.get("id")) willReturn Future.successful(None)
 
       val result = await(controller().get("id")(getRequestWithCSRF()))
-      status(result)      shouldBe Status.OK
+      status(result)      shouldBe Status.NOT_FOUND
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("ruling_not_found-heading")
+      bodyOf(result)      should include("not_found-heading")
     }
 
-    "return 403 when not allowed" in {
+    "return 303 when not allowed" in {
       val result = await(controller(allowlist = AllowListEnabled()).get("id")(getRequestWithCSRF()))
-      status(result) shouldBe Status.FORBIDDEN
+      status(result) shouldBe Status.SEE_OTHER
     }
-
   }
 
   "POST /" should {

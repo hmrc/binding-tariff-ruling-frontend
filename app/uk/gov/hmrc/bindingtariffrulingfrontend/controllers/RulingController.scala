@@ -16,21 +16,25 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
+import cats.data.OptionT
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AdminAction, AllowedAction, AuthenticatedAction}
-import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AdminAction, AllowListAction, AuthenticatedAction}
+import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
+import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class RulingController @Inject() (
   rulingService: RulingService,
-  allowlist: AllowedAction,
+  fileStoreService: FileStoreService,
+  allowlist: AllowListAction,
   authenticate: AuthenticatedAction,
   verifyAdmin: AdminAction,
   mcc: MessagesControllerComponents,
@@ -38,11 +42,15 @@ class RulingController @Inject() (
 ) extends FrontendController(mcc)
     with I18nSupport {
 
+  type Metadata = Map[String, FileMetadata]
+
   def get(id: String): Action[AnyContent] = (Action andThen allowlist).async { implicit request =>
-    rulingService.get(id) map {
-      case Some(ruling) => Ok(views.html.ruling(ruling))
-      case _            => Ok(views.html.ruling_not_found(id))
-    }
+    val maybeRulingDetails = for {
+      ruling       <- OptionT(rulingService.get(id))
+      fileMetadata <- OptionT.liftF[Future, Metadata](fileStoreService.get(ruling))
+    } yield Ok(views.html.ruling(ruling, fileMetadata))
+
+    maybeRulingDetails.getOrElse(NotFound(views.html.not_found_template()))
   }
 
   def post(id: String): Action[AnyContent] = (Action andThen authenticate).async { implicit request =>

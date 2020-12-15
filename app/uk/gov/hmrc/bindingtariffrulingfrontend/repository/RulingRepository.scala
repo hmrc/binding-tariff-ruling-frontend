@@ -17,6 +17,8 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
 import com.google.inject.ImplementedBy
+import java.time.ZoneId
+import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json._
 import reactivemongo.api.indexes.{Index, IndexType}
@@ -29,11 +31,6 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.repository.MongoIndexCreator._
 import uk.gov.hmrc.mongo.ReactiveRepository
 
 import scala.concurrent.{ExecutionContext, Future}
-import java.time.Instant
-import java.time.ZonedDateTime
-import java.time.ZoneId
-import java.time.LocalDate
-import java.time.ZoneOffset
 
 @ImplementedBy(classOf[RulingMongoRepository])
 trait RulingRepository {
@@ -93,7 +90,13 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
       )
       .map(_.value.map(_.as[Ruling]).get)
 
-  override def get(reference: String): Future[Option[Ruling]] = collection.find(byReference(reference)).one[Ruling]
+  override def get(reference: String): Future[Option[Ruling]] =
+    collection
+      .find(
+        selector   = byReference(reference),
+        projection = Option.empty[JsObject]
+      )
+      .one[Ruling]
 
   override def delete(reference: String): Future[Unit] = collection.findAndRemove(byReference(reference)).map(_ => ())
 
@@ -107,7 +110,7 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
 
     val dateFilter  = gt("effectiveEndDate", today)
     val textSearch  = search.query.map(text(_)).getOrElse(Json.obj())
-    val imageFilter = if (search.imagesOnly) nonEmpty("attachments") else Json.obj()
+    val imageFilter = if (search.imagesOnly) nonEmpty("images") else Json.obj()
 
     val allSearches: JsObject = dateFilter ++ textSearch ++ imageFilter
 
@@ -131,7 +134,7 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
                 limit       = None,
                 skip        = 0,
                 hint        = None,
-                readConcern = ReadConcern.Available
+                readConcern = ReadConcern.Majority
               )
 
     } yield Paged(results, search.pageIndex, search.pageSize, count)

@@ -29,7 +29,8 @@ case class Ruling(
   justification: String,
   goodsDescription: String,
   keywords: Set[String]    = Set.empty,
-  attachments: Seq[String] = Seq.empty
+  attachments: Seq[String] = Seq.empty,
+  images: Seq[String]      = Seq.empty
 ) {
   lazy val bindingCommodityCodeNgrams = bindingCommodityCode
     .scanLeft("") {
@@ -60,7 +61,17 @@ object Ruling {
         }
     }
 
-    implicit val rulingReads: Reads[Ruling] = Json.reads[Ruling]
+    implicit val rulingReads: Reads[Ruling] = (
+      (__ \ "reference").read[String] and
+        (__ \ "bindingCommodityCode").read[String] and
+        (__ \ "effectiveStartDate").read[Instant](formatInstant) and
+        (__ \ "effectiveEndDate").read[Instant](formatInstant) and
+        (__ \ "justification").read[String] and
+        (__ \ "goodsDescription").read[String] and
+        (__ \ "keywords").read[Set[String]] and
+        (__ \ "attachments").read[Seq[String]] and
+        (__ \ "images").readWithDefault[Seq[String]](Seq.empty)
+    )(Ruling.apply _)
 
     implicit val rulingWrites: OWrites[Ruling] = (
       (__ \ "reference").write[String] and
@@ -71,7 +82,8 @@ object Ruling {
         (__ \ "justification").write[String] and
         (__ \ "goodsDescription").write[String] and
         (__ \ "keywords").write[Set[String]] and
-        (__ \ "attachments").write[Seq[String]]
+        (__ \ "attachments").write[Seq[String]] and
+        (__ \ "images").write[Seq[String]]
     )(ruling =>
       (
         ruling.reference,
@@ -82,7 +94,8 @@ object Ruling {
         ruling.justification,
         ruling.goodsDescription,
         ruling.keywords,
-        ruling.attachments
+        ruling.attachments,
+        ruling.images
       )
     )
 

@@ -26,11 +26,13 @@ import org.mockito.BDDMockito._
 import org.mockito.Mockito
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import uk.gov.hmrc.bindingtariffrulingfrontend.WiremockTestServer
+import uk.gov.hmrc.bindingtariffrulingfrontend.{TestMetrics, WiremockTestServer}
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
 import uk.gov.hmrc.play.audit.http.HttpAuditing
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTestServer {
 
@@ -41,8 +43,9 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
   private val wsClient: WSClient         = app.injector.instanceOf[WSClient]
   private val httpAuditing: HttpAuditing = app.injector.instanceOf[HttpAuditing]
   private val client                     = new AuthenticatedHttpClient(httpAuditing, wsClient, actorSystem, realConfig)
+  private val metrics                    = new TestMetrics
 
-  private val connector = new BindingTariffClassificationConnector(appConfig, client)
+  private val connector = new BindingTariffClassificationConnector(appConfig, client, metrics)
 
   override def beforeAll(): Unit = {
     super.beforeAll()

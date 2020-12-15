@@ -14,20 +14,28 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
+package uk.gov.hmrc.bindingtariffrulingfrontend.connector.model
 
-import org.mockito.Mockito
-import play.api.mvc.{Request, Result}
-import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import play.api.libs.json.{Json, OFormat}
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-
-class AllowListDisabled() extends AllowListAction(Mockito.mock(classOf[AppConfig]), null) {
-  override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] =
-    block(request)
+case class FileMetadata(
+  id: String,
+  fileName: Option[String],
+  mimeType: Option[String],
+  url: Option[String] = None,
+  published: Boolean  = false
+) {
+  def isImage: Boolean =
+    mimeType
+      .map {
+        case "image/png"  => true
+        case "image/jpeg" => true
+        case "image/gif"  => true
+        case _            => false
+      }
+      .getOrElse(false)
 }
 
-object AllowListDisabled {
-  def apply(): AllowListDisabled = new AllowListDisabled()
+object FileMetadata {
+  implicit val outboundFormat: OFormat[FileMetadata] = Json.format[FileMetadata]
 }

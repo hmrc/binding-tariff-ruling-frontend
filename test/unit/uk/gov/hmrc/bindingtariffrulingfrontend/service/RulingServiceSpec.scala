@@ -36,17 +36,18 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
 
 import scala.concurrent.Future
 
-class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
+class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
-  private val connector    = mock[BindingTariffClassificationConnector]
-  private val repository   = mock[RulingRepository]
-  private val auditService = mock[AuditService]
+  private val connector        = mock[BindingTariffClassificationConnector]
+  private val repository       = mock[RulingRepository]
+  private val fileStoreService = mock[FileStoreService]
+  private val auditService     = mock[AuditService]
 
-  private val service = new RulingService(repository, auditService, connector)
+  private val service = new RulingService(repository, auditService, fileStoreService, connector)
 
   override protected def afterEach(): Unit = {
     super.afterEach()
-    reset(repository, connector, auditService)
+    reset(repository, connector, auditService, fileStoreService)
   }
 
   "Service DELETE ALL" should {
@@ -90,15 +91,43 @@ class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
     val startDate         = Instant.now().plus(10, ChronoUnit.SECONDS)
     val endDate           = Instant.now()
     val validDecision     = Decision("code", Some(startDate), Some(endDate), "justification", "description")
-    val publicAttachment  = Attachment("file-id", public = true)
-    val privateAttachment = Attachment("file-id", public = false)
+    val publicAttachment  = Attachment("public-file-id", public = true)
+    val publicImage       = Attachment("public-image-id", public = true)
+    val privateAttachment = Attachment("private-file-id", public = false)
+    val privateImage      = Attachment("private-image-id", public = false)
     val validCase: Case = Case(
       reference   = "ref",
       status      = CaseStatus.COMPLETED,
       application = Application(`type` = ApplicationType.BTI),
       decision    = Some(validDecision),
-      attachments = Seq(publicAttachment, privateAttachment),
+      attachments = Seq(publicAttachment, publicImage, privateAttachment, privateImage),
       keywords    = Set("keyword")
+    )
+    val fileMetadata = Map(
+      "public-file-id" -> FileMetadata(
+        "public-file-id",
+        Some("some.pdf"),
+        Some("application/pdf"),
+        Some("https://foo")
+      ),
+      "public-image-id" -> FileMetadata(
+        "public-image-id",
+        Some("some.png"),
+        Some("image/png"),
+        Some("https://bar")
+      ),
+      "private-file-id" -> FileMetadata(
+        "private-file-id",
+        Some("some.txt"),
+        Some("text/plain"),
+        Some("https://baz")
+      ),
+      "private-image-id" -> FileMetadata(
+        "private-image-id",
+        Some("some.jpeg"),
+        Some("application/jpeg"),
+        Some("https://quu")
+      )
     )
 
     "do nothing when case doesn't exist in repository or connector" in {
@@ -115,6 +144,7 @@ class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
       given(repository.get("ref")) willReturn Future.successful(None)
       given(connector.get("ref")) willReturn Future.successful(Some(validCase))
       given(repository.update(any[Ruling], any[Boolean])) will returnTheRuling
+      given(fileStoreService.get(fileMetadata.keys.toSeq)).willReturn(fileMetadata)
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
@@ -127,7 +157,8 @@ class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
         "justification",
         "description",
         Set("keyword"),
-        Seq("file-id")
+        Seq("public-file-id"),
+        Seq("public-image-id")
       )
       theRulingUpdated shouldBe expectedRuling
 
@@ -140,6 +171,7 @@ class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
       given(repository.get("ref")) willReturn Future.successful(Some(existing))
       given(connector.get("ref")) willReturn Future.successful(Some(validCase))
       given(repository.update(any[Ruling], any[Boolean])) will returnTheRuling
+      given(fileStoreService.get(fileMetadata.keys.toSeq)).willReturn(fileMetadata)
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
@@ -153,7 +185,8 @@ class RulingServiceTest extends BaseSpec with BeforeAndAfterEach {
         "justification",
         "description",
         Set("keyword"),
-        Seq("file-id")
+        Seq("public-file-id"),
+        Seq("public-image-id")
       )
       theRulingUpdated shouldBe expectedRuling
 
