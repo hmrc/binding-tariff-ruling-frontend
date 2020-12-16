@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
-import java.time.{Instant, LocalDate, ZoneId}
-
+import java.time.{Clock, Duration, LocalDate, ZoneId, ZoneOffset}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import reactivemongo.api.{DB, ReadConcern}
@@ -37,6 +36,8 @@ class RulingMongoRepositoryTest
   self =>
 
   import Ruling.Mongo.format
+
+  private val clock = Clock.tickSeconds(ZoneOffset.UTC)
 
   private val provider: MongoDbProvider = new MongoDbProvider {
     override val mongo: () => DB = self.mongo
@@ -67,7 +68,7 @@ class RulingMongoRepositoryTest
 
   "Update" should {
     "Update One" in {
-      val document = Ruling(reference = "ref", "code", Instant.now, tomorrow, "justification", "description")
+      val document = Ruling(reference = "ref", "code", clock.instant(), tomorrow, "justification", "description")
       givenAnExistingDocument(document)
 
       val update = document.copy(bindingCommodityCode = "code")
@@ -79,10 +80,10 @@ class RulingMongoRepositoryTest
   "Delete by Reference" should {
     "Delete One" in {
       givenAnExistingDocument(
-        Ruling(reference = "ref1", "code", Instant.now, tomorrow, "justification", "description")
+        Ruling(reference = "ref1", "code", clock.instant(), tomorrow, "justification", "description")
       )
       givenAnExistingDocument(
-        Ruling(reference = "ref2", "code", Instant.now, tomorrow, "justification", "description")
+        Ruling(reference = "ref2", "code", clock.instant(), tomorrow, "justification", "description")
       )
 
       await(repository.delete("ref1"))
@@ -94,10 +95,10 @@ class RulingMongoRepositoryTest
   "Delete Many" should {
     "Delete All" in {
       givenAnExistingDocument(
-        Ruling(reference = "ref1", "code", Instant.now, tomorrow, "justification", "description")
+        Ruling(reference = "ref1", "code", clock.instant(), tomorrow, "justification", "description")
       )
       givenAnExistingDocument(
-        Ruling(reference = "ref2", "code", Instant.now, tomorrow, "justification", "description")
+        Ruling(reference = "ref2", "code", clock.instant(), tomorrow, "justification", "description")
       )
 
       await(repository.deleteAll())
@@ -113,7 +114,7 @@ class RulingMongoRepositoryTest
 
     "Retrieve One" in {
       // Given
-      val document = Ruling(reference = "ref", "code", Instant.now, tomorrow, "justification", "description")
+      val document = Ruling(reference = "ref", "code", clock.instant(), tomorrow, "justification", "description")
       givenAnExistingDocument(document)
 
       await(repository.get("ref")) shouldBe Some(document)
@@ -127,9 +128,9 @@ class RulingMongoRepositoryTest
 
     "Retrieve Multiple - no query" in {
       // Given
-      val document1 = Ruling(reference = "ref1", "0", Instant.now, tomorrow, "justification", "exacting")
-      val document2 = Ruling(reference = "ref2", "0", Instant.now, tomorrow, "justification", "exactly")
-      val document3 = Ruling(reference = "ref3", "0", Instant.now, tomorrow, "justification", "fountain pen")
+      val document1 = Ruling(reference = "ref1", "0", clock.instant(), tomorrow, "justification", "exacting")
+      val document2 = Ruling(reference = "ref2", "0", clock.instant(), tomorrow, "justification", "exactly")
+      val document3 = Ruling(reference = "ref3", "0", clock.instant(), tomorrow, "justification", "fountain pen")
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
       givenAnExistingDocument(document3)
@@ -143,8 +144,8 @@ class RulingMongoRepositoryTest
 
     "Retrieve One - by Reference - exact match" in {
       // Given
-      val document1 = Ruling(reference = "ref1", "0", Instant.now, tomorrow, "justification", "description")
-      val document2 = Ruling(reference = "ref11", "0", Instant.now, tomorrow, "justification", "description")
+      val document1 = Ruling(reference = "ref1", "0", clock.instant(), tomorrow, "justification", "description")
+      val document2 = Ruling(reference = "ref11", "0", clock.instant(), tomorrow, "justification", "description")
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
 
@@ -153,8 +154,8 @@ class RulingMongoRepositoryTest
 
     "Retrieve One - by Commodity Code - starts with" in {
       // Given
-      val document1 = Ruling(reference = "ref1", "00", Instant.now, tomorrow, "justification", "description")
-      val document2 = Ruling(reference = "ref2", "10", Instant.now, tomorrow, "justification", "description")
+      val document1 = Ruling(reference = "ref1", "00", clock.instant(), tomorrow, "justification", "description")
+      val document2 = Ruling(reference = "ref2", "10", clock.instant(), tomorrow, "justification", "description")
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
 
@@ -163,8 +164,8 @@ class RulingMongoRepositoryTest
 
     "Retrieve One - by Goods Description - case insensitive" in {
       // Given
-      val document1 = Ruling(reference = "ref1", "0", Instant.now, tomorrow, "justification", "fountain pen")
-      val document2 = Ruling(reference = "ref2", "0", Instant.now, tomorrow, "justification", "laptop")
+      val document1 = Ruling(reference = "ref1", "0", clock.instant(), tomorrow, "justification", "fountain pen")
+      val document2 = Ruling(reference = "ref2", "0", clock.instant(), tomorrow, "justification", "laptop")
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
 
@@ -174,9 +175,9 @@ class RulingMongoRepositoryTest
 
     "Retrieve Multiple - by Goods Description - word stems" in {
       // Given
-      val document1 = Ruling(reference = "ref1", "0", Instant.now, tomorrow, "justification", "exacting")
-      val document2 = Ruling(reference = "ref2", "0", Instant.now, tomorrow, "justification", "exactly")
-      val document3 = Ruling(reference = "ref3", "0", Instant.now, tomorrow, "justification", "fountain pen")
+      val document1 = Ruling(reference = "ref1", "0", clock.instant(), tomorrow, "justification", "exacting")
+      val document2 = Ruling(reference = "ref2", "0", clock.instant(), tomorrow, "justification", "exactly")
+      val document3 = Ruling(reference = "ref3", "0", clock.instant(), tomorrow, "justification", "fountain pen")
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
       givenAnExistingDocument(document3)
@@ -190,9 +191,17 @@ class RulingMongoRepositoryTest
     "Retrieve One - by Goods Description - images only" in {
       // Given
       val document1 =
-        Ruling(reference = "ref1", "0", Instant.now, tomorrow, "justification", "exacting", images = Seq("id1, id2"))
-      val document2 = Ruling(reference = "ref2", "0", Instant.now, tomorrow, "justification", "exactly")
-      val document3 = Ruling(reference = "ref3", "0", Instant.now, tomorrow, "justification", "fountain pen")
+        Ruling(
+          reference = "ref1",
+          "0",
+          clock.instant(),
+          tomorrow,
+          "justification",
+          "exacting",
+          images = Seq("id1, id2")
+        )
+      val document2 = Ruling(reference = "ref2", "0", clock.instant(), tomorrow, "justification", "exactly")
+      val document3 = Ruling(reference = "ref3", "0", clock.instant(), tomorrow, "justification", "fountain pen")
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
       givenAnExistingDocument(document3)
