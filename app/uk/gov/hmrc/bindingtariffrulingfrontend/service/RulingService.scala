@@ -105,7 +105,7 @@ class RulingService @Inject() (
     val decision: Decision    = cse.decision.get
 
     val (images, attachments) = cse.attachments
-      .filter(_.public)
+      .filter(att => att.public && att.shouldPublishToRulings)
       .flatMap(att => fileMetaData.get(att.id))
       .partition(_.isImage)
 

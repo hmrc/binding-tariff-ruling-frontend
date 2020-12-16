@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.filters
 
-import com.digitaltangible.playguard.{RateLimiter, RateLimitActionFilter}
+import com.digitaltangible.playguard.{RateLimitActionFilter, RateLimiter}
 import javax.inject.Inject
 import play.api.mvc.{ActionFilter, Request, Result, Results}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig

@@ -61,17 +61,8 @@ object Ruling {
         }
     }
 
-    implicit val rulingReads: Reads[Ruling] = (
-      (__ \ "reference").read[String] and
-        (__ \ "bindingCommodityCode").read[String] and
-        (__ \ "effectiveStartDate").read[Instant](formatInstant) and
-        (__ \ "effectiveEndDate").read[Instant](formatInstant) and
-        (__ \ "justification").read[String] and
-        (__ \ "goodsDescription").read[String] and
-        (__ \ "keywords").read[Set[String]] and
-        (__ \ "attachments").read[Seq[String]] and
-        (__ \ "images").readWithDefault[Seq[String]](Seq.empty)
-    )(Ruling.apply _)
+    implicit val rulingReads: Reads[Ruling] =
+      Json.using[Json.WithDefaultValues].format[Ruling]
 
     implicit val rulingWrites: OWrites[Ruling] = (
       (__ \ "reference").write[String] and

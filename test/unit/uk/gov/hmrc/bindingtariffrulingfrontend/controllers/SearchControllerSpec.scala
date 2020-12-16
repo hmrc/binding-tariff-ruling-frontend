@@ -128,14 +128,14 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       given(appConfig.rateLimiterEnabled) willReturn true
       given(appConfig.rateLimitBucketSize) willReturn 5
       given(appConfig.rateLimitRatePerSecond) willReturn 2
-      val results = for (_ <- 0 until 100) yield controller().get(Some("foo"), false, 1)(getRequestWithCSRF())
+      val results  = for (_ <- 0 until 100) yield controller().get(Some("foo"), false, 1)(getRequestWithCSRF())
       val statuses = await(Future.sequence(results)).map(status)
       atLeast(1, statuses) shouldBe Status.TOO_MANY_REQUESTS
     }
 
     "return 200 when rate limiting is disabled" in {
       given(appConfig.rateLimiterEnabled) willReturn false
-      val results = for (_ <- 0 until 100) yield controller().get(Some("foo"), false, 1)(getRequestWithCSRF())
+      val results  = for (_ <- 0 until 100) yield controller().get(Some("foo"), false, 1)(getRequestWithCSRF())
       val statuses = await(Future.sequence(results)).map(status)
       all(statuses) shouldBe Status.OK
     }

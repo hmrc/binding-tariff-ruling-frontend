@@ -57,7 +57,7 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
     val startDate        = Instant.now().plus(10, ChronoUnit.SECONDS)
     val endDate          = Instant.now()
     val validDecision    = Decision("code", Some(startDate), Some(endDate), "justification", "description")
-    val publicAttachment = Attachment("file-id", public = true)
+    val publicAttachment = Attachment("file-id", public = true, shouldPublishToRulings = true)
     val validCase: Case = Case(
       reference   = "ref",
       status      = CaseStatus.COMPLETED,

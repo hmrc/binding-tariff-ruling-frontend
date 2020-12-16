@@ -20,9 +20,11 @@ import play.api.libs.json.{Json, OFormat}
 
 case class Attachment(
   id: String,
-  public: Boolean
+  public: Boolean                 = false,
+  shouldPublishToRulings: Boolean = false
 )
 
 object Attachment {
-  implicit val outboundFormat: OFormat[Attachment] = Json.format[Attachment]
+  implicit val outboundFormat: OFormat[Attachment] =
+    Json.using[Json.WithDefaultValues].format[Attachment]
 }
