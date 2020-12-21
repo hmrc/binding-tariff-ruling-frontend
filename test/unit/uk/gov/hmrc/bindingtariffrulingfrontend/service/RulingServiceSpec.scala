@@ -35,6 +35,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
 
 import scala.concurrent.Future
+import scala.collection.immutable.ListMap
 
 class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
@@ -88,22 +89,41 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
   }
 
   "Service Refresh" should {
-    val startDate         = Instant.now().plus(10, ChronoUnit.SECONDS)
-    val endDate           = Instant.now()
-    val validDecision     = Decision("code", Some(startDate), Some(endDate), "justification", "description")
-    val publicAttachment  = Attachment("public-file-id", public = true)
-    val publicImage       = Attachment("public-image-id", public = true)
-    val privateAttachment = Attachment("private-file-id", public = false)
-    val privateImage      = Attachment("private-image-id", public = false)
+    val startDate = Instant.now().plus(10, ChronoUnit.SECONDS)
+    val endDate   = Instant.now()
+
+    val validDecision = Decision("code", Some(startDate), Some(endDate), "justification", "description")
+
+    val publicAttachment       = Attachment("public-file-id", public     = true, shouldPublishToRulings  = true)
+    val publicImage            = Attachment("public-image-id", public    = true, shouldPublishToRulings  = true)
+    val privateAttachment      = Attachment("private-file-id", public    = false, shouldPublishToRulings = false)
+    val privateImage           = Attachment("private-image-id", public   = false, shouldPublishToRulings = false)
+    val nonPublishAttachment   = Attachment("nopublish-file-id", public  = true, shouldPublishToRulings  = false)
+    val nonPublishImage        = Attachment("nopublish-image-id", public = true, shouldPublishToRulings  = false)
+    val invalidStateAttachment = Attachment("invalid-file-id", public    = false, shouldPublishToRulings = true)
+    val invalidStateImage      = Attachment("invalid-image-id", public   = false, shouldPublishToRulings = true)
+
+    val attachments = Seq(
+      publicAttachment,
+      publicImage,
+      privateAttachment,
+      privateImage,
+      nonPublishAttachment,
+      nonPublishImage,
+      invalidStateAttachment,
+      invalidStateImage
+    )
+
     val validCase: Case = Case(
       reference   = "ref",
       status      = CaseStatus.COMPLETED,
       application = Application(`type` = ApplicationType.BTI),
       decision    = Some(validDecision),
-      attachments = Seq(publicAttachment, publicImage, privateAttachment, privateImage),
+      attachments = attachments,
       keywords    = Set("keyword")
     )
-    val fileMetadata = Map(
+
+    val fileMetadata = ListMap(
       "public-file-id" -> FileMetadata(
         "public-file-id",
         Some("some.pdf"),
@@ -127,6 +147,30 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
         Some("some.jpeg"),
         Some("application/jpeg"),
         Some("https://quu")
+      ),
+      "nopublish-attachment-id" -> FileMetadata(
+        "nopublish-attachment-id",
+        Some("some.txt"),
+        Some("text/plain"),
+        Some("https://quux")
+      ),
+      "nopublish-image-id" -> FileMetadata(
+        "nopublish-image-id",
+        Some("some.jpeg"),
+        Some("application/jpeg"),
+        Some("https://arg")
+      ),
+      "invalid-attachment-id" -> FileMetadata(
+        "invalid-attachment-id",
+        Some("some.txt"),
+        Some("text/plain"),
+        Some("https://blarg")
+      ),
+      "invalid-image-id" -> FileMetadata(
+        "invalid-image-id",
+        Some("some.jpeg"),
+        Some("application/jpeg"),
+        Some("https://flurg")
       )
     )
 
@@ -144,21 +188,22 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       given(repository.get("ref")) willReturn Future.successful(None)
       given(connector.get("ref")) willReturn Future.successful(Some(validCase))
       given(repository.update(any[Ruling], any[Boolean])) will returnTheRuling
-      given(fileStoreService.get(fileMetadata.keys.toSeq)).willReturn(fileMetadata)
+      given(fileStoreService.get(attachments.map(_.id))).willReturn(fileMetadata)
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository).update(any[Ruling], refEq(true))
+
       val expectedRuling = Ruling(
-        "ref",
-        "code",
+        validCase.reference,
+        validCase.decision.get.bindingCommodityCode,
         startDate,
         endDate,
-        "justification",
-        "description",
-        Set("keyword"),
-        Seq("public-file-id"),
-        Seq("public-image-id")
+        validCase.decision.get.justification,
+        validCase.decision.get.goodsDescription,
+        validCase.keywords,
+        Seq(publicAttachment.id),
+        Seq(publicImage.id)
       )
       theRulingUpdated shouldBe expectedRuling
 
@@ -171,22 +216,22 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       given(repository.get("ref")) willReturn Future.successful(Some(existing))
       given(connector.get("ref")) willReturn Future.successful(Some(validCase))
       given(repository.update(any[Ruling], any[Boolean])) will returnTheRuling
-      given(fileStoreService.get(fileMetadata.keys.toSeq)).willReturn(fileMetadata)
+      given(fileStoreService.get(attachments.map(_.id))).willReturn(fileMetadata)
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository).update(any[Ruling], refEq(false))
 
       val expectedRuling = Ruling(
-        "ref",
-        "code",
+        validCase.reference,
+        validCase.decision.get.bindingCommodityCode,
         startDate,
         endDate,
-        "justification",
-        "description",
-        Set("keyword"),
-        Seq("public-file-id"),
-        Seq("public-image-id")
+        validCase.decision.get.justification,
+        validCase.decision.get.goodsDescription,
+        validCase.keywords,
+        Seq(publicAttachment.id),
+        Seq(publicImage.id)
       )
       theRulingUpdated shouldBe expectedRuling
 
