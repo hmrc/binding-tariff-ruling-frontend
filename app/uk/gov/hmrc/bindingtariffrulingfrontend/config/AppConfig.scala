@@ -18,13 +18,14 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.config
 
 import javax.inject.{Inject, Singleton}
 import play.api.{ConfigLoader, Configuration}
+import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
 class AppConfig @Inject() (val configuration: Configuration) extends ServicesConfig(configuration) {
 
   private lazy val contactHost             = configuration.getOptional[String](s"contact-frontend.host").getOrElse("")
-  private val contactFormServiceIdentifier = "binding-tariff-ruling-frontend"
+  private val contactFormServiceIdentifier = "AdvanceTariffRulings"
 
   lazy val assetsPrefix: String                   = loadConfig[String](s"assets.url") + loadConfig[String](s"assets.version")
   lazy val analyticsToken: String                 = loadConfig[String](s"google-analytics.token")
@@ -58,6 +59,12 @@ class AppConfig @Inject() (val configuration: Configuration) extends ServicesCon
   lazy val rateLimitBucketSize: Int    = loadConfig[Int]("filters.rateLimit.bucketSize")
   lazy val rateLimitRatePerSecond: Int = loadConfig[Int]("filters.rateLimit.ratePerSecond")
   lazy val rateLimiterEnabled: Boolean = loadConfig[Boolean]("filters.rateLimit.enabled")
+
+  lazy val accessibilityBaseUrl: String = loadConfig[String](s"accessibility-statement.baseUrl")
+  lazy private val accessibilityRedirectUrl: String = loadConfig[String](s"accessibility-statement.redirectUrl")
+  def accessibilityStatementUrl(referrer: String) =
+    s"$accessibilityBaseUrl/accessibility-statement$accessibilityRedirectUrl?referrerUrl=${SafeRedirectUrl(
+      accessibilityBaseUrl + referrer).encodedUrl}"
 
   private def loadConfig[A](key: String)(implicit loader: ConfigLoader[A]) =
     configuration.getOptional[A](key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
