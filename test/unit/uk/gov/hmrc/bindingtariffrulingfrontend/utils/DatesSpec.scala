@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class DatesSpec extends BaseSpec {
       val date   = LocalDate.of(2018, 1, 1).atStartOfDay(ZoneOffset.UTC).toInstant
       val output = Dates.format(date)
 
-      output shouldBe "01/01/2018"
+      output shouldBe "01 Jan 2018"
     }
 
   }

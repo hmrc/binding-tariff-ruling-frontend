@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,11 +60,10 @@ class AppConfig @Inject() (val configuration: Configuration) extends ServicesCon
   lazy val rateLimitRatePerSecond: Int = loadConfig[Int]("filters.rateLimit.ratePerSecond")
   lazy val rateLimiterEnabled: Boolean = loadConfig[Boolean]("filters.rateLimit.enabled")
 
-  lazy val accessibilityBaseUrl: String = loadConfig[String](s"accessibility-statement.baseUrl")
+  lazy val accessibilityBaseUrl: String             = loadConfig[String](s"accessibility-statement.baseUrl")
   lazy private val accessibilityRedirectUrl: String = loadConfig[String](s"accessibility-statement.redirectUrl")
   def accessibilityStatementUrl(referrer: String) =
-    s"$accessibilityBaseUrl/accessibility-statement$accessibilityRedirectUrl?referrerUrl=${SafeRedirectUrl(
-      accessibilityBaseUrl + referrer).encodedUrl}"
+    s"$accessibilityBaseUrl/accessibility-statement$accessibilityRedirectUrl?referrerUrl=${SafeRedirectUrl(accessibilityBaseUrl + referrer).encodedUrl}"
 
   private def loadConfig[A](key: String)(implicit loader: ConfigLoader[A]) =
     configuration.getOptional[A](key).getOrElse(throw new Exception(s"Missing configuration key: $key"))

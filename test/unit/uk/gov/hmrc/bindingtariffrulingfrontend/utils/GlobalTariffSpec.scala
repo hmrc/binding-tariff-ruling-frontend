@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ class GlobalTariffSpec extends BaseSpec {
     "produce a link to UK Global Tariff" in {
       GlobalTariff
         .link("8888")(realConfig)
-        .url shouldBe "https://www.check-future-uk-trade-tariffs.service.gov.uk/tariff?q=8888"
+        .url shouldBe "https://www.trade-tariff.service.gov.uk/search?q=8888"
     }
   }
 }

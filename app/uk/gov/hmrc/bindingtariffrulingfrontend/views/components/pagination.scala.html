@@ -1,5 +1,5 @@
 @*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.components.PaginationUtil
+
 @(id: String = "pagination",
   pager: Paged[_],
   onChange: Int => Call,
@@ -23,23 +24,27 @@
 
 @if(pager.pageCount > 1) {
   <nav class="moj-pagination mt-2" id="pagination-label">
-    <p class="visually-hidden" aria-labelledby="pagination-label">Pagination navigation</p>
+    <p class="govuk-visually-hidden" aria-labelledby="pagination-label">Pagination navigation</p>
 
     <ul class="moj-pagination__list">
       @if(pager.pageIndex > 1) {
         <li id="@id-page_back" class="moj-pagination__item  moj-pagination__item--prev">
           <a href="@onChange(pager.pageIndex - 1)" class="moj-pagination__link" href="">
-            Previous<span class="visually-hidden"> set of pages</span>
+            Previous<span class="govuk-visually-hidden"> page</span>
           </a>
         </li>
       }
 
       @for(pageIndex <- PaginationUtil.surroundingPages(pager.pageIndex, pager.pageCount, 5)) {
         @if(pageIndex == pager.pageIndex) {
-          <li id="@id-page_current" class="moj-pagination__item moj-pagination__item--active">@pageIndex</li>
+          <li id="@id-page_current" class="moj-pagination__item moj-pagination__item--active">
+            <span class="govuk-visually-hidden">Current page </span>@pageIndex
+          </li>
         } else {
           <li id="@id-page_@pageIndex" class="moj-pagination__item">
-            <a class="moj-pagination__link" href="@onChange(pageIndex)">@pageIndex</a>
+            <a class="moj-pagination__link" href="@onChange(pageIndex)">
+              <span class="govuk-visually-hidden">Page </span>@pageIndex
+            </a>
           </li>
         }
       }
@@ -47,7 +52,7 @@
       @if(pager.pageIndex < pager.pageCount) {
         <li id="@id-page_next" class="moj-pagination__item  moj-pagination__item--next">
           <a href="@onChange(pager.pageIndex + 1)" class="moj-pagination__link" href="">
-            Next<span class="visually-hidden"> set of pages</span>
+            Next<span class="govuk-visually-hidden"> page</span>
           </a>
         </li>
       }

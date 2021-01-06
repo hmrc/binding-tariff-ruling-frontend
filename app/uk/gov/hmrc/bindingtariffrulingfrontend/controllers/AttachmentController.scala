@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ class AttachmentController @Inject() (
   fileStoreService: FileStoreService,
   allowlist: AllowListAction,
   mcc: MessagesControllerComponents,
+  notFoundView: views.html.not_found,
   implicit val appConfig: AppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendController(mcc)
@@ -55,7 +56,7 @@ class AttachmentController @Inject() (
           "Content-Disposition" -> s"filename=$fileName"
         )
 
-      fileStoreResponse.getOrElse(NotFound(views.html.not_found_template())).recover {
+      fileStoreResponse.getOrElse(NotFound(notFoundView())).recover {
         case NonFatal(e) =>
           logger.error("Exception while calling binding-tariff-filestore", e)
           BadGateway

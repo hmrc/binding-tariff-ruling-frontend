@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,16 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
+import akka.stream.scaladsl.Source
+import akka.util.ByteString
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
 import org.mockito.Mockito._
+import java.nio.charset.StandardCharsets
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action._
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
+import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.http.HeaderCarrier
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
@@ -29,18 +33,14 @@ import play.api.test.Helpers._
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import akka.stream.scaladsl.Source
-import akka.util.ByteString
-import java.nio.charset.StandardCharsets
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   private val fileStoreService = mock[FileStoreService]
+  private val notFoundView     = app.injector.instanceOf[views.html.not_found]
 
   private def controller(allowlist: AllowListAction = AllowListDisabled()) =
-    new AttachmentController(fileStoreService, allowlist, mcc, realConfig)
+    new AttachmentController(fileStoreService, allowlist, mcc, notFoundView, realConfig)
 
   override protected def afterEach(): Unit = {
     super.afterEach()

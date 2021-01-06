@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ class SearchController @Inject() (
   allowList: AllowListAction,
   rateLimit: RateLimitFilter,
   mcc: MessagesControllerComponents,
+  search: views.html.search,
   implicit val appConfig: AppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendController(mcc)
@@ -47,16 +48,21 @@ class SearchController @Inject() (
   type Metadata = Map[String, FileMetadata]
 
   private def badRequest(form: Form[SimpleSearch])(implicit request: Request[_]): Future[Result] =
-    Future.successful(BadRequest(views.html.search(form)))
+    Future.successful(BadRequest(search(form)))
 
   private def renderView(
     form: Form[SimpleSearch],
     rulings: Option[Paged[Ruling]] = None,
     fileMetadata: Metadata         = Map.empty
   )(implicit request: Request[_]) =
-    Future.successful(Ok(views.html.search(form, rulings, fileMetadata)))
+    Future.successful(Ok(search(form, rulings, fileMetadata)))
 
-  def get(query: Option[String], imagesOnly: Boolean, page: Int): Action[AnyContent] =
+  def get(
+    query: Option[String],
+    imagesOnly: Boolean,
+    page: Int,
+    enableTrackingConsent: Boolean = false
+  ): Action[AnyContent] =
     (Action andThen allowList andThen rateLimit).async { implicit request =>
       val form = SimpleSearch.form.bindFromRequest()
 

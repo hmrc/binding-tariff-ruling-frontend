@@ -1,7 +1,13 @@
+service.name = Search for Advance Tariff Rulings
+
 site.service_name = Search for Advance Tariff Rulings
 site.title.suffix = Search for Advance Tariff Rulings - GOV.UK
 site.heading.secondary = Advance Tariff Ruling
 site.back = Back
+
+feedback.before = This is a new service - your
+feedback.link = feedback
+feedback.after = will help us to improve it.
 
 site.notfound.heading = Page not found
 site.notfound.title = Page not found
@@ -10,19 +16,20 @@ site.notfound.checkcomplete = If you pasted the web address, check you copied th
 
 search.heading = Search for Advance Tariff Rulings
 search.hint = You can search using a combination of words, commodity codes and reference numbers.
-search.form.submit = Search rulings
+search.form.submit = Search
 search.form.images = Only show rulings that include images
 
 search.summary.nomatch = There are no rulings that match your search.
 search.summary.onematch = Showing 1 result that matches your search.
 search.summary.onepage = Showing {0} results that match your search.
 search.summary.manypage = Showing {0} to {1} of {2} results that match your search.
-search.pagination.label = Showing <b>{0}</b> to <b>{1}</b> of <b>{2}</b> rulings
+search.pagination.label = Showing {0} to {1} of {2} results
 
 search.results.ruling.reference = Ruling reference:
 search.results.ruling.commodityCode = Commodity code:
 search.results.ruling.commodityCode.newTab = (opens in new tab)
 search.results.ruling.view = View ruling
+search.results.ruling.expiryDate = Expiry date:
 
 ruling.title = Information for ruling
 ruling.heading = Information for ruling {0}

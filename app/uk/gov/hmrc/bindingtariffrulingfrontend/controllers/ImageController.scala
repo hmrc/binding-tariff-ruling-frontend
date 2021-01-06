@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,8 @@ class ImageController @Inject() (
   fileStoreService: FileStoreService,
   allowlist: AllowListAction,
   mcc: MessagesControllerComponents,
+  imageView: views.html.image,
+  notFoundView: views.html.not_found,
   implicit val appConfig: AppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendController(mcc)
@@ -46,9 +48,9 @@ class ImageController @Inject() (
       val fileStoreResponse = for {
         meta     <- OptionT(fileStoreService.get(imageId))
         fileName <- OptionT.fromOption[Future](meta.fileName)
-      } yield Ok(views.html.image(rulingReference, imageId, fileName))
+      } yield Ok(imageView(rulingReference, imageId, fileName))
 
-      fileStoreResponse.getOrElse(NotFound(views.html.not_found_template())).recover {
+      fileStoreResponse.getOrElse(NotFound(notFoundView())).recover {
         case NonFatal(e) =>
           logger.error("Exception while calling binding-tariff-filestore", e)
           BadGateway

@@ -1,5 +1,5 @@
 @*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,17 @@
  *@
 
 @import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-@import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.govuk_wrapper
+@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
+@import uk.gov.hmrc.hmrcfrontend.views.html.components._
+
+@this(
+  mainTemplate: main_template,
+  hmrcPageHeading: HmrcPageHeading,
+)
+
 @(pageTitle: String, heading: String, message: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@contentHeader = {
-  <h1>@heading</h1>
-}
-
-@mainContent = {
+@mainTemplate(title = Some(pageTitle)) {
+  @hmrcPageHeading(PageHeading(heading))
   <p>@message</p>
 }
-
-@govuk_wrapper(appConfig = appConfig, title = pageTitle, contentHeader = Some(contentHeader), mainContent = mainContent)
