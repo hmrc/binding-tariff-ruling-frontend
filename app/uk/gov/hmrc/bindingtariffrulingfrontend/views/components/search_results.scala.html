@@ -25,9 +25,16 @@
 
 @this(
   govukSummaryList: GovukSummaryList,
+  govukButton: GovukButton,
 )
 
 @(search: Option[SimpleSearch], results: Paged[Ruling], fileMetadata: Map[String, FileMetadata])(implicit messages: Messages, appConfig: AppConfig)
+
+@commodityCodeLink(result: Ruling) = {
+  <a href="@GlobalTariff.link(result.bindingCommodityCode)" class="govuk-link" target="_blank">
+      @result.bindingCommodityCode @messages("search.results.ruling.commodityCode.newTab")
+  </a>
+}
 
 @rulingImages(result: Ruling) = {
   @result.images.map { id =>
@@ -45,60 +52,55 @@
   }
 }
 
+@rulingKeywords(result: Ruling) = {
+  @result.keywords.map { keyword =>
+    <span class="govuk-tag govuk-tag--grey">@keyword</span>
+  }
+}
+
 @if(results.nonEmpty) {
-  <ol id="search_results-list" class="govuk-list">
+  <ol id="search_results-list" class="govuk-list border-top">
     @for((result: Ruling, index: Int) <- results.results.zipWithIndex) {
       <li id="search_results-list-@index" class="border-bottom">
-        <div class="mb-1">
-          @messages("search.results.ruling.reference")
-          <a href="@routes.RulingController.get(result.reference)">@result.reference</a>
-        </div>
-        <div class="mb-1">
-            @result.goodsDescription
-        </div>
-        <div class="mb-1">
-          @messages("search.results.ruling.commodityCode")
-          <a href="@GlobalTariff.link(result.bindingCommodityCode)" target="_blank">
-              @result.bindingCommodityCode @messages("search.results.ruling.commodityCode.newTab")
-          </a>
-        </div>
-        <div class="mb-1">
-          @rulingImages(result)
-        </div>
-        <div class="mb-1" id="search_results-list-@index-end_date">
-          @messages("search.results.ruling.expiryDate")
-          @Dates.format(result.effectiveEndDate)
-        </div>
+        @govukSummaryList(SummaryList(
+          classes = "mt-1 govuk-summary-list--no-border",
+          rows = Seq(
+            SummaryListRow(
+              key = Key(Text(messages("search.results.ruling.description"))),
+              value = Value(Text(result.goodsDescription))
+            )
+          ) ++ {
+            if (result.keywords.isEmpty)
+              Seq.empty
+            else Seq(SummaryListRow(
+              key = Key(Text(messages("search.results.ruling.keywords"))),
+              value = Value(HtmlContent(rulingKeywords(result)))
+            ))
+          } ++ Seq(
+            SummaryListRow(
+              key = Key(Text(messages("search.results.ruling.expiryDate"))),
+              value = Value(Text(Dates.format(result.effectiveEndDate)))
+            ),
+            SummaryListRow(
+              key = Key(Text(messages("search.results.ruling.commodityCode"))),
+              value = Value(HtmlContent(commodityCodeLink(result)))
+            ),
+          ) ++ {
+            if (result.images.isEmpty)
+              Seq.empty
+            else Seq(SummaryListRow(
+              key = Key(Text(messages("search.results.ruling.images"))),
+              value = Value(HtmlContent(rulingImages(result)))
+            ))
+          }
+        ))
+
+        @govukButton(Button(
+          element = Some("a"),
+          href = Some(routes.RulingController.get(result.reference).url),
+          content = Text(messages("search.results.ruling.view", result.reference))
+        ))
       </li>
     }
   </ol>
-                @*<dl>
-                    <dt>
-
-                    </dt>
-                </dl>
-                    <div class="mb-1">
-                        @messages("search.results.ruling.reference")
-
-                    </div>
-                    <div class="mb-1">
-                        @result.goodsDescription
-                    </div>
-                    <div class="mb-1">
-                    </div>
-                    <div class="mb-1">
-                    </div>
-                    <div class="mb-1">
-                    </div>
-                    <div class="mb-1">
-                    </div>
-                </td>
-                <td class="valign-top" id="search_results-table-row_@index-end_date">
-                </td>
-                <td class="valign-top">
-                    <a class="font-bold" href="@routes.RulingController.get(result.reference)">
-                        @messages("search.results.ruling.view")
-                    </a>
-                </td>
-            </tr>*@
 }

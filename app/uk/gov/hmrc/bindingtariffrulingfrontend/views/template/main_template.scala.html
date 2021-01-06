@@ -21,7 +21,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers._
 
 @this(
-  govukLayout: GovukLayout,
+  govukTemplate: GovukTemplate,
   govukPhaseBanner: GovukPhaseBanner,
   hmrcHeader: HmrcHeader,
   hmrcStandardFooter: HmrcStandardFooter,
@@ -71,11 +71,13 @@
   </div>
 }
 
-@govukLayout(
+@govukTemplate(
+  htmlLang = Some(messages.lang.code),
   pageTitle = Some(title.fold(messages("site.title.suffix"))(_ + " - " + messages("site.title.suffix"))),
   headBlock = Some(headBlock),
-  headerBlock = Some(headerBlock),
+  headerBlock = headerBlock,
   beforeContentBlock = Some(beforeContentBlock),
-  scriptsBlock = Some(scriptsBlock),
-  footerBlock = Some(hmrcStandardFooter())
+  bodyEndBlock = Some(scriptsBlock),
+  mainClasses = Some("govuk-main-wrapper--auto-spacing"),
+  footerBlock = hmrcStandardFooter()
 )(contentBlock)

@@ -25,11 +25,14 @@ search.summary.onepage = Showing {0} results that match your search.
 search.summary.manypage = Showing {0} to {1} of {2} results that match your search.
 search.pagination.label = Showing {0} to {1} of {2} results
 
-search.results.ruling.reference = Ruling reference:
-search.results.ruling.commodityCode = Commodity code:
+search.results.ruling.reference = Ruling reference
+search.results.ruling.description = Description
+search.results.ruling.keywords = Keywords
+search.results.ruling.images = Images
+search.results.ruling.commodityCode = Commodity code
 search.results.ruling.commodityCode.newTab = (opens in new tab)
-search.results.ruling.view = View ruling
-search.results.ruling.expiryDate = Expiry date:
+search.results.ruling.view = View ruling {0}
+search.results.ruling.expiryDate = Expiry date
 
 ruling.title = Information for ruling
 ruling.heading = Information for ruling {0}

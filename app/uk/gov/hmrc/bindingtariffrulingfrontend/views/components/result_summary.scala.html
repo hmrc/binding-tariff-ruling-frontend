@@ -20,7 +20,7 @@
   pager: Paged[_],
 )(implicit messages: Messages)
 
-<div id="@id" class="mb-1 border-bottom">
+<div id="@id" class="mb-1">
   <h2 class="govuk-heading-m">Search results</h2>
   @if(pager.nonEmpty) {
     @if(pager.pageCount == 1) {
