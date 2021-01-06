@@ -42,7 +42,7 @@
           @meta.fileName.map { fileName =>
               @meta.url.map { url =>
                   <a href="@routes.ImageController.get(result.reference, id)">
-                      <img class="image-thumbnail" alt="@fileName" src="@url" />
+                      <img class="govuk-image-thumbnail" alt="@fileName" src="@url" />
                   </a>
               }
           }.getOrElse {
