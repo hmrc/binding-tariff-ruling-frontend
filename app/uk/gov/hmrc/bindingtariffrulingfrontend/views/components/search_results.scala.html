@@ -42,7 +42,7 @@
           @meta.fileName.map { fileName =>
               @meta.url.map { url =>
                   <a href="@routes.ImageController.get(result.reference, id)">
-                      <img class="govuk-image-thumbnail" alt="@fileName" src="@url" />
+                      <img class="image-thumbnail" alt="@fileName" src="@url" />
                   </a>
               }
           }.getOrElse {
@@ -89,7 +89,7 @@
             if (result.images.isEmpty)
               Seq.empty
             else Seq(SummaryListRow(
-              key = Key(Text(messages("search.results.ruling.images"))),
+              key = Key(Text(messages("search.results.ruling.images")), classes = "valign-top"),
               value = Value(HtmlContent(rulingImages(result)))
             ))
           }

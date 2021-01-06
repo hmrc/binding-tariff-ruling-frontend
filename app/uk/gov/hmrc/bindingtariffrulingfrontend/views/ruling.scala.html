@@ -67,7 +67,7 @@
     @fileMetadata.get(id).map { meta =>
       @meta.fileName.map { fileName =>
         <a href="@routes.ImageController.get(ruling.reference, id)">
-            <img class="govuk-image-thumbnail-large"
+            <img class="image-thumbnail-large"
                 alt="@fileName"
                 src="@routes.AttachmentController.get(ruling.reference, id)" />
         </a>
@@ -123,7 +123,7 @@
       if (ruling.images.isEmpty)
         Seq.empty
       else Seq(SummaryListRow(
-        key = Key(Text(messages("ruling.images"))),
+        key = Key(Text(messages("ruling.images")), classes = "valign-top"),
         value = Value(HtmlContent(rulingImages))
       ))
     } ++ {
