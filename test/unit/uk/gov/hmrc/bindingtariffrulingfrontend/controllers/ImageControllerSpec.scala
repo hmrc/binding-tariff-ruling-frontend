@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.mockito.Mockito._
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action._
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
+import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.http.HeaderCarrier
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
@@ -33,9 +34,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   private val fileStoreService = mock[FileStoreService]
+  private val imageView        = app.injector.instanceOf[views.html.image]
+  private val notFoundView     = app.injector.instanceOf[views.html.not_found]
 
   private def controller(allowlist: AllowListAction = AllowListDisabled()) =
-    new ImageController(fileStoreService, allowlist, mcc, realConfig)
+    new ImageController(fileStoreService, allowlist, mcc, imageView, notFoundView, realConfig)
 
   override protected def afterEach(): Unit = {
     super.afterEach()
@@ -61,7 +64,7 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("image-heading")
+      bodyOf(result)      should include(messageApi("image.heading", rulingReference))
 
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
     }

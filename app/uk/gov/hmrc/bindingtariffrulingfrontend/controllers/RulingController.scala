@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ class RulingController @Inject() (
   allowlist: AllowListAction,
   authenticate: AuthenticatedAction,
   verifyAdmin: AdminAction,
+  rulingView: views.html.ruling,
+  notFoundView: views.html.not_found,
   mcc: MessagesControllerComponents,
   implicit val appConfig: AppConfig
 ) extends FrontendController(mcc)
@@ -48,9 +50,9 @@ class RulingController @Inject() (
     val maybeRulingDetails = for {
       ruling       <- OptionT(rulingService.get(id))
       fileMetadata <- OptionT.liftF[Future, Metadata](fileStoreService.get(ruling))
-    } yield Ok(views.html.ruling(ruling, fileMetadata))
+    } yield Ok(rulingView(ruling, fileMetadata))
 
-    maybeRulingDetails.getOrElse(NotFound(views.html.not_found_template()))
+    maybeRulingDetails.getOrElse(NotFound(notFoundView()))
   }
 
   def post(id: String): Action[AnyContent] = (Action andThen authenticate).async { implicit request =>

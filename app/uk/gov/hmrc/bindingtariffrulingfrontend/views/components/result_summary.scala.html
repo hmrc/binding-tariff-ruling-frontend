@@ -1,5 +1,5 @@
 @*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,27 +21,28 @@
 )(implicit messages: Messages)
 
 <div id="@id" class="mb-1">
+  <h2 class="govuk-heading-m">Search results</h2>
   @if(pager.nonEmpty) {
     @if(pager.pageCount == 1) {
-      <h2 id="@id-one" class="mt-1 mb-3 heading-medium">
+      <p id="@id-one" class="mt-1 govuk-body">
         @if(pager.resultCount == 1){
           @messages("search.summary.onematch")
         } else {
           @messages("search.summary.onepage", pager.resultCount)
         }
-      </h2>
+      </p>
     } else {
-      <h2 id="@id-some" class="mt-1 mb-3 heading-medium">
+      <p id="@id-some" class="mt-1 govuk-body">
         @defining((pager.pageIndex - 1) * pager.pageSize + 1) { from =>
           @defining((pager.pageIndex - 1) * pager.pageSize + pager.size) { to =>
             @messages("search.summary.manypage", from, to, pager.resultCount)
           }
         }
-      </h2>
+      </p>
     }
   } else {
-    <h2 id="@id-none" class="mt-1 mb-3 heading-medium">
+    <p id="@id-none" class="mt-1 govuk-body">
       @messages("search.summary.nomatch")
-    </h2>
+    </p>
   }
 </div>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action._
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
+import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -34,13 +35,25 @@ class RulingControllerSpec extends ControllerSpec {
 
   private val rulingService    = mock[RulingService]
   private val fileStoreService = mock[FileStoreService]
+  private val rulingView       = app.injector.instanceOf[views.html.ruling]
+  private val notFoundView     = app.injector.instanceOf[views.html.not_found]
 
   private def controller(
     allowlist: AllowListAction = AllowListDisabled(),
     auth: AuthenticatedAction  = SuccessfulAuth(),
     admin: AdminAction         = AdminEnabled()
   ) =
-    new RulingController(rulingService, fileStoreService, allowlist, auth, admin, mcc, realConfig)
+    new RulingController(
+      rulingService,
+      fileStoreService,
+      allowlist,
+      auth,
+      admin,
+      rulingView,
+      notFoundView,
+      mcc,
+      realConfig
+    )
 
   "GET /" should {
     "return 200" in {
@@ -54,7 +67,7 @@ class RulingControllerSpec extends ControllerSpec {
       status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("ruling-heading")
+      bodyOf(result)      should include(messageApi("ruling.heading", "ref"))
     }
 
     "return 404 - when not found" in {

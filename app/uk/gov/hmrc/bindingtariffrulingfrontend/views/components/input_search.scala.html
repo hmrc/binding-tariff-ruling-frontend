@@ -1,5 +1,5 @@
 @*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,64 +14,58 @@
  * limitations under the License.
  *@
 
-@(
-    queryField: Field,
-    imagesField: Field,
-    imagesLabel: String,
-    submitText: String,
-    label: Option[String] = None,
-    labelClass: Option[String] = None,
-    labelHtml: Option[Html] = None,
-    inputClass: Option[String] = None,
-    hint: Option[String] = None,
-    inputPurpose: Option[String] = None
-)(implicit messages: Messages)
+@import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
-<div class="form-group @if(queryField.hasErrors){form-group-error}">
-    <label class="form-label" for="@{queryField.id}">
-        @labelHtml.map { lb => @lb }
+@this(
+  govukLabel: GovukLabel,
+  govukHint: GovukHint,
+  govukInput: GovukInput,
+  govukButton: GovukButton,
+  govukCheckBoxes: GovukCheckboxes,
+)
 
-        @if(label.isDefined){
-            <div class="@if(labelClass.nonEmpty) {@labelClass}">@label</div>
-        }
-        @if(hint.isDefined){
-            <div class="form-hint">@hint</div>
-        }
-        @queryField.errors.map { error =>
-            <span class="error-message" id="error-message-@{queryField.id}-input"><span class="visually-hidden">@messages("error.browser.title.prefix")</span>@messages(error.message, error.args: _*)</span>
-        }
-    </label>
-    <div class="grid-row mt-1">
-        <div class="column-two-thirds">
-            <div class="form-control-wrapper">
-                <input
-                        class="form-control @inputClass"
-                        type="search"
-                        id="@{queryField.id}"
-                        name="@{queryField.name}"
-                        value="@{queryField.value}"
-                        @if(queryField.hasErrors){aria-describedby="error-message-@{queryField.id}-input"}
-                        @if(inputPurpose.isDefined) {autocomplete="@inputPurpose"}
-                />
-            </div>
-        </div>
-        <div class="column-one-third">
-            <button id="submit" class="button">@submitText</button>
-        </div>
-    </div>
+@(form: Form[SimpleSearch])(implicit messages: Messages)
 
-    <fieldset id="@{imagesField.id}" class="mt-1">
-        <div class="multiple-choice">
-            <input
-                    class="form-control"
-                    id="@{imagesField.id}-check"
-                    type="checkbox"
-                    name="@{imagesField.name}"
-                    value="true"
-                    @if(imagesField.value.contains("true")){checked="checked"}/>
-            <label for="@{imagesField.id}">
-                @imagesLabel
-            </label>
-        </div>
-    </fieldset>
-</div>
+@defining(form("query").id + "-hint") { hintId =>
+  @govukLabel(Label(
+    forAttr = Some(form("query").id),
+    isPageHeading = true,
+    classes = "govuk-label--xl mb-3",
+    content = Text(messages("search.heading"))
+  ))
+
+  @govukHint(Hint(
+    id = Some(hintId),
+    content = Text(messages("search.hint"))
+  ))
+
+  @govukInput(Input(
+    id = form("query").id,
+    name = form("query").name,
+    value = form("query").value,
+    describedBy = Some(hintId),
+    attributes = Map("autocomplete" -> "off"),
+    errorMessage = form.errors.asTextErrorMessageForField(fieldKey = "query")
+  ))
+
+  @govukCheckBoxes(Checkboxes(
+    name = "images-check",
+    errorMessage = form.errors.asTextErrorMessageForField(fieldKey = "images"),
+    items = Seq(CheckboxItem(
+      id = Some(form("images").id),
+      name = Some(form("images").name),
+      value = "true",
+      checked = form("images").value.contains("true"),
+      content = Text(messages("search.form.images")),
+    ))
+  ))
+
+  @govukButton(Button(
+    attributes = Map("id" -> "submit"),
+    inputType = Some("submit"),
+    content = Text(messages("search.form.submit"))
+  ))
+}
+

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,5 +21,5 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
 object GlobalTariff {
   def link(commodityCode: String)(implicit appConfig: AppConfig): Call =
-    Call("GET", s"${appConfig.ukGlobalTariffHost}/tariff?q=$commodityCode")
+    Call("GET", s"${appConfig.ukGlobalTariffHost}/search?q=$commodityCode")
 }

@@ -1,8 +1,13 @@
 # microservice specific routes
 
-GET         /assets/*file                       controllers.Assets.versioned(path="/public", file)
+->         /govuk-frontend                      govuk.Routes
+->         /hmrc-frontend                       hmrcfrontend.Routes
 
-GET        /                                    @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.SearchController.get(query: Option[String] ?= None, images: Boolean ?= false, page: Int ?= 1)
+GET        /assets/*file                        controllers.Assets.versioned(path="/public", file: Asset)
+
+GET        /search                              @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.SearchController.get(query: Option[String] ?= None, images: Boolean ?= false, page: Int ?= 1, enableTrackingConsent: Boolean ?= false)
+
+GET        /                                    controllers.Default.redirect(to = uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes.SearchController.get(enableTrackingConsent = true).path)
 
 GET        /ruling/:id                          @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.RulingController.get(id: String)
 POST       /ruling/:id                          @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.RulingController.post(id: String)

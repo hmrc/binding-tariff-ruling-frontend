@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,13 @@ import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 
 @Singleton
-class ErrorHandler @Inject() (val messagesApi: MessagesApi, implicit val appConfig: AppConfig)
-    extends FrontendErrorHandler {
+class ErrorHandler @Inject() (
+  val messagesApi: MessagesApi,
+  val errorTemplate: views.html.error,
+  implicit val appConfig: AppConfig
+) extends FrontendErrorHandler {
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(
     implicit request: Request[_]
   ): Html =
-    views.html.error_template(pageTitle, heading, message)
+    errorTemplate(pageTitle, heading, message)
 }

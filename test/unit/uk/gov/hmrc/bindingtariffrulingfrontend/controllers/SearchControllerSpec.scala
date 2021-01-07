@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.filters.RateLimitFilter
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
+import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -42,6 +43,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
   private val rulingService    = mock[RulingService]
   private val fileStoreService = mock[FileStoreService]
   private val rateLimit        = new RateLimitFilter(appConfig)
+  private val searchView       = app.injector.instanceOf[views.html.search]
 
   override protected def afterEach(): Unit = {
     super.afterEach()
@@ -52,7 +54,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
   private def asDocument(html: String): Document = Jsoup.parse(html)
 
   private def controller(allowlist: AllowListAction = AllowListDisabled()) =
-    new SearchController(rulingService, fileStoreService, allowlist, rateLimit, mcc, realConfig)
+    new SearchController(rulingService, fileStoreService, allowlist, rateLimit, mcc, searchView, realConfig)
 
   "GET /" should {
     "return 200 with a valid query" in {
@@ -65,11 +67,10 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
           .get(query = Some("query"), imagesOnly = false, page = 1)(getRequestWithCSRF("/?query=query&page=1"))
       )
 
-      status(result)                                                   shouldBe Status.OK
-      contentType(result)                                              shouldBe Some("text/html")
-      charset(result)                                                  shouldBe Some("utf-8")
-      bodyOf(result)                                                   should include("search-heading")
-      asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.heading")
+      status(result)      shouldBe Status.OK
+      contentType(result) shouldBe Some("text/html")
+      charset(result)     shouldBe Some("utf-8")
+      bodyOf(result)      should include(messageApi("search.heading"))
 
       verify(rulingService).get(SimpleSearch(Some("query"), imagesOnly = false, 1))
       verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
@@ -78,11 +79,10 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     "return 200 with no search query" in {
       val result = await(controller().get(query = None, imagesOnly = false, page = 1)(getRequestWithCSRF()))
 
-      status(result)                                                   shouldBe Status.OK
-      contentType(result)                                              shouldBe Some("text/html")
-      charset(result)                                                  shouldBe Some("utf-8")
-      bodyOf(result)                                                   should include("search-heading")
-      asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.heading")
+      status(result)      shouldBe Status.OK
+      contentType(result) shouldBe Some("text/html")
+      charset(result)     shouldBe Some("utf-8")
+      bodyOf(result)      should include(messageApi("search.heading"))
 
       verifyZeroInteractions(rulingService)
       verifyZeroInteractions(fileStoreService)
@@ -91,11 +91,10 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     "return 200 with an empty search query" in {
       val result = await(controller().get(query = Some(""), imagesOnly = false, page = 1)(getRequestWithCSRF()))
 
-      status(result)                                                   shouldBe Status.OK
-      contentType(result)                                              shouldBe Some("text/html")
-      charset(result)                                                  shouldBe Some("utf-8")
-      bodyOf(result)                                                   should include("search-heading")
-      asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.heading")
+      status(result)      shouldBe Status.OK
+      contentType(result) shouldBe Some("text/html")
+      charset(result)     shouldBe Some("utf-8")
+      bodyOf(result)      should include(messageApi("search.heading"))
 
       verifyZeroInteractions(rulingService)
       verifyZeroInteractions(fileStoreService)
@@ -107,11 +106,10 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
           .get(query = Some("query"), imagesOnly = false, page = 1)(getRequestWithCSRF("/?query=query&page=foo"))
       )
 
-      status(result)                                                   shouldBe Status.BAD_REQUEST
-      contentType(result)                                              shouldBe Some("text/html")
-      charset(result)                                                  shouldBe Some("utf-8")
-      bodyOf(result)                                                   should include("search-heading")
-      asDocument(bodyOf(result)).getElementById("search-heading").text shouldBe messageApi("search.heading")
+      status(result)      shouldBe Status.BAD_REQUEST
+      contentType(result) shouldBe Some("text/html")
+      charset(result)     shouldBe Some("utf-8")
+      bodyOf(result)      should include(messageApi("search.heading"))
 
       verifyZeroInteractions(rulingService)
     }
