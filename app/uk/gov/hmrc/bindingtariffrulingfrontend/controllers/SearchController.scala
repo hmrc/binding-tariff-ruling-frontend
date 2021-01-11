@@ -54,10 +54,38 @@ class SearchController @Inject() (
     form: Form[SimpleSearch],
     rulings: Option[Paged[Ruling]] = None,
     fileMetadata: Metadata         = Map.empty
-  )(implicit request: Request[_]) =
+  )(implicit request: Request[_]) ={
+
+    println("this is the form :::::: ")
+    println("this is the form :::::: ")
+    println("this is the form :::::: " + form.value.get.query.isDefined)
+    println("this is the form :::::: " + form("query").name)
+    println("this is the form :::::: " + form("query"))
     Future.successful(Ok(search(form, rulings, fileMetadata)))
+  }
+
 
   def get(
+    query: Option[String],
+    imagesOnly: Boolean,
+    page: Int,
+    enableTrackingConsent: Boolean = false
+  ): Action[AnyContent] =
+    (Action andThen allowList andThen rateLimit).async { implicit request =>
+      val form = SimpleSearch.landingForm.bindFromRequest()
+      form.fold(
+        badRequest,
+        search =>
+          for {
+            paged        <- rulingService.get(search.copy(query = Some("0")))
+            fileMetadata <- fileStoreService.get(paged)
+            html         <- renderView(form, Some(paged), fileMetadata)
+          } yield html
+      )
+    }
+
+
+  def searchRuling(
     query: Option[String],
     imagesOnly: Boolean,
     page: Int,

@@ -6,6 +6,7 @@
 GET        /assets/*file                        controllers.Assets.versioned(path="/public", file: Asset)
 
 GET        /search                              @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.SearchController.get(query: Option[String] ?= None, images: Boolean ?= false, page: Int ?= 1, enableTrackingConsent: Boolean ?= false)
+POST       /search                              @uk.gov.hmrc.bindingtariffrulingfrontend.controllers.SearchController.searchRuling(query: Option[String] ?= None, images: Boolean ?= false, page: Int ?= 1, enableTrackingConsent: Boolean ?= false)
 
 GET        /                                    controllers.Default.redirect(to = uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes.SearchController.get(enableTrackingConsent = true).path)
 

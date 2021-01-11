@@ -16,8 +16,11 @@
 
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.components.PaginationUtil
+@import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
+
 @(id: String,
   pager: Paged[_],
+  searchForm: Form[SimpleSearch]
 )(implicit messages: Messages)
 
 <div id="@id" class="mb-1">
@@ -26,23 +29,39 @@
     @if(pager.pageCount == 1) {
       <p id="@id-one" class="mt-1 govuk-body">
         @if(pager.resultCount == 1){
-          @messages("search.summary.onematch")
+          @if(!searchForm.value.get.query.isDefined){
+            @messages("search.summary.onematch.landing")
+          }else{
+            @messages("search.summary.onematch")
+          }
         } else {
-          @messages("search.summary.onepage", pager.resultCount)
+          @if(!searchForm.value.get.query.isDefined){
+            @messages("search.summary.onepage.landing", pager.resultCount)
+          }else{
+            @messages("search.summary.onepage", pager.resultCount)
+          }
         }
       </p>
     } else {
       <p id="@id-some" class="mt-1 govuk-body">
         @defining((pager.pageIndex - 1) * pager.pageSize + 1) { from =>
           @defining((pager.pageIndex - 1) * pager.pageSize + pager.size) { to =>
-            @messages("search.summary.manypage", from, to, pager.resultCount)
+            @if(!searchForm.value.get.query.isDefined){
+                @messages("search.summary.manypage.landing", from, to, pager.resultCount)
+            }else{
+                @messages("search.summary.manypage", from, to, pager.resultCount)
+            }
           }
         }
       </p>
     }
   } else {
     <p id="@id-none" class="mt-1 govuk-body">
-      @messages("search.summary.nomatch")
+        @if(!searchForm.value.get.query.isDefined){
+            @messages("There is no rulings")
+        }else{
+            @messages("search.summary.nomatch")
+        }
     </p>
   }
 </div>

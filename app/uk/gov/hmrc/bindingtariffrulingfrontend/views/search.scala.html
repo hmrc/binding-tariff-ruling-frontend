@@ -40,14 +40,16 @@
 
   @errorSummary(form)
 
-  @formWithCSRF(action = routes.SearchController.get()) {
+  @formWithCSRF(action = routes.SearchController.searchRuling()) {
     @searchInput(form)
   }
+
 
   @searchResults.filterNot(_ => form.hasErrors).map { results =>
     @result_summary(
       id = "search-summary_top",
-      pager = results
+      pager = results,
+      form
     )
 
     @searchResultsView(form.value, results, fileMetadata)
