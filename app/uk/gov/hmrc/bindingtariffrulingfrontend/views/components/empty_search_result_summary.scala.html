@@ -17,7 +17,6 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.components.PaginationUtil
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
-
 @(id: String,
   pager: Paged[_],
   searchForm: Form[SimpleSearch]
@@ -29,23 +28,24 @@
     @if(pager.pageCount == 1) {
       <p id="@id-one" class="mt-1 govuk-body">
         @if(pager.resultCount == 1){
-            @messages("search.summary.onematch")
+          @messages("search.summary.onematch.landing")
         } else {
-            @messages("search.summary.onepage", pager.resultCount)
+            @messages("search.summary.onepage.landing", pager.resultCount)
         }
       </p>
     } else {
       <p id="@id-some" class="mt-1 govuk-body">
         @defining((pager.pageIndex - 1) * pager.pageSize + 1) { from =>
           @defining((pager.pageIndex - 1) * pager.pageSize + pager.size) { to =>
-                @messages("search.summary.manypage", from, to, pager.resultCount)
+                @messages("search.summary.manypage.landing", from, to, pager.resultCount)
+
           }
         }
       </p>
     }
   } else {
     <p id="@id-none" class="mt-1 govuk-body">
-            @messages("search.summary.nomatch")
+        @messages("There is no rulings")
     </p>
   }
 </div>

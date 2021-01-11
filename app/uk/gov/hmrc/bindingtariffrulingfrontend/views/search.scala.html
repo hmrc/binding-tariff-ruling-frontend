@@ -19,7 +19,7 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
-@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.{error_summary, input_search, pagination, result_summary, search_results}
+@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.{error_summary, input_search, pagination, result_summary, empty_search_result_summary, search_results}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 
@@ -45,12 +45,27 @@
   }
 
 
-  @searchResults.filterNot(_ => form.hasErrors).map { results =>
-    @result_summary(
-      id = "search-summary_top",
-      pager = results,
-      form
+  @searchResults.map { results =>
+
+    @if(form.hasErrors){
+        @empty_search_result_summary(
+            id = "search-summary_top",
+            pager = results,
+            form
+            )
+    }else if(!form.value.get.query.isDefined){
+        @empty_search_result_summary(
+            id = "search-summary_top",
+            pager = results,
+            form
     )
+    }else{
+        @result_summary(
+            id = "search-summary_top",
+            pager = results,
+            form
+        )
+    }
 
     @searchResultsView(form.value, results, fileMetadata)
 

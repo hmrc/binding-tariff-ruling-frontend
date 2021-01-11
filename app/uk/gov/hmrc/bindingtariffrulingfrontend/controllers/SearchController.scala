@@ -55,15 +55,8 @@ class SearchController @Inject() (
     rulings: Option[Paged[Ruling]] = None,
     fileMetadata: Metadata         = Map.empty
   )(implicit request: Request[_]) ={
-
-    println("this is the form :::::: ")
-    println("this is the form :::::: ")
-    println("this is the form :::::: " + form.value.get.query.isDefined)
-    println("this is the form :::::: " + form("query").name)
-    println("this is the form :::::: " + form("query"))
     Future.successful(Ok(search(form, rulings, fileMetadata)))
   }
-
 
   def get(
     query: Option[String],
@@ -93,13 +86,24 @@ class SearchController @Inject() (
   ): Action[AnyContent] =
     (Action andThen allowList andThen rateLimit).async { implicit request =>
       val form = SimpleSearch.form.bindFromRequest()
+      println("this is the form :::::: ")
+      println("this is the form :::::: ")
+      println("this is the form :::::: " + form.value)
 
       form.fold(
-        badRequest,
+        badRequest => {for {
+          paged        <- rulingService.get(SimpleSearch(query = Some("0"), imagesOnly, page))
+          fileMetadata <- fileStoreService.get(paged)
+          html         <- renderView(badRequest, Some(paged), fileMetadata)
+        } yield html},
         search =>
           search.query match {
             case None =>
-              renderView(form)
+                for {
+                  paged        <- rulingService.get(search.copy(query = Some("0")))
+                  fileMetadata <- fileStoreService.get(paged)
+                  html         <- renderView(form, Some(paged), fileMetadata)
+                } yield html
             case Some(_) =>
               for {
                 paged        <- rulingService.get(search)
