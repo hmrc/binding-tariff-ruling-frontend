@@ -64,7 +64,9 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
       val result = await(
         controller()
-          .get(query = Some("query"), imagesOnly = false, page = 1)(getRequestWithCSRF("/?query=query&page=1"))
+          .get(query = Some("query"), imagesOnly = false, page = 1)(getRequestWithCSRF("/?query=query&page=1").withFormUrlEncodedBody(
+            "query" -> "query"
+          ))
       )
 
       status(result)      shouldBe Status.OK

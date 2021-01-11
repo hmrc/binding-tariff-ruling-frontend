@@ -20,6 +20,7 @@ search.form.submit = Search
 search.form.images = Only show rulings that include images
 
 search.summary.nomatch = There are no rulings that match your search.
+search.summary.nomatch.landing = There is no rulings.
 search.summary.onematch = Showing 1 result that matches your search.
 search.summary.onematch.landing = Showing 1 result.
 search.summary.onepage = Showing {0} results that match your search.

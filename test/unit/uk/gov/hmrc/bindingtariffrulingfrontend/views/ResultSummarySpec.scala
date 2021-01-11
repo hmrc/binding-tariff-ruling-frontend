@@ -17,8 +17,9 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.views
 
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling, SimplePagination}
-
 import java.time.Instant
+
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 
 class ResultSummarySpec extends ViewSpec {
 
@@ -36,7 +37,7 @@ class ResultSummarySpec extends ViewSpec {
   "result summary" should {
     "render search results when there are no results for the search query" in {
 
-      val renderedView = view(html.components.result_summary("results", Paged.empty))
+      val renderedView = view(html.components.result_summary("results", Paged.empty, SimpleSearch.form))
 
       renderedView.text() should include("There are no rulings that match your search.")
     }
@@ -45,7 +46,7 @@ class ResultSummarySpec extends ViewSpec {
 
       val results = Paged(Seq(ruling))
 
-      val renderedView = view(html.components.result_summary("results", results))
+      val renderedView = view(html.components.result_summary("results", results, SimpleSearch.form))
 
       renderedView.text() should include("Showing 1 result that matches your search.")
     }
@@ -54,7 +55,7 @@ class ResultSummarySpec extends ViewSpec {
 
       val results = Paged(Seq.fill(6)(ruling))
 
-      val renderedView = view(html.components.result_summary("results", results))
+      val renderedView = view(html.components.result_summary("results", results, SimpleSearch.form))
 
       renderedView.text() should include("Showing 6 results that match your search.")
     }
@@ -63,7 +64,7 @@ class ResultSummarySpec extends ViewSpec {
 
       val results = Paged(Seq.fill(25)(ruling), SimplePagination(1, 25), 100)
 
-      val renderedView = view(html.components.result_summary("results", results))
+      val renderedView = view(html.components.result_summary("results", results, SimpleSearch.form))
 
       renderedView.text() should include("Showing 1 to 25 of 100 results that match your search.")
     }
@@ -72,7 +73,7 @@ class ResultSummarySpec extends ViewSpec {
 
       val results = Paged(Seq.fill(25)(ruling), SimplePagination(2, 25), 100)
 
-      val renderedView = view(html.components.result_summary("results", results))
+      val renderedView = view(html.components.result_summary("results", results, SimpleSearch.form))
 
       renderedView.text() should include("Showing 26 to 50 of 100 results that match your search.")
     }

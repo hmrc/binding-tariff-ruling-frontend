@@ -68,12 +68,16 @@ class SearchController @Inject() (
       val form = SimpleSearch.landingForm.bindFromRequest()
       form.fold(
         badRequest,
-        search =>
+        search =>{
+          println(":::::::::")
+          println(":::::::::")
+          println(":::::::::")
+          println(":::::::::" + search)
           for {
             paged        <- rulingService.get(search.copy(query = Some("0")))
             fileMetadata <- fileStoreService.get(paged)
             html         <- renderView(form, Some(paged), fileMetadata)
-          } yield html
+          } yield html}
       )
     }
 
