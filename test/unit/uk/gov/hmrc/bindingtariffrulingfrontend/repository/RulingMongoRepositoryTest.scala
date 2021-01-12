@@ -53,8 +53,13 @@ class RulingMongoRepositoryTest
   val today           = startOfToday.toInstant(zoneOffsetToday)
 
   val startOfTomorrow    = LocalDate.now().plusDays(1).atStartOfDay
+  val startOfNextMonth    = LocalDate.now().plusMonths(1).atStartOfDay
+
   val zoneOffsetTomorrow = ZoneId.of("Europe/London").getRules().getOffset(startOfTomorrow)
+  val zoneOffsetNextMonth = ZoneId.of("Europe/London").getRules().getOffset(startOfNextMonth)
+
   val tomorrow           = startOfTomorrow.toInstant(zoneOffsetTomorrow)
+  val nextMonth   = startOfNextMonth.toInstant(zoneOffsetNextMonth)
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -121,6 +126,7 @@ class RulingMongoRepositoryTest
     }
   }
 
+
   "Get by SimpleSearch" should {
     "Retrieve None" in {
       await(repository.get(SimpleSearch(Some("ref"), imagesOnly = false, 1, 100))).results shouldBe Seq.empty
@@ -175,7 +181,7 @@ class RulingMongoRepositoryTest
 
     "Retrieve Multiple - by Goods Description - word stems" in {
       // Given
-      val document1 = Ruling(reference = "ref1", "0", clock.instant(), tomorrow, "justification", "exacting")
+      val document1 = Ruling(reference = "ref1", "0", clock.instant(), nextMonth, "justification", "exacting")
       val document2 = Ruling(reference = "ref2", "0", clock.instant(), tomorrow, "justification", "exactly")
       val document3 = Ruling(reference = "ref3", "0", clock.instant(), tomorrow, "justification", "fountain pen")
       givenAnExistingDocument(document1)

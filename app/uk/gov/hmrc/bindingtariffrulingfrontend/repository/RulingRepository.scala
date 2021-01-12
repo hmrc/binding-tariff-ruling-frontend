@@ -117,7 +117,9 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
     val textScore: JsObject = if(search.query.isDefined)
       Json.obj("score" -> Json.obj("$meta" -> "textScore")) else Json.obj()
 
-    val sortBy = if(search.query.isDefined) textScore else Json.obj("effectiveEndDate" -> -1)
+    val sortByDate = Json.obj("effectiveEndDate" -> -1)
+
+    val sortBy = textScore ++ sortByDate
 
     for {
       results <- collection

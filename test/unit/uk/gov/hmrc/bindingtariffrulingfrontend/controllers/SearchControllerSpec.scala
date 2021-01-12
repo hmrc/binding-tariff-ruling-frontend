@@ -158,4 +158,68 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
   }
 
+  "searchRuling" should {
+    "return 200 with a valid query" in {
+      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+        .willReturn(Future.successful(Map.empty[String, FileMetadata]))
+
+      val result = await(
+        controller()
+          .searchRuling(query = Some("query"), imagesOnly = false, page = 1)(
+            postRequestWithCSRF.withFormUrlEncodedBody(
+              "query" -> "query"
+            ))
+      )
+
+      status(result)      shouldBe Status.OK
+      contentType(result) shouldBe Some("text/html")
+      charset(result)     shouldBe Some("utf-8")
+      bodyOf(result)      should include(messageApi("search.heading"))
+
+      verify(rulingService).get(SimpleSearch(Some("query"), imagesOnly = false, 1))
+      verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
+    }
+
+    "return 200 with no search query" in {
+
+      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+        .willReturn(Future.successful(Map.empty[String, FileMetadata]))
+
+      val result = await(controller().searchRuling(query = None, imagesOnly = false, page = 1)(postRequestWithCSRF))
+
+      status(result)      shouldBe Status.OK
+      contentType(result) shouldBe Some("text/html")
+      charset(result)     shouldBe Some("utf-8")
+      bodyOf(result)      should include(messageApi("search.heading"))
+
+      verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
+      verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
+    }
+
+    "return a form with error when a blank search query is passed" in {
+
+      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+        .willReturn(Future.successful(Map.empty[String, FileMetadata]))
+
+      val result = await(
+        controller()
+          .searchRuling(query = Some(""), imagesOnly = false, page = 1)(
+            postRequestWithCSRF.withFormUrlEncodedBody(
+              "query" -> ""
+            ))
+      )
+
+      status(result)      shouldBe Status.OK
+      contentType(result) shouldBe Some("text/html")
+      charset(result)     shouldBe Some("utf-8")
+      bodyOf(result)      should include(messageApi("search.heading"))
+      bodyOf(result)      should include(messageApi("cannot be empty"))
+
+      verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
+      verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
+    }
+  }
 }
