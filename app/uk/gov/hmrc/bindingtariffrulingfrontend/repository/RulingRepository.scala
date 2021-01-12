@@ -114,8 +114,10 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
 
     val allSearches: JsObject = dateFilter ++ textSearch ++ imageFilter
 
-    val textScore: JsObject =
-      Json.obj("score" -> Json.obj("$meta" -> "textScore"))
+    val textScore: JsObject = if(search.query.isDefined)
+      Json.obj("score" -> Json.obj("$meta" -> "textScore")) else Json.obj()
+
+    val sortBy = if(search.query.isDefined) textScore else Json.obj("effectiveEndDate" -> -1)
 
     for {
       results <- collection
@@ -124,7 +126,7 @@ class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implici
                     projection = Some(textScore)
                   )
                   .options(QueryOpts(skipN = (search.pageIndex - 1) * search.pageSize, batchSizeN = search.pageSize))
-                  .sort(textScore)
+                  .sort(sortBy)
                   .cursor[JsObject]()
                   .collect[List](search.pageSize, Cursor.FailOnError[List[JsObject]]())
                   .map(_.map(_.as[Ruling](Ruling.Mongo.format.reads)))

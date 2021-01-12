@@ -79,6 +79,11 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 200 with no search query" in {
+
+      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+        .willReturn(Future.successful(Map.empty[String, FileMetadata]))
+
       val result = await(controller().get(query = None, imagesOnly = false, page = 1)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.OK
@@ -86,11 +91,15 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       charset(result)     shouldBe Some("utf-8")
       bodyOf(result)      should include(messageApi("search.heading"))
 
-      verifyZeroInteractions(rulingService)
-      verifyZeroInteractions(fileStoreService)
+      verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
+      verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
     }
 
-    "return 200 with an empty search query" in {
+   "return 200 with an empty search query" in {
+     given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+     given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+       .willReturn(Future.successful(Map.empty[String, FileMetadata]))
+
       val result = await(controller().get(query = Some(""), imagesOnly = false, page = 1)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.OK
@@ -98,23 +107,23 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       charset(result)     shouldBe Some("utf-8")
       bodyOf(result)      should include(messageApi("search.heading"))
 
-      verifyZeroInteractions(rulingService)
-      verifyZeroInteractions(fileStoreService)
+     verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
+     verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
     }
 
     "return 400 when form is filled incorrectly" in {
-      val result = await(
-        controller()
-          .get(query = Some("query"), imagesOnly = false, page = 1)(getRequestWithCSRF("/?query=query&page=foo"))
-      )
+       val result = await(
+         controller()
+           .get(query = Some("query"), imagesOnly = false, page = 1)(getRequestWithCSRF("/?query=query&page=foo"))
+       )
 
-      status(result)      shouldBe Status.BAD_REQUEST
-      contentType(result) shouldBe Some("text/html")
-      charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include(messageApi("search.heading"))
+       status(result)      shouldBe Status.BAD_REQUEST
+       contentType(result) shouldBe Some("text/html")
+       charset(result)     shouldBe Some("utf-8")
+       bodyOf(result)      should include(messageApi("search.heading"))
 
-      verifyZeroInteractions(rulingService)
-    }
+       verifyZeroInteractions(rulingService)
+     }
 
     "return 303 when disallowed" in {
       val result = await(
@@ -125,6 +134,10 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 429 when too many requests are made" in {
+      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+        .willReturn(Future.successful(Map.empty[String, FileMetadata]))
+
       given(appConfig.rateLimiterEnabled) willReturn true
       given(appConfig.rateLimitBucketSize) willReturn 5
       given(appConfig.rateLimitRatePerSecond) willReturn 2
@@ -134,6 +147,10 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 200 when rate limiting is disabled" in {
+      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+        .willReturn(Future.successful(Map.empty[String, FileMetadata]))
+
       given(appConfig.rateLimiterEnabled) willReturn false
       val results  = for (_ <- 0 until 100) yield controller().get(Some("foo"), false, 1)(getRequestWithCSRF())
       val statuses = await(Future.sequence(results)).map(status)

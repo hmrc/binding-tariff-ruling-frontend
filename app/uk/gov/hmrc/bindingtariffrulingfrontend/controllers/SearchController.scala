@@ -33,7 +33,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SearchController @Inject() (
+class SearchController @Inject()(
   rulingService: RulingService,
   fileStoreService: FileStoreService,
   allowList: AllowListAction,
@@ -54,9 +54,8 @@ class SearchController @Inject() (
     form: Form[SimpleSearch],
     rulings: Option[Paged[Ruling]] = None,
     fileMetadata: Metadata         = Map.empty
-  )(implicit request: Request[_]) ={
+  )(implicit request: Request[_]) =
     Future.successful(Ok(search(form, rulings, fileMetadata)))
-  }
 
   def get(
     query: Option[String],
@@ -68,19 +67,14 @@ class SearchController @Inject() (
       val form = SimpleSearch.landingForm.bindFromRequest()
       form.fold(
         badRequest,
-        search =>{
-          println(":::::::::")
-          println(":::::::::")
-          println(":::::::::")
-          println(":::::::::" + search)
+        search =>
           for {
-            paged        <- rulingService.get(search.copy(query = Some("0")))
+            paged        <- rulingService.get(search)
             fileMetadata <- fileStoreService.get(paged)
             html         <- renderView(form, Some(paged), fileMetadata)
-          } yield html}
+          } yield html
       )
     }
-
 
   def searchRuling(
     query: Option[String],
@@ -90,31 +84,21 @@ class SearchController @Inject() (
   ): Action[AnyContent] =
     (Action andThen allowList andThen rateLimit).async { implicit request =>
       val form = SimpleSearch.form.bindFromRequest()
-      println("this is the form :::::: ")
-      println("this is the form :::::: ")
-      println("this is the form :::::: " + form.value)
 
       form.fold(
-        badRequest => {for {
-          paged        <- rulingService.get(SimpleSearch(query = Some("0"), imagesOnly, page))
-          fileMetadata <- fileStoreService.get(paged)
-          html         <- renderView(badRequest, Some(paged), fileMetadata)
-        } yield html},
+        formWithErrors =>
+          for {
+            paged        <- rulingService.get(SimpleSearch(query = None, imagesOnly, page))
+            fileMetadata <- fileStoreService.get(paged)
+            html         <- renderView(formWithErrors, Some(paged), fileMetadata)
+          } yield html,
+
         search =>
-          search.query match {
-            case None =>
-                for {
-                  paged        <- rulingService.get(search.copy(query = Some("0")))
-                  fileMetadata <- fileStoreService.get(paged)
-                  html         <- renderView(form, Some(paged), fileMetadata)
-                } yield html
-            case Some(_) =>
-              for {
-                paged        <- rulingService.get(search)
-                fileMetadata <- fileStoreService.get(paged)
-                html         <- renderView(form, Some(paged), fileMetadata)
-              } yield html
-          }
+          for {
+            paged        <- rulingService.get(search)
+            fileMetadata <- fileStoreService.get(paged)
+            html         <- renderView(form, Some(paged), fileMetadata)
+          } yield html
       )
     }
 }
