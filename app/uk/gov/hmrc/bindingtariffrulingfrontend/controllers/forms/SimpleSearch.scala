@@ -35,7 +35,7 @@ object SimpleSearch {
 
   val form: Form[SimpleSearch] = Form(
     mapping(
-      "query"  -> of(optionalStringFormatter).verifying("cannot be empty", _.isDefined),
+      "query"  -> of(optionalStringFormatter).verifying("Enter a search term", _.isDefined),
       "images" -> boolean,
       "page"   -> optional(number).transform(_.getOrElse(1), (page: Int) => Some(page))
     )(SimpleSearch.apply(_, _, _))(s => Some((s.query, s.imagesOnly, s.pageIndex)))

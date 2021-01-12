@@ -216,7 +216,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
       bodyOf(result)      should include(messageApi("search.heading"))
-      bodyOf(result)      should include(messageApi("cannot be empty"))
+      bodyOf(result)      should include(messageApi("Enter a search term"))
 
       verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
       verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
