@@ -53,13 +53,13 @@
             pager = results,
             form
             )
-    }else if(!form.value.get.query.isDefined){
+    } else if(!form.value.get.query.isDefined){
         @empty_search_result_summary(
             id = "search-summary_top",
             pager = results,
             form
-    )
-    }else{
+        )
+    } else{
         @result_summary(
             id = "search-summary_top",
             pager = results,
