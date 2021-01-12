@@ -31,18 +31,14 @@ import java.nio.charset.StandardCharsets
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer with BeforeAndAfter {
+class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer {
   val appConfig: AppConfig = mock[AppConfig]
   val httpClient           = app.injector.instanceOf[AuthenticatedHttpClient]
   val metrics              = new TestMetrics
   val wsClient             = app.injector.instanceOf[WSClient]
   given(appConfig.maxUriLength).willReturn(2048L)
+  given(appConfig.bindingTariffFileStoreUrl).willReturn(wireMockUrl)
   val connector = new FileStoreConnector(appConfig, httpClient, wsClient, metrics)
-
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-    given(appConfig.bindingTariffFileStoreUrl).willReturn(wireMockUrl)
-  }
 
   def fromFile(path: String): String = {
     val url = getClass.getClassLoader.getResource(path)
