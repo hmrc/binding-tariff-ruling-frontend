@@ -46,8 +46,10 @@ class FileStoreConnector @Inject() (
   type Metadata = Map[String, FileMetadata]
   private lazy val noMetadata: Metadata = Map.empty
 
-  private val ParamLength = 40 // A 36-char UUID plus &id=
-  private val BatchSize   = (appConfig.maxUriLength / ParamLength).intValue()
+  private val ParamLength =
+    42 // A 36-char UUID plus &id= and some wiggle room
+  private val BatchSize =
+    ((appConfig.maxUriLength - appConfig.bindingTariffFileStoreUrl.length) / ParamLength).intValue()
 
   private def makeQuery(ids: Seq[String]): String = {
     val query = s"?${ids.map("id=" + _).mkString("&")}"

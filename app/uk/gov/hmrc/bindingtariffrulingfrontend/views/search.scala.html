@@ -73,5 +73,14 @@
         onChange = page => routes.SearchController.get(query = form.value.flatMap(_.query), images = form.value.exists(_.imagesOnly), page = page)
     )
 
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ 'search_results_atar_ruling': @results.resultCount });
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchParam = urlParams.get('query');
+      if (searchParam) window.dataLayer.push({ 'search_query_atar_ruling': searchParam });
+    </script>
+
   }
 }
