@@ -24,6 +24,7 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AllowListAction, AllowListDisabled, AllowListEnabled}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
@@ -33,9 +34,8 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import scala.concurrent.Future
 
 class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
@@ -64,9 +64,10 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
       val result = await(
         controller()
-          .get(query = Some("query"), imagesOnly = false, page = 1)(getRequestWithCSRF("/?query=query&page=1").withFormUrlEncodedBody(
-            "query" -> "query"
-          ))
+          .get(query = Some("query"), images = false, page = 1)(
+            getRequestWithCSRF("/?query=query&page=1").withFormUrlEncodedBody(
+              "query" -> "query"
+            ))
       )
 
       status(result)      shouldBe Status.OK
@@ -84,7 +85,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
         .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
-      val result = await(controller().get(query = None, imagesOnly = false, page = 1)(getRequestWithCSRF()))
+      val result = await(controller().get(query = None, images = false, page = 1)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
@@ -95,39 +96,25 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
     }
 
-   "return 200 with an empty search query" in {
-     given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
-     given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
-       .willReturn(Future.successful(Map.empty[String, FileMetadata]))
+    "return 200 with an empty search query" in {
+      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+        .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
-      val result = await(controller().get(query = Some(""), imagesOnly = false, page = 1)(getRequestWithCSRF()))
+      val result = await(controller().get(query = Some(""), images = false, page = 1)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
       bodyOf(result)      should include(messageApi("search.heading"))
 
-     verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
-     verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
+      verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
+      verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
     }
-
-    "return 400 when form is filled incorrectly" in {
-       val result = await(
-         controller()
-           .get(query = Some("query"), imagesOnly = false, page = 1)(getRequestWithCSRF("/?query=query&page=foo"))
-       )
-
-       status(result)      shouldBe Status.BAD_REQUEST
-       contentType(result) shouldBe Some("text/html")
-       charset(result)     shouldBe Some("utf-8")
-       bodyOf(result)      should include(messageApi("search.heading"))
-
-       verifyZeroInteractions(rulingService)
-     }
-
+    
     "return 303 when disallowed" in {
       val result = await(
-        controller(allowlist = AllowListEnabled()).get(query = None, imagesOnly = false, page = 1)(getRequestWithCSRF())
+        controller(allowlist = AllowListEnabled()).get(query = None, images = false, page = 1)(getRequestWithCSRF())
       )
 
       status(result) shouldBe Status.SEE_OTHER
@@ -166,8 +153,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
       val result = await(
         controller()
-          .searchRuling(query = Some("query"), imagesOnly = false, page = 1)(
-            postRequestWithCSRF.withFormUrlEncodedBody(
+          .get(query = Some("query"), images = false, page = 1)(
+            getRequestWithCSRF().withFormUrlEncodedBody(
               "query" -> "query"
             ))
       )
@@ -187,7 +174,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
         .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
-      val result = await(controller().searchRuling(query = None, imagesOnly = false, page = 1)(postRequestWithCSRF))
+      val result = await(controller().get(query = None, images = false, page = 1)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
@@ -206,8 +193,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
       val result = await(
         controller()
-          .searchRuling(query = Some(""), imagesOnly = false, page = 1)(
-            postRequestWithCSRF.withFormUrlEncodedBody(
+          .get(query = Some(""), images = false, page = 1)(
+            getRequestWithCSRF().withFormUrlEncodedBody(
               "query" -> ""
             ))
       )
