@@ -59,7 +59,7 @@ class SearchController @Inject() (
 
   def get(
     query: Option[String],
-    imagesOnly: Boolean,
+    images: Boolean,
     page: Int,
     enableTrackingConsent: Boolean = false
   ): Action[AnyContent] =
@@ -67,18 +67,23 @@ class SearchController @Inject() (
       val form = SimpleSearch.form.bindFromRequest()
 
       form.fold(
-        badRequest,
+        formWithErrors => allResultsView(formWithErrors, 1),
         search =>
-          search.query match {
-            case None =>
-              renderView(form)
-            case Some(_) =>
-              for {
-                paged        <- rulingService.get(search)
-                fileMetadata <- fileStoreService.get(paged)
-                html         <- renderView(form, Some(paged), fileMetadata)
-              } yield html
-          }
+          for {
+            paged        <- rulingService.get(search)
+            fileMetadata <- fileStoreService.get(paged)
+            html         <- renderView(form, Some(paged), fileMetadata)
+          } yield html
       )
     }
+
+  private def allResultsView(form: Form[SimpleSearch], page: Int)(implicit request: Request[_]): Future[Result] = {
+    val search = SimpleSearch(query = None, imagesOnly = false, pageIndex = page)
+
+    for {
+      paged        <- rulingService.get(search)
+      fileMetadata <- fileStoreService.get(paged)
+      html         <- renderView(form, Some(paged), fileMetadata)
+    } yield html
+  }
 }

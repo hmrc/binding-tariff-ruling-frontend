@@ -35,7 +35,7 @@ object SimpleSearch {
 
   val form: Form[SimpleSearch] = Form(
     mapping(
-      "query"  -> of(optionalStringFormatter),
+      "query"  -> of(optionalStringFormatter).verifying("Enter a search term", _.forall(_.nonEmpty)),
       "images" -> boolean,
       "page"   -> optional(number).transform(_.getOrElse(1), (page: Int) => Some(page))
     )(SimpleSearch.apply(_, _, _))(s => Some((s.query, s.imagesOnly, s.pageIndex)))
@@ -50,7 +50,6 @@ object SimpleSearch {
         data
           .get(key)
           .map(normaliseWhiteSpace)
-          .filter(_.nonEmpty)
       )
 
     override def unbind(key: String, value: Option[String]): Map[String, String] =
