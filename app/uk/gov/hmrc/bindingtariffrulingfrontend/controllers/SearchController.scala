@@ -33,7 +33,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SearchController @Inject()(
+class SearchController @Inject() (
   rulingService: RulingService,
   fileStoreService: FileStoreService,
   allowList: AllowListAction,
@@ -59,26 +59,7 @@ class SearchController @Inject()(
 
   def get(
     query: Option[String],
-    imagesOnly: Boolean,
-    page: Int,
-    enableTrackingConsent: Boolean = false
-  ): Action[AnyContent] =
-    (Action andThen allowList andThen rateLimit).async { implicit request =>
-      val form = SimpleSearch.landingForm.bindFromRequest()
-      form.fold(
-        badRequest,
-        search =>
-          for {
-            paged        <- rulingService.get(search)
-            fileMetadata <- fileStoreService.get(paged)
-            html         <- renderView(form, Some(paged), fileMetadata)
-          } yield html
-      )
-    }
-
-  def searchRuling(
-    query: Option[String],
-    imagesOnly: Boolean,
+    images: Boolean,
     page: Int,
     enableTrackingConsent: Boolean = false
   ): Action[AnyContent] =
@@ -86,13 +67,7 @@ class SearchController @Inject()(
       val form = SimpleSearch.form.bindFromRequest()
 
       form.fold(
-        formWithErrors =>
-          for {
-            paged        <- rulingService.get(SimpleSearch(query = None, imagesOnly, page))
-            fileMetadata <- fileStoreService.get(paged)
-            html         <- renderView(formWithErrors, Some(paged), fileMetadata)
-          } yield html,
-
+        formWithErrors => allResultsView(formWithErrors, 1),
         search =>
           for {
             paged        <- rulingService.get(search)
@@ -101,4 +76,14 @@ class SearchController @Inject()(
           } yield html
       )
     }
+
+  private def allResultsView(form: Form[SimpleSearch], page: Int)(implicit request: Request[_]): Future[Result] = {
+    val search = SimpleSearch(query = None, imagesOnly = false, pageIndex = page)
+
+    for {
+      paged        <- rulingService.get(search)
+      fileMetadata <- fileStoreService.get(paged)
+      html         <- renderView(form, Some(paged), fileMetadata)
+    } yield html
+  }
 }

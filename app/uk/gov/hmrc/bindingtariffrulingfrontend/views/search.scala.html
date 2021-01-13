@@ -19,12 +19,10 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
-@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.{error_summary, input_search, pagination, result_summary, empty_search_result_summary, search_results}
+@import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.{error_summary, input_search, pagination, result_summary, search_results}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 
 @this(
-  formWithCSRF: FormWithCSRF,
   mainTemplate: main_template,
   errorSummary: error_summary,
   searchInput: input_search,
@@ -40,39 +38,40 @@
 
   @errorSummary(form)
 
-  @formWithCSRF(action = routes.SearchController.searchRuling()) {
+  @helper.form(action = routes.SearchController.get()) {
     @searchInput(form)
   }
 
 
   @searchResults.map { results =>
 
-    @if(form.hasErrors){
-        @empty_search_result_summary(
+    @if(form.hasErrors || !form.value.exists(_.query.isDefined)){
+        @result_summary(
             id = "search-summary_top",
             pager = results,
-            form
+            oneMatchKey = "search.summary.onematch.landing",
+            onePageKey = "search.summary.onepage.landing",
+            manyPageKey = "search.summary.manypage.landing",
+            noMatchKey = "search.summary.nomatch.landing"
             )
-    } else if(!form.value.get.query.isDefined){
-        @empty_search_result_summary(
-            id = "search-summary_top",
-            pager = results,
-            form
-        )
     } else{
         @result_summary(
             id = "search-summary_top",
             pager = results,
-            form
+            oneMatchKey = "search.summary.onematch",
+            onePageKey = "search.summary.onepage",
+            manyPageKey = "search.summary.manypage",
+            noMatchKey = "search.summary.nomatch"
         )
     }
 
     @searchResultsView(form.value, results, fileMetadata)
 
     @pagination(
-      id = "search-pagination_bottom",
-      pager = results,
-      onChange = page => routes.SearchController.get(query = form.get.query, page = page)
+        id = "search-pagination_bottom",
+        pager = results,
+        onChange = page => routes.SearchController.get(query = form.value.flatMap(_.query), images = form.value.exists(_.imagesOnly), page = page)
     )
+
   }
 }
