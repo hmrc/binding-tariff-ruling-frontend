@@ -42,4 +42,9 @@ class BindingTariffClassificationConnector @Inject() (
       client.GET[Option[Case]](url)
     }
 
+
+  def newApprovedRulings(implicit hc: HeaderCarrier) = ???
+
+  def newCanceledRulings(implicit hc: HeaderCarrier) = ???
+
 }
