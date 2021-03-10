@@ -23,13 +23,17 @@ import org.quartz.TriggerBuilder.newTrigger
 import org.quartz.impl.StdSchedulerFactory
 import org.quartz.{Job, JobDetail, JobExecutionContext}
 import play.api.Logger.logger
-
 import java.time.Instant
-import javax.inject.Singleton
+
+import javax.inject.{Inject, Singleton}
+import play.api.inject.ApplicationLifecycle
+
+import scala.concurrent.Future
 
 @Singleton
-class BackendScheduler {
+class BackendScheduler @Inject()(lifecycle: ApplicationLifecycle) {
   lazy val quartz = StdSchedulerFactory.getDefaultScheduler
+
 
   val job: JobDetail = newJob(classOf[Job]).withIdentity("job1", "group1").build
 
@@ -39,12 +43,14 @@ class BackendScheduler {
     .startNow()
     .withSchedule(
       simpleSchedule()
-        .withIntervalInSeconds(10)
+        .withIntervalInSeconds(30)
         .repeatForever()
     )
+    .forJob(job)
     .build()
 
   quartz.scheduleJob(job, trigger)
+  lifecycle.addStopHook(()  => Future.successful(quartz.shutdown()))
 
   val exampleJob = new Job {
     override def execute(context: JobExecutionContext): Unit =

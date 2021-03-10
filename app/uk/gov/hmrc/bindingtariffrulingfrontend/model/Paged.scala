@@ -16,6 +16,10 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
+import play.api.libs.json.{Format, JsArray, JsDefined, JsError, JsNumber, JsResult, JsSuccess, JsValue, Json, Reads, Writes}
+
+import scala.util.Try
+
 /*
  * Copyright 2019 HM Revenue & Customs
  *
@@ -47,4 +51,35 @@ object Paged {
     Paged(results, pagination.pageIndex, pagination.pageSize, resultCount)
   def apply[T](results: Seq[T]): Paged[T]                   = Paged(results, SimplePagination(), results.size)
   def apply[T](results: Seq[T], resultCount: Int): Paged[T] = Paged(results, SimplePagination(), resultCount)
+
+
+  implicit def format[T](implicit fmt: Format[T]): Format[Paged[T]] =
+    Format[Paged[T]](Reads[Paged[T]](reads), Writes[Paged[T]](writes))
+
+  private def reads[T](implicit fmt: Reads[T]): JsValue => JsResult[Paged[T]] =
+    js =>
+      Try(
+        new Paged[T](
+          js \ "results" match {
+            case JsDefined(JsArray(r)) => r.map(jsResult => jsResult.as[T])
+            case _                     => throw new IllegalArgumentException("invalid results")
+          },
+          (js \ "pageIndex").as[Int],
+          (js \ "pageSize").as[Int],
+          (js \ "resultCount").as[Int]
+        )
+      ).map(JsSuccess(_))
+        .recover {
+          case t: Throwable => JsError(t.getMessage)
+        }
+        .get
+
+  private def writes[T](implicit fmt: Writes[T]): Paged[T] => JsValue =
+    (paged: Paged[T]) =>
+      Json.obj(
+        "results"     -> JsArray(paged.results.map(fmt.writes)),
+        "pageIndex"   -> JsNumber(paged.pageIndex),
+        "pageSize"    -> JsNumber(paged.pageSize),
+        "resultCount" -> JsNumber(paged.resultCount)
+      )
 }

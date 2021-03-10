@@ -16,14 +16,23 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.config
 
+import javax.inject.{Inject, Provider}
 import play.api.inject.Binding
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.bindingtariffrulingfrontend.scheduler.BackendScheduler
+import uk.gov.hmrc.bindingtariffrulingfrontend.scheduler.{BackendScheduler, ScheduledJobs}
 
 class Module extends play.api.inject.Module {
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = Seq(
+    bind[ScheduledJobs].toProvider[ScheduledJobProvider],
     bind[BackendScheduler].toSelf.eagerly()
   )
 
+}
+
+class ScheduledJobProvider @Inject() (
+  backendScheduler: BackendScheduler
+) extends Provider[ScheduledJobs] {
+  override def get(): ScheduledJobs =
+    ScheduledJobs(Set(backendScheduler.exampleJob))
 }
