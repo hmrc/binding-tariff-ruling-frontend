@@ -63,9 +63,17 @@
   ))
 
   @govukButton(Button(
-    attributes = Map("id" -> "submit"),
+    attributes = Map(
+        "id" -> "submit",
+        "onclick" -> "window.dataLayer.push({ 'search_query_atar_ruling': searchParam })"),
     inputType = Some("submit"),
     content = Text(messages("search.form.submit"))
   ))
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchParam = urlParams.get('query');
+        if (searchParam) window.dataLayer.push({'search_query_atar_ruling': searchParam});
+    </script>
 }
 
