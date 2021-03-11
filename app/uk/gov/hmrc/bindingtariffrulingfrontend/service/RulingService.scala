@@ -16,18 +16,17 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
-import javax.inject.Inject
 import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditService
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{ApplicationType, Case, CaseStatus, Decision}
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 
 class RulingService @Inject() (
   repository: RulingRepository,
@@ -47,6 +46,12 @@ class RulingService @Inject() (
 
   def get(query: SimpleSearch): Future[Paged[Ruling]] =
     repository.get(query)
+
+  def updateNewRulings(implicit hc: HeaderCarrier) =
+    for {
+      ruling: Paged[Case] <- bindingTariffClassificationConnector.newApprovedRulings
+      cases: Seq[String] = ruling.results.map(_.reference)
+    } cases.map(c => refresh(c))
 
   def refresh(reference: String)(implicit hc: HeaderCarrier): Future[Unit] = {
 

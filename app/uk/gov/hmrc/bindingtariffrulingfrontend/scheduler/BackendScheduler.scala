@@ -16,24 +16,24 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.scheduler
 
-import org.quartz.CronScheduleBuilder.dailyAtHourAndMinute
 import org.quartz.JobBuilder.newJob
 import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.TriggerBuilder.newTrigger
 import org.quartz.impl.StdSchedulerFactory
 import org.quartz.{Job, JobDetail, JobExecutionContext}
 import play.api.Logger.logger
-import java.time.Instant
-
-import javax.inject.{Inject, Singleton}
 import play.api.inject.ApplicationLifecycle
 
+import java.time.Instant
+import java.util.UUID
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class BackendScheduler @Inject()(lifecycle: ApplicationLifecycle) {
+class BackendScheduler @Inject() (lifecycle: ApplicationLifecycle) {
   lazy val quartz = StdSchedulerFactory.getDefaultScheduler
 
+  val jobId = UUID.randomUUID().toString
 
   val job: JobDetail = newJob(classOf[Job]).withIdentity("job1", "group1").build
 
@@ -50,7 +50,7 @@ class BackendScheduler @Inject()(lifecycle: ApplicationLifecycle) {
     .build()
 
   quartz.scheduleJob(job, trigger)
-  lifecycle.addStopHook(()  => Future.successful(quartz.shutdown()))
+  lifecycle.addStopHook(() => Future.successful(quartz.shutdown()))
 
   val exampleJob = new Job {
     override def execute(context: JobExecutionContext): Unit =

@@ -25,8 +25,8 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 import com.kenshoo.play.metrics.Metrics
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{NoPagination, Paged, Pagination}
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged.format
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.CaseStatus._
 
 @Singleton
@@ -38,7 +38,7 @@ class BindingTariffClassificationConnector @Inject() (
   implicit ec: ExecutionContext
 ) extends HasMetrics {
 
-  private lazy val statuses: String = Set(CANCELLED, COMPLETED)
+  private lazy val statuses: String = Set(CANCELLED, COMPLETED, ANNULLED)
     .map(_.toString)
     .mkString(",")
 
@@ -51,8 +51,7 @@ class BindingTariffClassificationConnector @Inject() (
 
   def newApprovedRulings(implicit hc: HeaderCarrier) : Future[Paged[Case]] = {
     val queryString =
-      s"application_type=${"BTI&"}" +
-        s"status=$statuses"
+      s"application_type=${"BTI"}&status=$statuses=&pagination=${NoPagination()}&page_size=${Integer.MAX_VALUE}"
     val url = s"${appConfig.bindingTariffClassificationUrl}/cases?$queryString"
       client.GET[Paged[Case]](url)
   }
