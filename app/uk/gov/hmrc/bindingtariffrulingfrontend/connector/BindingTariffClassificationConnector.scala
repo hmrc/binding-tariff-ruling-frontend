@@ -16,18 +16,19 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import javax.inject.{Inject, Singleton}
+import com.kenshoo.play.metrics.Metrics
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.Case
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.CaseStatus._
 import uk.gov.hmrc.bindingtariffrulingfrontend.metrics.HasMetrics
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged.format
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{NoPagination, Paged}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpReads.Implicits._
 
+import java.time.{ZoneOffset, ZonedDateTime}
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import com.kenshoo.play.metrics.Metrics
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.{NoPagination, Paged, Pagination}
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged.format
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.CaseStatus._
 
 @Singleton
 class BindingTariffClassificationConnector @Inject() (
@@ -48,12 +49,15 @@ class BindingTariffClassificationConnector @Inject() (
       client.GET[Option[Case]](url)
     }
 
+  def newApprovedRulings(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
 
-  def newApprovedRulings(implicit hc: HeaderCarrier) : Future[Paged[Case]] = {
+    val time = ZonedDateTime.of(2019, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant
+
     val queryString =
-      s"application_type=${"BTI"}&status=$statuses=&pagination=${NoPagination()}&page_size=${Integer.MAX_VALUE}"
+      s"application_type=${"BTI"}&status=$statuses=&min_decision_end=$time&pagination=${NoPagination()}&page_size=${Integer.MAX_VALUE}"
     val url = s"${appConfig.bindingTariffClassificationUrl}/cases?$queryString"
-      client.GET[Paged[Case]](url)
+
+    client.GET[Paged[Case]](url)
   }
 
   def newCanceledRulings(implicit hc: HeaderCarrier) = ???
