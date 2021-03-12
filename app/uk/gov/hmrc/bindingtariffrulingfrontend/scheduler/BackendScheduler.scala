@@ -23,14 +23,21 @@ import org.quartz.impl.StdSchedulerFactory
 import org.quartz.{Job, JobDetail, JobExecutionContext}
 import play.api.Logger.logger
 import play.api.inject.ApplicationLifecycle
-
 import java.time.Instant
 import java.util.UUID
+
 import javax.inject.{Inject, Singleton}
+import play.api.Logging
+import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
+import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.Future
 
 @Singleton
-class BackendScheduler @Inject() (lifecycle: ApplicationLifecycle) {
+class BackendScheduler @Inject() (rulingService: RulingService, lifecycle: ApplicationLifecycle) extends Logging {
+
+  private implicit val headers: HeaderCarrier = HeaderCarrier()
+
   lazy val quartz = StdSchedulerFactory.getDefaultScheduler
 
   val jobId = UUID.randomUUID().toString
@@ -52,9 +59,16 @@ class BackendScheduler @Inject() (lifecycle: ApplicationLifecycle) {
   quartz.scheduleJob(job, trigger)
   lifecycle.addStopHook(() => Future.successful(quartz.shutdown()))
 
-  val exampleJob = new Job {
+  val updateNewRulingsJob = new Job {
     override def execute(context: JobExecutionContext): Unit =
-      logger.info(s"Backend scheduler started at${Instant.now}")
+      logger.info(s"Backend scheduler for updateNewRulingsJob started at${Instant.now}")
+        rulingService.updateNewRulings
 
+  }
+
+  val updateCanceledRulingsJob = new Job {
+    override def execute(context: JobExecutionContext): Unit =
+      logger.info(s"Backend scheduler for updateCanceledRulingsJob started at${Instant.now}")
+       rulingService.updateCanceledRulings
   }
 }

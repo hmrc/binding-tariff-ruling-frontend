@@ -49,9 +49,15 @@ class RulingService @Inject() (
 
   def updateNewRulings(implicit hc: HeaderCarrier) =
     for {
-      ruling: Paged[Case] <- bindingTariffClassificationConnector.newApprovedRulings
-      cases: Seq[String] = ruling.results.map(_.reference)
-    } cases.map(c => refresh(c))
+      ruling <- bindingTariffClassificationConnector.newApprovedRulings
+      cases  = ruling.results.map(_.reference)
+    } cases.map(refresh(_))
+
+  def updateCanceledRulings(implicit hc: HeaderCarrier) =
+    for {
+      ruling <- bindingTariffClassificationConnector.newCanceledRulings
+      cases  = ruling.results.map(_.reference)
+    } cases.map(refresh(_))
 
   def refresh(reference: String)(implicit hc: HeaderCarrier): Future[Unit] = {
 

@@ -34,5 +34,5 @@ class ScheduledJobProvider @Inject() (
   backendScheduler: BackendScheduler
 ) extends Provider[ScheduledJobs] {
   override def get(): ScheduledJobs =
-    ScheduledJobs(Set(backendScheduler.exampleJob))
+    ScheduledJobs(Set(backendScheduler.updateNewRulingsJob, backendScheduler.updateCanceledRulingsJob))
 }
