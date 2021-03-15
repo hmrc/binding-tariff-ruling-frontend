@@ -52,7 +52,6 @@ object Paged {
   def apply[T](results: Seq[T]): Paged[T]                   = Paged(results, SimplePagination(), results.size)
   def apply[T](results: Seq[T], resultCount: Int): Paged[T] = Paged(results, SimplePagination(), resultCount)
 
-
   implicit def format[T](implicit fmt: Format[T]): Format[Paged[T]] =
     Format[Paged[T]](Reads[Paged[T]](reads), Writes[Paged[T]](writes))
 

@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.scheduler
 
+import java.time.temporal.ChronoUnit
+
 import org.quartz.JobBuilder.newJob
 import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.TriggerBuilder.newTrigger
@@ -23,7 +25,7 @@ import org.quartz.impl.StdSchedulerFactory
 import org.quartz.{Job, JobDetail, JobExecutionContext}
 import play.api.Logger.logger
 import play.api.inject.ApplicationLifecycle
-import java.time.Instant
+import java.time.{Instant, LocalDate, ZoneOffset}
 import java.util.UUID
 
 import javax.inject.{Inject, Singleton}
@@ -62,13 +64,14 @@ class BackendScheduler @Inject() (rulingService: RulingService, lifecycle: Appli
   val updateNewRulingsJob = new Job {
     override def execute(context: JobExecutionContext): Unit =
       logger.info(s"Backend scheduler for updateNewRulingsJob started at${Instant.now}")
-        rulingService.updateNewRulings
-
+        rulingService.updateNewRulings(Instant.now().minus(12, ChronoUnit.HOURS))
   }
 
   val updateCanceledRulingsJob = new Job {
     override def execute(context: JobExecutionContext): Unit =
       logger.info(s"Backend scheduler for updateCanceledRulingsJob started at${Instant.now}")
-       rulingService.updateCanceledRulings
+       rulingService.updateCanceledRulings(Instant.now().minus(12, ChronoUnit.HOURS))
   }
 }
+
+

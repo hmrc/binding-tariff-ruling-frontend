@@ -16,6 +16,10 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
+import java.time.Instant
+
+import cats.syntax.all._
+import javax.inject.Inject
 import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditService
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
@@ -24,7 +28,6 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -47,17 +50,19 @@ class RulingService @Inject() (
   def get(query: SimpleSearch): Future[Paged[Ruling]] =
     repository.get(query)
 
-  def updateNewRulings(implicit hc: HeaderCarrier) =
+  def updateNewRulings(minDecisionStart: Instant)(implicit hc: HeaderCarrier) =
     for {
-      ruling <- bindingTariffClassificationConnector.newApprovedRulings
-      cases  = ruling.results.map(_.reference)
-    } cases.map(refresh(_))
+      ruling <- bindingTariffClassificationConnector.newApprovedRulings(minDecisionStart)
+      cases = ruling.results.map(_.reference)
+      _ <- cases.toList.traverse_(refresh(_))
+    } yield ()
 
-  def updateCanceledRulings(implicit hc: HeaderCarrier) =
+  def updateCanceledRulings(minDecisionEnd: Instant)(implicit hc: HeaderCarrier) =
     for {
-      ruling <- bindingTariffClassificationConnector.newCanceledRulings
-      cases  = ruling.results.map(_.reference)
-    } cases.map(refresh(_))
+      ruling <- bindingTariffClassificationConnector.newCanceledRulings(minDecisionEnd)
+      cases = ruling.results.map(_.reference)
+      _ <- cases.toList.traverse_(refresh(_))
+    } yield ()
 
   def refresh(reference: String)(implicit hc: HeaderCarrier): Future[Unit] = {
 

@@ -55,7 +55,7 @@ class BindingTariffClassificationConnector @Inject() (
   ): String = {
     val sortBy = "application.type,application.status"
     val queryString =
-      s"application_type=${types.map(_.toString).mkString(",")}&status=$statuses&min_decision_start=$minDecisionStart&min_decision_end=$minDecisionEnd&sort_by=$sortBy&sort_direction=desc&pagination=${NoPagination()}&page_size=${Integer.MAX_VALUE}"
+      s"application_type=${types.map(_.toString).mkString(",")}&status=$statuses&min_decision_start=$minDecisionStart&min_decision_end=$minDecisionEnd&sort_by=$sortBy&sort_direction=desc&pagination=${NoPagination()}"
     s"${appConfig.bindingTariffClassificationUrl}/cases?$queryString"
   }
 
@@ -65,16 +65,16 @@ class BindingTariffClassificationConnector @Inject() (
       client.GET[Option[Case]](url)
     }
 
-  def newApprovedRulings(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
+  def newApprovedRulings(minDecisionStart: Instant)(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
 
-    val url = buildQueryUrl(statuses = statuses, minDecisionStart = Some(Instant.now()), minDecisionEnd = None)
+    val url = buildQueryUrl(statuses = statuses, minDecisionStart = Some(minDecisionStart), minDecisionEnd = None)
     client.GET[Paged[Case]](url)
 
   }
 
-  def newCanceledRulings(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
+  def newCanceledRulings(minDecisionEnd: Instant)(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
 
-    val url = buildQueryUrl(statuses = cancelStatus, minDecisionStart = None, minDecisionEnd = Some(Instant.now()))
+    val url = buildQueryUrl(statuses = cancelStatus, minDecisionStart = None, minDecisionEnd = Some(minDecisionEnd))
     client.GET[Paged[Case]](url)
 
   }

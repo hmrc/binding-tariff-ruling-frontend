@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import java.time.Instant
 import java.time.temporal.ChronoUnit
+import java.time.{Instant, LocalDate, ZoneOffset}
 
 import akka.actor.ActorSystem
 import com.github.tomakehurst.wiremock.client.WireMock._
@@ -26,15 +26,17 @@ import org.mockito.BDDMockito._
 import org.mockito.Mockito
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import uk.gov.hmrc.bindingtariffrulingfrontend.{TestMetrics, WiremockTestServer}
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
+import uk.gov.hmrc.bindingtariffrulingfrontend.utils.CaseQueueBuilder
+import uk.gov.hmrc.bindingtariffrulingfrontend.{TestMetrics, WiremockTestServer}
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTestServer {
+class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTestServer with CaseQueueBuilder {
 
   private val actorSystem = ActorSystem.create("testActorSystem")
 
@@ -105,4 +107,73 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
     }
   }
 
+  "get newApprovedRulings" should {
+
+    val startDate        = LocalDate.now().atStartOfDay().minusHours(12).toInstant(ZoneOffset.UTC)
+    val endDate          = LocalDate.of(2022, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+    val validDecision    = Decision("code", Some(startDate), Some(endDate), "justification", "description")
+    val publicAttachment = Attachment("file-id", public = true, shouldPublishToRulings = true)
+    val validCase: Case = Case(
+      reference   = "ref",
+      status      = CaseStatus.COMPLETED,
+      application = Application(`type` = ApplicationType.BTI),
+      decision    = Some(validDecision),
+      attachments = Seq(publicAttachment),
+      keywords    = Set("keyword")
+    )
+
+    "return new cases with status Completed" in {
+
+      val url = buildQueryUrl(
+        types            = Seq(ApplicationType.BTI),
+        statuses         = "COMPLETED,ANNULLED",
+        minDecisionStart = Some(LocalDate.now().atStartOfDay().minusHours(12).toInstant(ZoneOffset.UTC)),
+        minDecisionEnd   = None
+      )
+
+      val responseJSON = Json.toJson(Paged(Seq(validCase))).toString()
+
+      stubFor(
+        get(urlEqualTo(url))
+          .willReturn(
+            aResponse()
+              .withStatus(HttpStatus.SC_OK)
+              .withBody(responseJSON)
+          )
+      )
+
+      await(connector.newApprovedRulings(startDate)) shouldBe Paged(Seq(validCase))
+
+      verify(
+        getRequestedFor(urlEqualTo(url))
+          .withHeader("X-Api-Token", equalTo(realConfig.authorization))
+      )
+    }
+
+    "Return Paged(Empty) for 404" in {
+
+      val url = buildQueryUrl(
+        types            = Seq(ApplicationType.BTI),
+        statuses         = "COMPLETED,ANNULLED",
+        minDecisionStart = Some(LocalDate.now().atStartOfDay().minusHours(12).toInstant(ZoneOffset.UTC)),
+        minDecisionEnd   = None
+      )
+
+      stubFor(
+        get(urlEqualTo(url))
+          .willReturn(
+            aResponse()
+              .withStatus(HttpStatus.SC_OK)
+              .withBody(Json.toJson(Paged.empty[Case]).toString())
+          )
+      )
+
+      await(connector.newApprovedRulings(startDate)) shouldBe Paged.empty[Case]
+
+      verify(
+        getRequestedFor(urlEqualTo(url))
+          .withHeader("X-Api-Token", equalTo(realConfig.authorization))
+      )
+    }
+  }
 }
