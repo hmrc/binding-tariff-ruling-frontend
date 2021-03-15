@@ -16,62 +16,56 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.scheduler
 
-import java.time.temporal.ChronoUnit
-
+import org.quartz.CronScheduleBuilder.dailyAtHourAndMinute
 import org.quartz.JobBuilder.newJob
+import org.quartz.JobDetail
 import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.TriggerBuilder.newTrigger
 import org.quartz.impl.StdSchedulerFactory
-import org.quartz.{Job, JobDetail, JobExecutionContext}
-import play.api.Logger.logger
-import play.api.inject.ApplicationLifecycle
-import java.time.{Instant, LocalDate, ZoneOffset}
-import java.util.UUID
-
-import javax.inject.{Inject, Singleton}
 import play.api.Logging
-import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
+import play.api.inject.ApplicationLifecycle
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.util.UUID
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class BackendScheduler @Inject() (rulingService: RulingService, lifecycle: ApplicationLifecycle) extends Logging {
+class BackendScheduler @Inject() (
+  lifecycle: ApplicationLifecycle,
+  scheduledJobs: ScheduledJobs,
+  scheduledJobFactory: ScheduledJobFactory
+) extends Logging {
 
   private implicit val headers: HeaderCarrier = HeaderCarrier()
 
+  def jobDetail(job: ScheduledJob) =
+    newJob(job.getClass).withIdentity(job.jobName).build
+
+  def jobTrigger(job: ScheduledJob, jobDetails: JobDetail) =
+    newTrigger()
+      .withIdentity(s"${job.jobName} trigger")
+      .startNow()
+      .withSchedule(
+        job.schedule.fold(
+          duration => simpleSchedule().withIntervalInSeconds(duration.getSeconds.toInt),
+          localTime => dailyAtHourAndMinute(localTime.getHour, localTime.getMinute)
+        )
+      )
+      .forJob(jobDetails)
+      .build()
+
+//    .withSchedule(dailyAtHourAndMinute(15, 0)) // fire every day at 15:
   lazy val quartz = StdSchedulerFactory.getDefaultScheduler
+  quartz.setJobFactory(scheduledJobFactory)
+  scheduledJobs.jobs.foreach { job =>
+    val details = jobDetail(job)
+    val trigger = jobTrigger(job, details)
+    quartz.scheduleJob(details, trigger)
+  }
 
-  val jobId = UUID.randomUUID().toString
+  quartz.start()
 
-  val job: JobDetail = newJob(classOf[Job]).withIdentity("job1", "group1").build
-
-  val trigger = newTrigger()
-    .withIdentity("trigger3", "group1")
-    //    .withSchedule(dailyAtHourAndMinute(15, 0)) // fire every day at 15:
-    .startNow()
-    .withSchedule(
-      simpleSchedule()
-        .withIntervalInSeconds(30)
-        .repeatForever()
-    )
-    .forJob(job)
-    .build()
-
-  quartz.scheduleJob(job, trigger)
   lifecycle.addStopHook(() => Future.successful(quartz.shutdown()))
 
-  val updateNewRulingsJob = new Job {
-    override def execute(context: JobExecutionContext): Unit =
-      logger.info(s"Backend scheduler for updateNewRulingsJob started at${Instant.now}")
-        rulingService.updateNewRulings(Instant.now().minus(12, ChronoUnit.HOURS))
-  }
-
-  val updateCanceledRulingsJob = new Job {
-    override def execute(context: JobExecutionContext): Unit =
-      logger.info(s"Backend scheduler for updateCanceledRulingsJob started at${Instant.now}")
-       rulingService.updateCanceledRulings(Instant.now().minus(12, ChronoUnit.HOURS))
-  }
 }
-
-

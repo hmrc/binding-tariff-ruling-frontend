@@ -19,7 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.config
 import javax.inject.{Inject, Provider}
 import play.api.inject.Binding
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.bindingtariffrulingfrontend.scheduler.{BackendScheduler, ScheduledJobs}
+import uk.gov.hmrc.bindingtariffrulingfrontend.scheduler.{BackendScheduler, ScheduledJobs, UpdateCanceledRulingsJob, UpdateNewRulingsJob}
 
 class Module extends play.api.inject.Module {
 
@@ -31,8 +31,9 @@ class Module extends play.api.inject.Module {
 }
 
 class ScheduledJobProvider @Inject() (
-  backendScheduler: BackendScheduler
+  updateNewRulingJob: UpdateNewRulingsJob,
+  updateCanceledRulingsJob: UpdateCanceledRulingsJob
 ) extends Provider[ScheduledJobs] {
   override def get(): ScheduledJobs =
-    ScheduledJobs(Set(backendScheduler.updateNewRulingsJob, backendScheduler.updateCanceledRulingsJob))
+    ScheduledJobs(Set(updateNewRulingJob, updateCanceledRulingsJob))
 }

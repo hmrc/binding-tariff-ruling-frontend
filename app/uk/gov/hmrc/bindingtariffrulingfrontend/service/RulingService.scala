@@ -17,8 +17,9 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
 import java.time.Instant
-
 import cats.syntax.all._
+import play.api.Logger.logger
+
 import javax.inject.Inject
 import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditService
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
@@ -52,19 +53,20 @@ class RulingService @Inject() (
 
   def updateNewRulings(minDecisionStart: Instant)(implicit hc: HeaderCarrier) =
     for {
-      ruling <- bindingTariffClassificationConnector.newApprovedRulings(minDecisionStart)
-      cases = ruling.results.map(_.reference)
-      _ <- cases.toList.traverse_(refresh(_))
+      cases <- bindingTariffClassificationConnector.newApprovedRulings(minDecisionStart)
+      _     <- cases.results.toList.traverse_(cse => refresh(cse.reference, Some(cse)))
     } yield ()
 
   def updateCanceledRulings(minDecisionEnd: Instant)(implicit hc: HeaderCarrier) =
     for {
-      ruling <- bindingTariffClassificationConnector.newCanceledRulings(minDecisionEnd)
-      cases = ruling.results.map(_.reference)
-      _ <- cases.toList.traverse_(refresh(_))
+      cases <- bindingTariffClassificationConnector.newCanceledRulings(minDecisionEnd)
+      _     <- cases.results.toList.traverse_(cse => refresh(cse.reference, Some(cse)))
     } yield ()
 
-  def refresh(reference: String)(implicit hc: HeaderCarrier): Future[Unit] = {
+  def refresh(reference: String)(implicit hc: HeaderCarrier): Future[Unit] =
+    bindingTariffClassificationConnector.get(reference).flatMap(refresh(reference, _))
+
+  def refresh(reference: String, updatedCase: Option[Case])(implicit hc: HeaderCarrier): Future[Unit] = {
 
     type ExistingRuling = Option[Ruling]
     type UpdatedRuling  = Option[Ruling]
@@ -72,8 +74,6 @@ class RulingService @Inject() (
 
     val rulingUpdate: Future[RulingUpdate] = for {
       existingRuling: ExistingRuling <- repository.get(reference)
-
-      updatedCase: Option[Case] <- bindingTariffClassificationConnector.get(reference)
 
       validCase = updatedCase
         .filter(_.application.`type` == ApplicationType.BTI)

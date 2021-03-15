@@ -16,4 +16,13 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.scheduler
 
-case class ScheduledJobs(jobs: Iterable[ScheduledJob])
+import org.quartz.Job
+
+import java.time.{Duration, LocalTime}
+
+trait ScheduledJob extends Job {
+
+  def jobName: String
+
+  def schedule: Either[Duration, LocalTime]
+}
