@@ -54,7 +54,6 @@ class BackendScheduler @Inject() (
       .forJob(jobDetails)
       .build()
 
-//    .withSchedule(dailyAtHourAndMinute(15, 0)) // fire every day at 15:
   lazy val quartz = StdSchedulerFactory.getDefaultScheduler
   quartz.setJobFactory(scheduledJobFactory)
   scheduledJobs.jobs.foreach { job =>

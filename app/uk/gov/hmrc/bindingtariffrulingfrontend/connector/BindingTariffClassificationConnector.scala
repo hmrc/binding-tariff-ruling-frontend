@@ -40,9 +40,7 @@ class BindingTariffClassificationConnector @Inject() (
   implicit ec: ExecutionContext
 ) extends HasMetrics {
 
-  private lazy val statuses: String = Set(COMPLETED, ANNULLED)
-    .map(_.toString)
-    .mkString(",")
+  private lazy val completedStatus: String = COMPLETED.toString
 
   private lazy val cancelStatus: String = CANCELLED.toString
 
@@ -72,7 +70,7 @@ class BindingTariffClassificationConnector @Inject() (
   def newApprovedRulings(minDecisionStart: Instant, pagination: Pagination)(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
 
     val url = buildQueryUrl(
-      statuses         = statuses,
+      statuses         = completedStatus,
       minDecisionStart = Some(minDecisionStart),
       minDecisionEnd   = None,
       pagination       = pagination

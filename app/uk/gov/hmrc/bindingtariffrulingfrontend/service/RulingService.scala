@@ -71,14 +71,14 @@ class RulingService @Inject() (
       }
       .runWith(Sink.ignore)
 
-  def updateCanceledRulings(minDecisionEnd: Instant)(implicit hc: HeaderCarrier) =
+  def updateCancelledRulings(minDecisionEnd: Instant)(implicit hc: HeaderCarrier) =
     Paged
       .stream(StreamPagination)(pagination =>
         bindingTariffClassificationConnector.newCanceledRulings(minDecisionEnd, pagination)
       )
       .throttle(10, 1.second)
       .mapAsync(1) { c =>
-        logger.info(s"Refreshing canceled ruling with reference: ${c.reference}")
+        logger.info(s"Refreshing cancelled ruling with reference: ${c.reference}")
         refresh(c.reference, Some(c))
       }
       .runWith(Sink.ignore)

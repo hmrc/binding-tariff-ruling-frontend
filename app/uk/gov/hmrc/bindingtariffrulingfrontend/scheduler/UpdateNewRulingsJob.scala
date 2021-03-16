@@ -21,9 +21,9 @@ import org.quartz.JobExecutionContext
 import play.api.Logging
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import uk.gov.hmrc.http.HeaderCarrier
-
 import java.time.temporal.ChronoUnit
 import java.time.{Duration, Instant, LocalTime}
+
 import javax.inject.Singleton
 
 @Singleton
@@ -32,7 +32,7 @@ class UpdateNewRulingsJob @Inject() (rulingService: RulingService) extends Sched
 
   override def jobName: String = "Update new rulings"
 
-  override def schedule: Either[Duration, LocalTime] = Left(Duration.ofMinutes(1L))
+  override def schedule: Either[Duration, LocalTime] = Right(LocalTime.of(2,0))
 
   override def execute(context: JobExecutionContext): Unit = {
     logger.info(s"Backend scheduler for updateNewRulingsJob started at${Instant.now}")
