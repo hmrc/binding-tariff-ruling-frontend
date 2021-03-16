@@ -26,7 +26,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.CaseStatus._
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{ApplicationType, Case, CaseStatus}
 import uk.gov.hmrc.bindingtariffrulingfrontend.metrics.HasMetrics
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged.format
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.{NoPagination, Paged, Pagination}
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{NoPagination, Paged, Pagination, SimplePagination}
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.pagination
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -46,7 +46,7 @@ class BindingTariffClassificationConnector @Inject() (
     .map(_.toString)
     .mkString(",")
 
-  private lazy val cancelStatus: String = COMPLETED.toString
+  private lazy val cancelStatus: String = CANCELLED.toString
 
   private def buildQueryUrl(
     types: Seq[ApplicationType] = Seq(ApplicationType.BTI),
@@ -71,25 +71,25 @@ class BindingTariffClassificationConnector @Inject() (
       client.GET[Option[Case]](url)
     }
 
-  def newApprovedRulings(minDecisionStart: Instant)(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
+  def newApprovedRulings(minDecisionStart: Instant, pagination: Pagination)(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
 
     val url = buildQueryUrl(
       statuses         = statuses,
       minDecisionStart = Some(minDecisionStart),
       minDecisionEnd   = None,
-      pagination       = NoPagination()
+      pagination       = pagination
     )
     client.GET[Paged[Case]](url)
 
   }
 
-  def newCanceledRulings(minDecisionEnd: Instant)(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
+  def newCanceledRulings(minDecisionEnd: Instant, pagination: Pagination)(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
 
     val url = buildQueryUrl(
       statuses         = cancelStatus,
       minDecisionStart = None,
       minDecisionEnd   = Some(minDecisionEnd),
-      pagination       = NoPagination()
+      pagination       = pagination
     )
     client.GET[Paged[Case]](url)
 

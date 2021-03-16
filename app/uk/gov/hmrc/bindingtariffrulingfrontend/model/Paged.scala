@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
+import akka.stream.scaladsl.Source
 import play.api.libs.json.{Format, JsArray, JsDefined, JsError, JsNumber, JsResult, JsSuccess, JsValue, Json, Reads, Writes}
 
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 /*
@@ -45,6 +47,16 @@ case class Paged[T](results: Seq[T], pageIndex: Int, pageSize: Int, resultCount:
 }
 
 object Paged {
+  def stream[T](initialPagination: Pagination)(fetchPage: Pagination => Future[Paged[T]])(implicit ec: ExecutionContext): Source[T, _] =
+    Source
+      .unfoldAsync(initialPagination) { pagination =>
+        fetchPage(pagination).map { page =>
+          if (page.isEmpty) None
+          else Some((pagination.withPage(pagination.pageIndex + 1), page))
+        }
+      }
+      .flatMapConcat(page => Source(page.results.toList))
+
   def empty[T]: Paged[T]                         = Paged(Seq.empty, 1, 0, 0)
   def empty[T](pagination: Pagination): Paged[T] = Paged(Seq.empty, pagination, 0)
   def apply[T](results: Seq[T], pagination: Pagination, resultCount: Int): Paged[T] =
