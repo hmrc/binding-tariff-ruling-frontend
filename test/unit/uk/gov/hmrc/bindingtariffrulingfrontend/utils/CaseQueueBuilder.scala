@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.utils
 
-import java.time.Instant
-
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType.ApplicationType
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.NoPagination
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.Pagination
+
+import java.time.Instant
 
 trait CaseQueueBuilder {
 
@@ -28,13 +28,14 @@ trait CaseQueueBuilder {
     types: Seq[ApplicationType] = Seq(ApplicationType.BTI),
     statuses: String,
     minDecisionStart: Option[Instant],
-    minDecisionEnd: Option[Instant]
-
+    minDecisionEnd: Option[Instant],
+    pagination: Pagination
   ): String = {
-    val sortBy = "application.type,application.status"
     val queryString = s"/cases?application_type=${types.map(_.toString).mkString(",")}&status=$statuses" +
-      s"&min_decision_start=$minDecisionStart&min_decision_end=$minDecisionEnd&sort_by=$sortBy&sort_direction=desc&" +
-      s"pagination=${NoPagination()}"
+      minDecisionStart.map(decisionStart => s"&min_decision_start=$decisionStart").getOrElse("") +
+      minDecisionEnd.map(decisionEnd => s"&min_decision_end=$decisionEnd").getOrElse("") +
+      s"&page=${pagination.pageIndex}" +
+      s"&page_size=${pagination.pageSize}"
     queryString
   }
 

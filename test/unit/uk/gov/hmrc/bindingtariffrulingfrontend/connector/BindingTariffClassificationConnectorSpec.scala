@@ -16,9 +16,6 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import java.time.temporal.ChronoUnit
-import java.time.{Instant, LocalDate, ZoneOffset}
-
 import akka.actor.ActorSystem
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.apache.http.HttpStatus
@@ -29,11 +26,13 @@ import play.api.libs.ws.WSClient
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{NoPagination, Paged, SimplePagination}
 import uk.gov.hmrc.bindingtariffrulingfrontend.utils.CaseQueueBuilder
 import uk.gov.hmrc.bindingtariffrulingfrontend.{TestMetrics, WiremockTestServer}
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 
+import java.time.temporal.ChronoUnit
+import java.time.{Instant, LocalDate, ZoneOffset}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTestServer with CaseQueueBuilder {
@@ -128,7 +127,8 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
         types            = Seq(ApplicationType.BTI),
         statuses         = "COMPLETED,ANNULLED",
         minDecisionStart = Some(LocalDate.now().atStartOfDay().minusHours(12).toInstant(ZoneOffset.UTC)),
-        minDecisionEnd   = None
+        minDecisionEnd   = None,
+        pagination       = SimplePagination()
       )
 
       val responseJSON = Json.toJson(Paged(Seq(validCase))).toString()
@@ -142,7 +142,7 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
           )
       )
 
-      await(connector.newApprovedRulings(startDate)) shouldBe Paged(Seq(validCase))
+      await(connector.newApprovedRulings(startDate, SimplePagination())) shouldBe Paged(Seq(validCase))
 
       verify(
         getRequestedFor(urlEqualTo(url))
@@ -156,7 +156,8 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
         types            = Seq(ApplicationType.BTI),
         statuses         = "COMPLETED,ANNULLED",
         minDecisionStart = Some(LocalDate.now().atStartOfDay().minusHours(12).toInstant(ZoneOffset.UTC)),
-        minDecisionEnd   = None
+        minDecisionEnd   = None,
+        pagination       = SimplePagination()
       )
 
       stubFor(
@@ -168,7 +169,7 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
           )
       )
 
-      await(connector.newApprovedRulings(startDate)) shouldBe Paged.empty[Case]
+      await(connector.newApprovedRulings(startDate, SimplePagination())) shouldBe Paged.empty[Case]
 
       verify(
         getRequestedFor(urlEqualTo(url))

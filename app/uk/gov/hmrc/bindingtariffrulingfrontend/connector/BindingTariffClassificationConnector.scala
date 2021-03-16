@@ -16,21 +16,19 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import java.time.Instant
 import com.kenshoo.play.metrics.Metrics
-
-import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType.ApplicationType
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.CaseStatus._
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{ApplicationType, Case, CaseStatus}
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{ApplicationType, Case}
 import uk.gov.hmrc.bindingtariffrulingfrontend.metrics.HasMetrics
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged.format
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.{NoPagination, Paged, Pagination, SimplePagination}
-import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.pagination
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpReads.Implicits._
 
+import java.time.Instant
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

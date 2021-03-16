@@ -26,7 +26,6 @@ import play.api.Logging
 import play.api.inject.ApplicationLifecycle
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
