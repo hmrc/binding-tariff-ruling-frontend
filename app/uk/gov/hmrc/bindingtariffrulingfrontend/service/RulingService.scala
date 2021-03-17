@@ -71,7 +71,7 @@ class RulingService @Inject() (
       }
       .runWith(Sink.ignore)
 
-  def updateCancelledRulings(minDecisionEnd: Instant)(implicit hc: HeaderCarrier) =
+  def updateCancelledRulings(minDecisionEnd: Instant)(implicit hc: HeaderCarrier): Future[Done] =
     Paged
       .stream(StreamPagination)(pagination =>
         bindingTariffClassificationConnector.newCanceledRulings(minDecisionEnd, pagination)

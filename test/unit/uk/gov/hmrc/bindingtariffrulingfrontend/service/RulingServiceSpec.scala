@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
-import java.time.Instant
+import java.time.{Instant, LocalDate, ZoneOffset}
 import java.time.temporal.ChronoUnit
 
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers._
+import org.mockito.ArgumentMatchers.{refEq, _}
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
@@ -31,8 +31,9 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import scala.collection.immutable.ListMap
@@ -308,6 +309,36 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       verifyZeroInteractions(auditService)
     }
 
+
+    "Service updateNewRulings" should {
+      "refresh ruling with reference and update it" in {
+
+        val expectedRuling = Ruling(
+          validCase.reference,
+          validCase.decision.get.bindingCommodityCode,
+          startDate,
+          endDate,
+          validCase.decision.get.justification,
+          validCase.decision.get.goodsDescription,
+          validCase.keywords,
+          Seq(publicAttachment.id),
+          Seq(publicImage.id)
+        )
+
+        given(repository.get("ref")) willReturn Future.successful(None)
+        given(connector.get("ref")) willReturn Future.successful(Some(validCase))
+        given(fileStoreService.get(attachments.map(_.id))).willReturn(fileMetadata)
+        given(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier])).willReturn (Paged(Seq(validCase)))
+        given(repository.update(any[Ruling], any[Boolean])) will returnTheRuling
+
+        await(service.refresh("ref")) shouldBe ((): Unit)
+
+        theRulingUpdated shouldBe expectedRuling
+
+      }
+    }
+
+
     def theRulingUpdated: Ruling = {
       val captor = ArgumentCaptor.forClass(classOf[Ruling])
       verify(repository).update(captor.capture(), anyBoolean())
@@ -319,5 +350,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     }
 
   }
+
+
 
 }
