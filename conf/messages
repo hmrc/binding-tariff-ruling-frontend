@@ -14,6 +14,7 @@ site.notfound.title = Page not found
 site.notfound.checkcorrect = If you typed the web address, check it is correct.
 site.notfound.checkcomplete = If you pasted the web address, check you copied the entire address.
 
+search.title = Search results for {0}
 search.heading = Search for Advance Tariff Rulings
 search.hint = You can search using a combination of words, commodity codes and reference numbers.
 search.form.submit = Search
@@ -38,7 +39,7 @@ search.results.ruling.commodityCode.newTab = (opens in new tab)
 search.results.ruling.view = View ruling {0}
 search.results.ruling.expiryDate = Expiry date
 
-ruling.title = Information for ruling
+ruling.title = Information for ruling {0}
 ruling.heading = Information for ruling {0}
 ruling.startDate = Start date
 ruling.expiryDate = Expiry date

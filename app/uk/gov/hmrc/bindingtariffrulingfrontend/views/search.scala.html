@@ -34,7 +34,7 @@
   fileMetadata: Map[String, FileMetadata] = Map.empty
 )(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@mainTemplate(title = None) {
+@mainTemplate(title = form("query").value.map(v=>messages("search.title", v))) {
 
   @errorSummary(form)
 
