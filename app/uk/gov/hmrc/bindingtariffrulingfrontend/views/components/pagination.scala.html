@@ -23,7 +23,7 @@
 )(implicit messages: Messages)
 
 @if(pager.pageCount > 1) {
-  <nav class="moj-pagination mt-2" id="pagination-label">
+  <nav class="moj-pagination mt-2" id="page-pagination" aria-label="Pagination">
     <p class="govuk-visually-hidden" aria-labelledby="pagination-label">Pagination navigation</p>
 
     <ul class="moj-pagination__list">
@@ -38,12 +38,12 @@
       @for(pageIndex <- PaginationUtil.surroundingPages(pager.pageIndex, pager.pageCount, 5)) {
         @if(pageIndex == pager.pageIndex) {
           <li id="@id-page_current" class="moj-pagination__item moj-pagination__item--active">
-            <span class="govuk-visually-hidden">Current page </span>@pageIndex
+              <span aria-current="page">@pageIndex</span>
           </li>
         } else {
           <li id="@id-page_@pageIndex" class="moj-pagination__item">
-            <a class="moj-pagination__link" href="@onChange(pageIndex)">
-              <span class="govuk-visually-hidden">Page </span>@pageIndex
+            <a class="moj-pagination__link" aria-describedby="page-pagination" href="@onChange(pageIndex)">
+              @pageIndex
             </a>
           </li>
         }
@@ -51,8 +51,8 @@
 
       @if(pager.pageIndex < pager.pageCount) {
         <li id="@id-page_next" class="moj-pagination__item  moj-pagination__item--next">
-          <a href="@onChange(pager.pageIndex + 1)" class="moj-pagination__link" href="">
-            Next<span class="govuk-visually-hidden"> page</span>
+          <a href="@onChange(pager.pageIndex + 1)" aria-describedby="page-pagination" class="moj-pagination__link" href="">
+            Next
           </a>
         </li>
       }
