@@ -310,35 +310,6 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     }
 
 
-    "Service updateNewRulings" should {
-      "refresh ruling with reference and update it" in {
-
-        val expectedRuling = Ruling(
-          validCase.reference,
-          validCase.decision.get.bindingCommodityCode,
-          startDate,
-          endDate,
-          validCase.decision.get.justification,
-          validCase.decision.get.goodsDescription,
-          validCase.keywords,
-          Seq(publicAttachment.id),
-          Seq(publicImage.id)
-        )
-
-        given(repository.get("ref")) willReturn Future.successful(None)
-        given(connector.get("ref")) willReturn Future.successful(Some(validCase))
-        given(fileStoreService.get(attachments.map(_.id))).willReturn(fileMetadata)
-        given(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier])).willReturn (Paged(Seq(validCase)))
-        given(repository.update(any[Ruling], any[Boolean])) will returnTheRuling
-
-        await(service.refresh("ref")) shouldBe ((): Unit)
-
-        theRulingUpdated shouldBe expectedRuling
-
-      }
-    }
-
-
     def theRulingUpdated: Ruling = {
       val captor = ArgumentCaptor.forClass(classOf[Ruling])
       verify(repository).update(captor.capture(), anyBoolean())

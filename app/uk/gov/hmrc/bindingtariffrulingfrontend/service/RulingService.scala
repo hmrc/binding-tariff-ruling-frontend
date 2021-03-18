@@ -16,36 +16,25 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
-import akka.Done
-import akka.stream.Materializer
-import akka.stream.scaladsl.Sink
 import play.api.Logging
 import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditService
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination, Ruling, SimplePagination}
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.Instant
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.concurrent.duration._
 
 class RulingService @Inject() (
   repository: RulingRepository,
   auditService: AuditService,
   fileStoreService: FileStoreService,
   bindingTariffClassificationConnector: BindingTariffClassificationConnector
-)(implicit mat: Materializer)
-    extends Logging {
-
-  val StreamPageSize               = 1000
-  val StreamPagination: Pagination = SimplePagination(pageSize = StreamPageSize)
-  val LocalDateFormatter           = DateTimeFormatter.ISO_LOCAL_DATE
+) extends Logging {
 
   def delete(reference: String): Future[Unit] =
     repository.delete(reference)
@@ -58,30 +47,6 @@ class RulingService @Inject() (
 
   def get(query: SimpleSearch): Future[Paged[Ruling]] =
     repository.get(query)
-
-  def updateNewRulings(minDecisionStart: Instant)(implicit hc: HeaderCarrier): Future[Done] =
-    Paged
-      .stream(StreamPagination)(pagination =>
-        bindingTariffClassificationConnector.newApprovedRulings(minDecisionStart, pagination)
-      )
-      .throttle(10, 1.second)
-      .mapAsync(1) { c =>
-        logger.info(s"Refreshing ruling with reference: ${c.reference}")
-        refresh(c.reference, Some(c))
-      }
-      .runWith(Sink.ignore)
-
-  def updateCancelledRulings(minDecisionEnd: Instant)(implicit hc: HeaderCarrier): Future[Done] =
-    Paged
-      .stream(StreamPagination)(pagination =>
-        bindingTariffClassificationConnector.newCanceledRulings(minDecisionEnd, pagination)
-      )
-      .throttle(10, 1.second)
-      .mapAsync(1) { c =>
-        logger.info(s"Refreshing cancelled ruling with reference: ${c.reference}")
-        refresh(c.reference, Some(c))
-      }
-      .runWith(Sink.ignore)
 
   def refresh(reference: String)(implicit hc: HeaderCarrier): Future[Unit] =
     bindingTariffClassificationConnector.get(reference).flatMap(refresh(reference, _))

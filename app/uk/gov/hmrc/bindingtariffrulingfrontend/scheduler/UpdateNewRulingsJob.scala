@@ -19,24 +19,24 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.scheduler
 import com.google.inject.Inject
 import org.quartz.JobExecutionContext
 import play.api.Logging
-import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
+import uk.gov.hmrc.bindingtariffrulingfrontend.workers.RulingsWorker
 import uk.gov.hmrc.http.HeaderCarrier
+
 import java.time.temporal.ChronoUnit
 import java.time.{Duration, Instant, LocalTime}
-
 import javax.inject.Singleton
 
 @Singleton
-class UpdateNewRulingsJob @Inject() (rulingService: RulingService) extends ScheduledJob with Logging {
+class UpdateNewRulingsJob @Inject() (rulingsWorker: RulingsWorker) extends ScheduledJob with Logging {
   private implicit val headers: HeaderCarrier = HeaderCarrier()
 
   override def jobName: String = "Update new rulings"
 
-  override def schedule: Either[Duration, LocalTime] = Right(LocalTime.of(2,0))
+  override def schedule: Either[Duration, LocalTime] = Right(LocalTime.of(2, 0))
 
   override def execute(context: JobExecutionContext): Unit = {
     logger.info(s"Backend scheduler for updateNewRulingsJob started at${Instant.now}")
 
-    rulingService.updateNewRulings(Instant.now().minus(12, ChronoUnit.HOURS))
+    rulingsWorker.updateNewRulings(Instant.now().minus(12, ChronoUnit.HOURS))
   }
 }

@@ -20,12 +20,14 @@ import javax.inject.{Inject, Provider}
 import play.api.inject.Binding
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.bindingtariffrulingfrontend.scheduler.{BackendScheduler, ScheduledJobs, UpdateCanceledRulingsJob, UpdateNewRulingsJob}
+import uk.gov.hmrc.bindingtariffrulingfrontend.workers.RulingsWorker
 
 class Module extends play.api.inject.Module {
 
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = Seq(
     bind[ScheduledJobs].toProvider[ScheduledJobProvider],
-    bind[BackendScheduler].toSelf.eagerly()
+    bind[BackendScheduler].toSelf.eagerly(),
+    bind[RulingsWorker].toSelf.eagerly()
   )
 
 }

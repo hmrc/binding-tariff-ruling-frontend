@@ -1,0 +1,151 @@
+/*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.bindingtariffrulingfrontend.workers
+
+import com.kenshoo.play.metrics.Metrics
+import org.joda.time.Duration
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers._
+import org.mockito.BDDMockito._
+import org.mockito.Mockito.{reset, verify}
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
+import org.scalatest.BeforeAndAfterAll
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination, Ruling, SimplePagination}
+import uk.gov.hmrc.bindingtariffrulingfrontend.repository.{LockRepoProvider, RulingRepository}
+import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
+import uk.gov.hmrc.bindingtariffrulingfrontend.{TestMetrics, UnitSpec}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lock.LockRepository
+import uk.gov.hmrc.mongo.MongoSpecSupport
+
+import java.time.{Clock, Instant, LocalDate, ZoneOffset}
+import scala.concurrent.Future
+
+class RulingsWorkerSpec extends UnitSpec with MockitoSugar with BeforeAndAfterAll with MongoSpecSupport { self =>
+
+  private val now              = Instant.now()
+  private val rulingService    = mock[RulingService]
+  private val connector        = mock[BindingTariffClassificationConnector]
+  private val appConfig        = mock[AppConfig]
+  private val lockRepo         = mock[LockRepository]
+  private val repository       = mock[RulingRepository]
+  private val fileStoreService = mock[FileStoreService]
+
+  val lockRepoProvider = new LockRepoProvider {
+    def repo = () => lockRepo
+  }
+
+  val configuredApp: GuiceApplicationBuilder => GuiceApplicationBuilder =
+    _.configure(
+      "metrics.jvm"     -> false,
+      "metrics.enabled" -> false
+    ).overrides(
+      bind[Metrics].to(new TestMetrics),
+      bind[AppConfig].to(appConfig),
+      bind[LockRepoProvider].to(lockRepoProvider),
+      bind[BindingTariffClassificationConnector].to(connector),
+      bind[RulingService].to(rulingService)
+    )
+
+  val StreamPageSize         = 50
+  val pagination: Pagination = SimplePagination(pageSize = StreamPageSize)
+
+  val startDate        = LocalDate.of(2017, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+  val endDate          = LocalDate.of(2020, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+  val validDecision    = Decision("code", Some(startDate), Some(endDate), "justification", "description")
+  val publicAttachment = Attachment("file-id", public = true, shouldPublishToRulings = true)
+  val validCase: Case = Case(
+    reference   = "ref",
+    status      = CaseStatus.CANCELLED,
+    application = Application(`type` = ApplicationType.BTI),
+    decision    = Some(validDecision),
+    attachments = Seq(publicAttachment),
+    keywords    = Set("keyword")
+  )
+
+  val pagedCases = Paged(
+    results =
+      Seq(validCase.copy(reference = "ref1"), validCase.copy(reference = "ref2"), validCase.copy(reference = "ref3")),
+    pagination  = pagination,
+    resultCount = 3
+  )
+
+  override protected def beforeAll(): Unit = {
+    given(lockRepo.renew(any[String], any[String], any[Duration]))
+      .willReturn(Future.successful(true))
+    given(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
+      .willReturn(Future.successful(pagedCases))
+  }
+
+  val minDecisionStart = LocalDate.now().atStartOfDay().minusHours(12).toInstant(ZoneOffset.UTC)
+
+  "updateNewRulings" should {
+    "refresh ruling with reference and update it" in {
+
+      val expectedRuling = Ruling(
+        validCase.reference,
+        validCase.decision.get.bindingCommodityCode,
+        startDate,
+        endDate,
+        validCase.decision.get.justification,
+        validCase.decision.get.goodsDescription,
+        validCase.keywords,
+        Seq(publicAttachment.id)
+      )
+
+      given(repository.get("ref")) willReturn Future.successful(None)
+      given(connector.get("ref")(any[HeaderCarrier])) willReturn Future.successful(Some(validCase))
+      given(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
+        .willReturn(Paged(Seq(validCase)))
+      given(repository.update(any[Ruling], any[Boolean])) will returnTheRuling
+
+      await(rulingService.refresh("ref")(any[HeaderCarrier])) shouldBe ((): Unit)
+
+      theRulingUpdated shouldBe expectedRuling
+
+    }
+  }
+
+  "RulingsWorker" should {
+    "Acquire lock and updateNewRulings" in {
+      Helpers.running(configuredApp) { app =>
+        await(app.injector.instanceOf[RulingsWorker].updateNewRulings(minDecisionStart)(any[HeaderCarrier]))
+        verify(rulingService).refresh(refEq("ref1"))(any[HeaderCarrier])
+        verify(rulingService).refresh(refEq("ref2"))(any[HeaderCarrier])
+        verify(rulingService).refresh(refEq("ref3"))(any[HeaderCarrier])
+      }
+    }
+  }
+
+  def theRulingUpdated: Ruling = {
+    val captor = ArgumentCaptor.forClass(classOf[Ruling])
+    verify(repository).update(captor.capture(), anyBoolean())
+    captor.getValue
+  }
+
+  def returnTheRuling: Answer[Future[Ruling]] = new Answer[Future[Ruling]] {
+    override def answer(invocation: InvocationOnMock): Future[Ruling] = Future.successful(invocation.getArgument(0))
+  }
+}
