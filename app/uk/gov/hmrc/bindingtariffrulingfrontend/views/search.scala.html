@@ -39,6 +39,7 @@
   @errorSummary(form)
 
   @helper.form(action = routes.SearchController.get()) {
+@helper.CSRF.formField
     @searchInput(form)
   }
 
