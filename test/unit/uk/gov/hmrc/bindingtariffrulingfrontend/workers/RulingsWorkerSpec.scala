@@ -16,49 +16,34 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.workers
 
-import com.kenshoo.play.metrics.Metrics
 import org.joda.time.Duration
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
-import org.mockito.Mockito.{reset, verify}
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 import org.scalatest.BeforeAndAfterAll
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination, Ruling, SimplePagination}
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination, SimplePagination}
 import uk.gov.hmrc.bindingtariffrulingfrontend.repository.{LockRepoProvider, RulingRepository}
-import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
-import uk.gov.hmrc.bindingtariffrulingfrontend.{TestMetrics, UnitSpec}
+import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lock.LockRepository
 import uk.gov.hmrc.mongo.MongoSpecSupport
-import java.time.{Clock, Instant, LocalDate, ZoneOffset}
 
-import akka.Done
-import akka.actor.ActorSystem
-import akka.stream.Materializer
-import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
-
+import java.time.{Instant, LocalDate, ZoneOffset}
 import scala.concurrent.Future
 
 class RulingsWorkerSpec extends BaseSpec with MockitoSugar with BeforeAndAfterAll with MongoSpecSupport { self =>
 
-  private val now              = Instant.now()
-  private val rulingService    = mock[RulingService]
-  private val connector        = mock[BindingTariffClassificationConnector]
-  private val appConfig        = mock[AppConfig]
-  private val lockRepo         = mock[LockRepository]
-  private val repository       = mock[RulingRepository]
-  private val fileStoreService = mock[FileStoreService]
-
-
+  private val rulingService = mock[RulingService]
+  private val connector     = mock[BindingTariffClassificationConnector]
+  private val appConfig     = mock[AppConfig]
+  private val lockRepo      = mock[LockRepository]
+  private val repository    = mock[RulingRepository]
 
   val lockRepoProvider = new LockRepoProvider {
     def repo = () => lockRepo
@@ -69,15 +54,13 @@ class RulingsWorkerSpec extends BaseSpec with MockitoSugar with BeforeAndAfterAl
       "metrics.jvm"     -> false,
       "metrics.enabled" -> false
     ).overrides(
-      bind[Metrics].to(new TestMetrics),
       bind[AppConfig].to(appConfig),
       bind[LockRepoProvider].to(lockRepoProvider),
       bind[BindingTariffClassificationConnector].to(connector),
       bind[RulingService].to(rulingService)
     )
 
-
-  val rulingWorker: RulingsWorker = new RulingsWorker(appConfig,lockRepoProvider,connector,rulingService)(ac,mat)
+  val rulingWorker: RulingsWorker = new RulingsWorker(appConfig, lockRepoProvider, connector, rulingService)(ac, mat)
 
   val StreamPageSize         = 50
   val pagination: Pagination = SimplePagination(pageSize = StreamPageSize)
@@ -113,27 +96,12 @@ class RulingsWorkerSpec extends BaseSpec with MockitoSugar with BeforeAndAfterAl
 
   "updateNewRulings" should {
     "refresh ruling with reference and update it" in {
-
-      val expectedRuling = Ruling(
-        validCase.reference,
-        validCase.decision.get.bindingCommodityCode,
-        startDate,
-        endDate,
-        validCase.decision.get.justification,
-        validCase.decision.get.goodsDescription,
-        validCase.keywords,
-        Seq(publicAttachment.id)
-      )
-
-      given(repository.get("ref")) willReturn Future.successful(None)
-      given(connector.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(Some(validCase))
+      given(lockRepo.renew(any[String], any[String], any[Duration]))
+        .willReturn(Future.successful(false))
       given(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-        .willReturn(Paged(Seq(validCase)))
-      given(rulingService.refresh(any[String])(any[HeaderCarrier])) willReturn((): Unit)
+        .willReturn(pagedCases)
 
-//      await(rulingWorker.updateNewRulings(startDate)) shouldBe((): Done)
-
-
+      //await(rulingWorker.updateNewRulings(any[Instant]) shouldBe ((): Unit))
     }
   }
 

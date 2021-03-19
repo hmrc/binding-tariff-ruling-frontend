@@ -19,7 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.workers
 import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
-import akka.stream.{Materializer, Supervision}
+import akka.stream.{ActorAttributes, Materializer, Supervision}
 import org.joda.time.Duration
 import play.api.Logging
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
@@ -61,7 +61,7 @@ class RulingsWorker @Inject() (
 
   val decider: Supervision.Decider = {
     case NonFatal(e) =>
-      logger.error("Skipping case migration due to error", e)
+      logger.error("Skipping RulingsWorker updates due to error", e)
       Supervision.resume
     case _ =>
       Supervision.stop
@@ -73,26 +73,28 @@ class RulingsWorker @Inject() (
         bindingTariffClassificationConnector.newApprovedRulings(minDecisionStart, pagination)
       )
       .throttle(10, 1.second)
-      .mapAsync(1) { c =>
+      .mapAsync(Runtime.getRuntime().availableProcessors()) { c =>
         logger.info(s"Refreshing ruling with reference: ${c.reference}")
         tryToAcquireOrRenewLock {
           rulingService.refresh(c.reference, Some(c))
         }
       }
+      .withAttributes(ActorAttributes.supervisionStrategy(decider))
       .runWith(Sink.ignore)
 
   def updateCancelledRulings(minDecisionEnd: Instant)(implicit hc: HeaderCarrier): Future[Done] =
     Paged
       .stream(StreamPagination)(pagination =>
         bindingTariffClassificationConnector.newCanceledRulings(minDecisionEnd, pagination)
-      )(ec)
+      )
       .throttle(10, 1.second)
-      .mapAsync(1) { c =>
+      .mapAsync(Runtime.getRuntime().availableProcessors()) { c =>
         logger.info(s"Refreshing cancelled ruling with reference: ${c.reference}")
         tryToAcquireOrRenewLock {
           rulingService.refresh(c.reference, Some(c))
         }
       }
+      .withAttributes(ActorAttributes.supervisionStrategy(decider))
       .runWith(Sink.ignore)
 
 }
