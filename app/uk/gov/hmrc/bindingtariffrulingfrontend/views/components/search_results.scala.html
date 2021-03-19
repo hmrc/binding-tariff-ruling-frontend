@@ -22,6 +22,7 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.utils.{Dates, GlobalTariff}
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Value
 
 @this(
   govukSummaryList: GovukSummaryList,
@@ -29,6 +30,16 @@
 )
 
 @(search: Option[SimpleSearch], results: Paged[Ruling], fileMetadata: Map[String, FileMetadata])(implicit messages: Messages, appConfig: AppConfig)
+
+@keywordList(result: Ruling) = {
+<ul id="keyword-list" role="list" class="govuk-list govuk-list--inline">
+    @result.keywords.map { keyword =>
+    <li role="listitem">
+        <span class="govuk-tag govuk-tag--grey">@keyword</span>
+    </li>
+    }
+</ul>
+}
 
 @commodityCodeLink(result: Ruling) = {
   <a href="@GlobalTariff.link(result.bindingCommodityCode)" class="govuk-link" target="_blank">
@@ -59,9 +70,10 @@
 }
 
 @if(results.nonEmpty) {
-  <ol id="search_results-list" class="govuk-list border-top">
+  <ol role="list" id="search_results-list" class="govuk-list border-top">
     @for((result: Ruling, index: Int) <- results.results.zipWithIndex) {
-      <li id="search_results-list-@index" class="border-bottom">
+      <h3 class="heading-small">Ruling reference @result.reference</h3>
+      <li role="listitem" id="search_results-list-@index" class="border-bottom">
         @govukSummaryList(SummaryList(
           classes = "mt-1 govuk-summary-list--no-border",
           rows = Seq(
@@ -74,7 +86,7 @@
               Seq.empty
             else Seq(SummaryListRow(
               key = Key(Text(messages("search.results.ruling.keywords"))),
-              value = Value(HtmlContent(rulingKeywords(result)))
+              value = Value(HtmlContent(keywordList(result)))
             ))
           } ++ Seq(
             SummaryListRow(
