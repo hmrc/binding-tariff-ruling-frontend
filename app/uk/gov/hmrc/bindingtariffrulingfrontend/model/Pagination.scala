@@ -19,11 +19,22 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.model
 trait Pagination {
   val pageIndex: Int
   val pageSize: Int
+  def withPage(page: Int) = this match {
+    case NoPagination(_, pageSize) =>
+      NoPagination(page, pageSize)
+    case SimplePagination(_, pageSize) =>
+      SimplePagination(page, pageSize)
+  }
 }
 
 // scalastyle:off magic.number
 case class SimplePagination(
   override val pageIndex: Int = 1,
   override val pageSize: Int  = 100
+) extends Pagination
+
+case class NoPagination(
+  override val pageIndex: Int = 1,
+  override val pageSize: Int  = Integer.MAX_VALUE
 ) extends Pagination
 // scalastyle:on magic.number

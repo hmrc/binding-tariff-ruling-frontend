@@ -16,16 +16,20 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import javax.inject.{Inject, Singleton}
+import com.kenshoo.play.metrics.Metrics
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.Case
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType.ApplicationType
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.CaseStatus._
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{ApplicationType, Case}
 import uk.gov.hmrc.bindingtariffrulingfrontend.metrics.HasMetrics
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged.format
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpReads.Implicits._
 
+import java.time.Instant
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.ExecutionContext
-import com.kenshoo.play.metrics.Metrics
 
 @Singleton
 class BindingTariffClassificationConnector @Inject() (
@@ -36,10 +40,54 @@ class BindingTariffClassificationConnector @Inject() (
   implicit ec: ExecutionContext
 ) extends HasMetrics {
 
+  private lazy val completedStatus: String = COMPLETED.toString
+
+  private lazy val cancelStatus: String = CANCELLED.toString
+
+  private def buildQueryUrl(
+    types: Seq[ApplicationType] = Seq(ApplicationType.BTI),
+    statuses: String,
+    minDecisionStart: Option[Instant],
+    minDecisionEnd: Option[Instant],
+    pagination: Pagination
+  ): String = {
+    val queryString =
+      s"application_type=${types.map(_.toString).mkString(",")}" +
+        s"&status=$statuses" +
+        minDecisionStart.map(decisionStart => s"&min_decision_start=$decisionStart").getOrElse("") +
+        minDecisionEnd.map(decisionEnd => s"&min_decision_end=$decisionEnd").getOrElse("") +
+        s"&page=${pagination.pageIndex}" +
+        s"&page_size=${pagination.pageSize}"
+    s"${appConfig.bindingTariffClassificationUrl}/cases?$queryString"
+  }
+
   def get(reference: String)(implicit hc: HeaderCarrier): Future[Option[Case]] =
     withMetricsTimerAsync("get-case") { _ =>
       val url = s"${appConfig.bindingTariffClassificationUrl}/cases/$reference"
       client.GET[Option[Case]](url)
     }
 
+  def newApprovedRulings(minDecisionStart: Instant, pagination: Pagination)(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
+
+    val url = buildQueryUrl(
+      statuses         = completedStatus,
+      minDecisionStart = Some(minDecisionStart),
+      minDecisionEnd   = None,
+      pagination       = pagination
+    )
+    client.GET[Paged[Case]](url)
+
+  }
+
+  def newCanceledRulings(minDecisionEnd: Instant, pagination: Pagination)(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
+
+    val url = buildQueryUrl(
+      statuses         = cancelStatus,
+      minDecisionStart = None,
+      minDecisionEnd   = Some(minDecisionEnd),
+      pagination       = pagination
+    )
+    client.GET[Paged[Case]](url)
+
+  }
 }

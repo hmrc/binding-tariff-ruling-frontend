@@ -16,25 +16,25 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
-import javax.inject.Inject
+import play.api.Logging
 import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditService
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{ApplicationType, Case, CaseStatus, Decision}
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 
 class RulingService @Inject() (
   repository: RulingRepository,
   auditService: AuditService,
   fileStoreService: FileStoreService,
   bindingTariffClassificationConnector: BindingTariffClassificationConnector
-) {
+) extends Logging {
 
   def delete(reference: String): Future[Unit] =
     repository.delete(reference)
@@ -48,7 +48,10 @@ class RulingService @Inject() (
   def get(query: SimpleSearch): Future[Paged[Ruling]] =
     repository.get(query)
 
-  def refresh(reference: String)(implicit hc: HeaderCarrier): Future[Unit] = {
+  def refresh(reference: String)(implicit hc: HeaderCarrier): Future[Unit] =
+    bindingTariffClassificationConnector.get(reference).flatMap(refresh(reference, _))
+
+  def refresh(reference: String, updatedCase: Option[Case])(implicit hc: HeaderCarrier): Future[Unit] = {
 
     type ExistingRuling = Option[Ruling]
     type UpdatedRuling  = Option[Ruling]
@@ -56,8 +59,6 @@ class RulingService @Inject() (
 
     val rulingUpdate: Future[RulingUpdate] = for {
       existingRuling: ExistingRuling <- repository.get(reference)
-
-      updatedCase: Option[Case] <- bindingTariffClassificationConnector.get(reference)
 
       validCase = updatedCase
         .filter(_.application.`type` == ApplicationType.BTI)
@@ -83,15 +84,21 @@ class RulingService @Inject() (
         for {
           _ <- repository.delete(reference)
           _ = auditService.auditRulingDeleted(reference)
+          _ = logger.info(s"Ruling has been deleted for case with reference: $reference")
+
         } yield ()
 
       case (None, Some(u)) =>
         for {
           _ <- repository.update(u, upsert = true)
           _ = auditService.auditRulingCreated(u)
+          _ = logger.info(s"Ruling has been created for case with reference: ${u.reference}")
         } yield ()
 
-      case (Some(_), Some(u)) => repository.update(u, upsert = false).map(_ => ())
+      case (Some(_), Some(u)) =>
+        repository.update(u, upsert = false).map { _ =>
+          logger.info(s"Ruling has been updated for case with reference: ${u.reference}")
+        }
 
       case _ => Future.successful(())
 
