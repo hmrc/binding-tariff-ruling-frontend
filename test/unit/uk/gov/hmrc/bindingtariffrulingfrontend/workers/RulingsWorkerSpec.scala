@@ -16,19 +16,19 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.workers
 
+import akka.Done
 import org.joda.time.Duration
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
+import org.mockito.Mockito.verify
 import org.scalatest.BeforeAndAfterAll
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination, SimplePagination}
-import uk.gov.hmrc.bindingtariffrulingfrontend.repository.{LockRepoProvider, RulingRepository}
+import uk.gov.hmrc.bindingtariffrulingfrontend.repository.LockRepoProvider
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lock.LockRepository
@@ -43,22 +43,10 @@ class RulingsWorkerSpec extends BaseSpec with MockitoSugar with BeforeAndAfterAl
   private val connector     = mock[BindingTariffClassificationConnector]
   private val appConfig     = mock[AppConfig]
   private val lockRepo      = mock[LockRepository]
-  private val repository    = mock[RulingRepository]
 
   val lockRepoProvider = new LockRepoProvider {
     def repo = () => lockRepo
   }
-
-  val configuredApp: GuiceApplicationBuilder => GuiceApplicationBuilder =
-    _.configure(
-      "metrics.jvm"     -> false,
-      "metrics.enabled" -> false
-    ).overrides(
-      bind[AppConfig].to(appConfig),
-      bind[LockRepoProvider].to(lockRepoProvider),
-      bind[BindingTariffClassificationConnector].to(connector),
-      bind[RulingService].to(rulingService)
-    )
 
   val rulingWorker: RulingsWorker = new RulingsWorker(appConfig, lockRepoProvider, connector, rulingService)(ac, mat)
 
@@ -78,42 +66,58 @@ class RulingsWorkerSpec extends BaseSpec with MockitoSugar with BeforeAndAfterAl
     keywords    = Set("keyword")
   )
 
-  val pagedCases = Paged(
+  val pagedNewCases = Paged(
     results =
       Seq(validCase.copy(reference = "ref1"), validCase.copy(reference = "ref2"), validCase.copy(reference = "ref3")),
     pagination  = pagination,
     resultCount = 3
   )
 
+  val pagedCanceledCases = Paged(
+    results     = Seq(validCase.copy(reference = "ref4"), validCase.copy(reference = "ref5")),
+    pagination  = pagination,
+    resultCount = 2
+  )
+
   override protected def beforeAll(): Unit = {
     given(lockRepo.renew(any[String], any[String], any[Duration]))
       .willReturn(Future.successful(true))
+    given(lockRepo.lock(any[String], any[String], any[Duration]))
+      .willReturn(Future.successful(true))
+    given(lockRepo.releaseLock(any[String], any[String]))
+      .willReturn(Future.successful(()))
     given(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-      .willReturn(Future.successful(pagedCases))
+      .willReturn(Future.successful(pagedNewCases))
+    given(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
+      .willReturn(Future.successful(pagedCanceledCases))
   }
-
-  val minDecisionStart = LocalDate.now().atStartOfDay().minusHours(12).toInstant(ZoneOffset.UTC)
 
   "updateNewRulings" should {
-    "refresh ruling with reference and update it" in {
-      given(lockRepo.renew(any[String], any[String], any[Duration]))
-        .willReturn(Future.successful(false))
+    "get new rulings from the backend and delegate to the RulingService" in {
       given(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-        .willReturn(pagedCases)
+        .willReturn(pagedNewCases)
+        .willReturn(Future.successful(Paged.empty[Case]))
+      given(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).willReturn(Future.successful(()))
 
-      //await(rulingWorker.updateNewRulings(any[Instant]) shouldBe ((): Unit))
+      await(rulingWorker.updateNewRulings(startDate)) shouldBe Done
+      verify(rulingService).refresh(refEq("ref1"), any[Some[Case]])(any[HeaderCarrier])
+      verify(rulingService).refresh(refEq("ref2"), any[Some[Case]])(any[HeaderCarrier])
+      verify(rulingService).refresh(refEq("ref3"), any[Some[Case]])(any[HeaderCarrier])
     }
+
   }
 
-//  "RulingsWorker" should {
-//    "Acquire lock and updateNewRulings" in {
-//      Helpers.running(configuredApp) { app =>
-//        await(app.injector.instanceOf[RulingsWorker].updateNewRulings(minDecisionStart)(any[HeaderCarrier]))
-//        verify(rulingService).refresh(refEq("ref1"))(any[HeaderCarrier])
-//        verify(rulingService).refresh(refEq("ref2"))(any[HeaderCarrier])
-//        verify(rulingService).refresh(refEq("ref3"))(any[HeaderCarrier])
-//      }
-//    }
-//  }
+  "updateCanceledRulings" should {
+    "get canceled rulings from the backend and delegate to the RulingService" in {
+      given(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
+        .willReturn(pagedCanceledCases)
+        .willReturn(Future.successful(Paged.empty[Case]))
+      given(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).willReturn(Future.successful(()))
+
+      await(rulingWorker.updateCancelledRulings(endDate)) shouldBe Done
+      verify(rulingService).refresh(refEq("ref4"), any[Some[Case]])(any[HeaderCarrier])
+      verify(rulingService).refresh(refEq("ref5"), any[Some[Case]])(any[HeaderCarrier])
+    }
+  }
 
 }
