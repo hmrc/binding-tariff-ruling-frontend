@@ -72,8 +72,9 @@
 @if(results.nonEmpty) {
   <ol role="list" id="search_results-list" class="govuk-list border-top">
     @for((result: Ruling, index: Int) <- results.results.zipWithIndex) {
-      <h3 class="heading-small">Ruling reference @result.reference</h3>
+
       <li role="listitem" id="search_results-list-@index" class="border-bottom">
+          <h3 class="heading-small">Ruling reference @result.reference</h3>
         @govukSummaryList(SummaryList(
           classes = "mt-1 govuk-summary-list--no-border",
           rows = Seq(
