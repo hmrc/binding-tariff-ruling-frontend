@@ -29,7 +29,7 @@
       @if(pager.pageIndex > 1) {
         <li id="@id-page_back" class="moj-pagination__item  moj-pagination__item--prev">
           <a href="@onChange(pager.pageIndex - 1)" class="moj-pagination__link" href="">
-            Previous<span class="govuk-visually-hidden"> page</span>
+            Previous<span class="govuk-visually-hidden"> set of pages</span>
           </a>
         </li>
       }
@@ -38,7 +38,7 @@
         @if(pageIndex == pager.pageIndex) {
           <li id="@id-page_current" class="moj-pagination__item moj-pagination__item--active">
               <span aria-current="page">@pageIndex</span>
-              <span class="govuk-visually-hidden">current page</span>
+              <span class="govuk-visually-hidden"> current page</span>
           </li>
         } else {
           <li id="@id-page_@pageIndex" class="moj-pagination__item">
@@ -52,7 +52,7 @@
       @if(pager.pageIndex < pager.pageCount) {
         <li id="@id-page_next" class="moj-pagination__item  moj-pagination__item--next">
           <a href="@onChange(pager.pageIndex + 1)" aria-describedby="page-pagination" class="moj-pagination__link" href="">
-            Next
+            Next<span class="govuk-visually-hidden"> set of pages</span>
           </a>
         </li>
       }

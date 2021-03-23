@@ -48,19 +48,23 @@
 }
 
 @rulingImages(result: Ruling) = {
+<ul id="image-list" role="list" class="govuk-list govuk-list--inline">
   @result.images.map { id =>
       @fileMetadata.get(id).map { meta =>
           @meta.fileName.map { fileName =>
               @meta.url.map { url =>
-                  <a href="@routes.ImageController.get(result.reference, id)">
-                      <img class="image-thumbnail" alt="@fileName" src="@url" />
-                  </a>
+                <li role="listitem">
+                      <a href="@routes.ImageController.get(result.reference, id)">
+                          <img class="image-thumbnail" alt="@fileName" src="@url" />
+                      </a>
+                </li>
               }
           }.getOrElse {
               HtmlFormat.empty
           }
       }
   }
+</ul>
 }
 
 @rulingKeywords(result: Ruling) = {
