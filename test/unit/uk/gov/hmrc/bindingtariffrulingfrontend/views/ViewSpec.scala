@@ -19,22 +19,11 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.i18n.{DefaultMessagesApi, Messages, MessagesApi}
-import play.api.mvc.AnyContentAsEmpty
 import play.api.test.{FakeRequest, Helpers}
 import play.twirl.api.Html
 import uk.gov.hmrc.bindingtariffrulingfrontend.UnitSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
-import play.api.mvc.{AnyContentAsEmpty, Result}
-import play.api.test.CSRFTokenHelper.CSRFFRequestHeader
-import play.api.test.FakeRequest
-import play.api.test.Helpers.LOCATION
-import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
-
-import scala.concurrent.Future
 
 abstract class ViewSpec extends UnitSpec with BaseSpec {
 
@@ -47,12 +36,6 @@ abstract class ViewSpec extends UnitSpec with BaseSpec {
   implicit val appConfig: AppConfig = realConfig
 
   implicit val fakeRequest  = FakeRequest()
-/*
-
-  protected def getRequestWithCSRF(uri: String = "/"): FakeRequest[AnyContentAsEmpty.type] =
-    FakeRequest("GET", uri).withCSRFToken.asInstanceOf[FakeRequest[AnyContentAsEmpty.type]]
-*/
-
 
   protected def view(html: Html): Document =
     Jsoup.parse(html.toString())
