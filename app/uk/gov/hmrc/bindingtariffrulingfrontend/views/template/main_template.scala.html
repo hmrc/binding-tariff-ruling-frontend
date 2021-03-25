@@ -51,19 +51,6 @@
   ))
 }
 
-@feedbackBanner = {
-  @messages("feedback.before")
-  <a class='govuk-link' href='@{appConfig.betaFeedbackUnauthenticatedUrl}'>@messages("feedback.link")</a>
-  @messages("feedback.after")
-}
-
-@beforeContentBlock = {
-  @govukPhaseBanner(PhaseBanner(
-    tag = Some(Tag(content = Text("beta"))),
-    content = HtmlContent(feedbackBanner)
-  ))
-}
-
 @contentBlock = {
   @content
   <div class="mt-2">
@@ -76,7 +63,6 @@
   pageTitle = Some(title.fold(messages("site.title.suffix"))(_ + " - " + messages("site.title.suffix"))),
   headBlock = Some(headBlock),
   headerBlock = headerBlock,
-  beforeContentBlock = Some(beforeContentBlock),
   bodyEndBlock = Some(scriptsBlock),
   mainClasses = Some("govuk-main-wrapper--auto-spacing"),
   footerBlock = hmrcStandardFooter()
