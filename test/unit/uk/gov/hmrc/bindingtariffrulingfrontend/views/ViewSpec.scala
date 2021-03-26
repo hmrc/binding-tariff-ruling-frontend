@@ -19,17 +19,23 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.i18n.{DefaultMessagesApi, Messages, MessagesApi}
-import play.api.test.Helpers
+import play.api.test.{FakeRequest, Helpers}
 import play.twirl.api.Html
 import uk.gov.hmrc.bindingtariffrulingfrontend.UnitSpec
+import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
-abstract class ViewSpec extends UnitSpec {
+abstract class ViewSpec extends UnitSpec with BaseSpec {
 
-  protected def testMessages: Map[String, Map[String, String]]
+  protected def testMessages: Map[String, Map[String, String]] = Map.empty
 
   lazy val messagesApi: MessagesApi = new DefaultMessagesApi(testMessages)
 
   implicit lazy val messages: Messages = Helpers.stubMessages(messagesApi)
+
+  implicit val appConfig: AppConfig = realConfig
+
+  implicit val fakeRequest  = FakeRequest()
 
   protected def view(html: Html): Document =
     Jsoup.parse(html.toString())
