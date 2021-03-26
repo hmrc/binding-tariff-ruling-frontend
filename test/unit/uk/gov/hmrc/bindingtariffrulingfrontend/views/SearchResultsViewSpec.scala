@@ -86,6 +86,7 @@ class SearchResultsViewSpec extends ViewSpec {
 
       val doc = view(searchResultsView(None, pagedRuling, fileMetaData))
 
+      
       doc.text() should include(s"Images")
       doc.getElementById("search_results-list-0") should containElementWithAttribute(
         "href",
