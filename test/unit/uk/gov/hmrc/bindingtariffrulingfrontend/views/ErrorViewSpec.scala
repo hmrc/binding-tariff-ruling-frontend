@@ -20,8 +20,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.error
 class ErrorViewSpec extends ViewSpec {
 
   val errorPage: error = app.injector.instanceOf[error]
-
-
+  
   "Error View" should {
     "render error page with correct text" in {
 
