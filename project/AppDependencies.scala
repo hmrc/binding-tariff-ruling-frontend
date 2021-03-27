@@ -30,7 +30,7 @@ object AppDependencies {
     "org.scalatestplus.play" %% "scalatestplus-play"       % "3.1.3"          % scope,
     "org.scalacheck"         %% "scalacheck"               % "1.14.3"         % scope,
     "uk.gov.hmrc"            %% "http-verbs-test"          % "1.8.0-play-27"  % scope,
-    "uk.gov.hmrc"            %% "service-integration-test" % "0.13.0-play-27" % scope,
+    "uk.gov.hmrc"            %% "service-integration-test" % "1.1.0-play-28" % scope,
     "uk.gov.hmrc"            %% "reactivemongo-test"       % "4.22.0-play-27" % scope,
     //Need to peg this version of jetty to prevent binary compatibility errors
     "org.eclipse.jetty" % "jetty-server"  % jettyVersion % scope,
