@@ -20,7 +20,7 @@ lazy val microservice = (project in file("."))
   .settings(PlayKeys.playDefaultPort := 9586)
   .settings(
     name := appName,
-    scalaVersion := "2.12.12",
+    scalaVersion := "2.12.13",
     targetJvm := "jvm-1.8",
     libraryDependencies ++= (AppDependencies.compile ++ AppDependencies.test).map(_ withSources ()),
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
