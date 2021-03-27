@@ -43,6 +43,12 @@ Open `http://localhost:9586/search-for-advance-tariff-rulings`.
 
 You can also run the `DIGITAL_TARIFFS` profile using `sm --start DIGITAL_TARIFFS -r` and then stop the Service Manager instance of this service using `sm --stop BINDING_TARIFF_RULING_FRONTEND` before running with sbt.
 
+### Testing
+
+Run `./run_all_tests.sh`. This also runs Scalastyle and does coverage testing.
+
+or `sbt test it:test` to run the tests only.
+
 ##### Populating data
 
 Rulings that have been granted are stored in the backend service  [binding-tariff-classification](https://github.com/hmrc/binding-tariff-classification). When a case is completed with a decision to grant a ruling or when a ruling is cancelled early, the [tariff-classification-frontend](https://github.com/hmrc/tariff-classification-frontend) notifies this service, which prompts the service to refresh the ruling data for that case.
