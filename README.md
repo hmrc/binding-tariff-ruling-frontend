@@ -35,7 +35,7 @@ The easiest way to run MongoDB and Localstack for local development is to use [D
 2) Start the backend service using `sm --start BINDING_TARIFF_CLASSIFICATION -r`
 3) Start the filestore service using `sm --start BINDING_TARIFF_FILESTORE -r`
 
-Use `sbt run` to boot the app.
+Use `sbt run` to boot the app or run it with Service Manager using `sm --start BINDING_TARIFF_RULING_FRONTEND -r`.
 
 This application runs on port 9586.
 
