@@ -28,7 +28,7 @@ object AppDependencies {
     "org.pegdown"            % "pegdown"                   % "1.6.0"          % scope,
     "org.scalatest"          %% "scalatest"                % "3.0.9"          % scope,
     "org.scalatestplus.play" %% "scalatestplus-play"       % "3.1.3"          % scope,
-    "org.scalacheck"         %% "scalacheck"               % "1.14.3"         % scope,
+    "org.scalacheck"         %% "scalacheck"               % "1.15.3"         % scope,
     "uk.gov.hmrc"            %% "http-verbs-test"          % "1.8.0-play-27"  % scope,
     "uk.gov.hmrc"            %% "service-integration-test" % "0.13.0-play-27" % scope,
     "uk.gov.hmrc"            %% "reactivemongo-test"       % "4.22.0-play-27" % scope,
