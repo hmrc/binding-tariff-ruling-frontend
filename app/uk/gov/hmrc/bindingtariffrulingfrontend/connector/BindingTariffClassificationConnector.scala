@@ -67,27 +67,29 @@ class BindingTariffClassificationConnector @Inject() (
       client.GET[Option[Case]](url)
     }
 
-  def newApprovedRulings(minDecisionStart: Instant, pagination: Pagination)(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
+  def newApprovedRulings(minDecisionStart: Instant, pagination: Pagination)(
+    implicit hc: HeaderCarrier
+  ): Future[Paged[Case]] =
+    withMetricsTimerAsync("get-new-approved-rulings") { _ =>
+      val url = buildQueryUrl(
+        statuses         = completedStatus,
+        minDecisionStart = Some(minDecisionStart),
+        minDecisionEnd   = None,
+        pagination       = pagination
+      )
+      client.GET[Paged[Case]](url)
+    }
 
-    val url = buildQueryUrl(
-      statuses         = completedStatus,
-      minDecisionStart = Some(minDecisionStart),
-      minDecisionEnd   = None,
-      pagination       = pagination
-    )
-    client.GET[Paged[Case]](url)
-
-  }
-
-  def newCanceledRulings(minDecisionEnd: Instant, pagination: Pagination)(implicit hc: HeaderCarrier): Future[Paged[Case]] = {
-
-    val url = buildQueryUrl(
-      statuses         = cancelStatus,
-      minDecisionStart = None,
-      minDecisionEnd   = Some(minDecisionEnd),
-      pagination       = pagination
-    )
-    client.GET[Paged[Case]](url)
-
-  }
+  def newCanceledRulings(minDecisionEnd: Instant, pagination: Pagination)(
+    implicit hc: HeaderCarrier
+  ): Future[Paged[Case]] =
+    withMetricsTimerAsync("get-new-cancelled-rulings") { _ =>
+      val url = buildQueryUrl(
+        statuses         = cancelStatus,
+        minDecisionStart = None,
+        minDecisionEnd   = Some(minDecisionEnd),
+        pagination       = pagination
+      )
+      client.GET[Paged[Case]](url)
+    }
 }
