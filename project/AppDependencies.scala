@@ -18,7 +18,7 @@ object AppDependencies {
 
   val scope = "test"
 
-  val jettyVersion = "9.4.27.v20200227"
+  val jettyVersion = "9.4.39.v20210325"
 
   val test = Seq(
     "com.github.tomakehurst" % "wiremock"                  % "2.27.2"         % scope,
