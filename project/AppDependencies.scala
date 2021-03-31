@@ -8,7 +8,7 @@ object AppDependencies {
     "uk.gov.hmrc"          %% "simple-reactivemongo"       % "7.31.0-play-27",
     "uk.gov.hmrc"          %% "play-json-union-formatter"  % "1.12.0-play-27",
     "uk.gov.hmrc"          %% "play-allowlist-filter"      % "0.2.0-play-27",
-    "uk.gov.hmrc"          %% "play-frontend-govuk"        % "0.56.0-play-27",
+    "uk.gov.hmrc"          %% "play-frontend-govuk"        % "0.69.0-play-27",
     "uk.gov.hmrc"          %% "play-frontend-hmrc"         % "0.34.0-play-27",
     "uk.gov.hmrc"          %% "mongo-lock"                 % "7.0.0-play-27",
     "org.typelevel"        %% "cats-core"                  % "2.2.0",
