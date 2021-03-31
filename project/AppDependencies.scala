@@ -11,7 +11,7 @@ object AppDependencies {
     "uk.gov.hmrc"          %% "play-frontend-govuk"        % "0.56.0-play-27",
     "uk.gov.hmrc"          %% "play-frontend-hmrc"         % "0.34.0-play-27",
     "uk.gov.hmrc"          %% "mongo-lock"                 % "7.0.0-play-27",
-    "org.typelevel"        %% "cats-core"                  % "2.2.0",
+    "org.typelevel"        %% "cats-core"                  % "2.5.0",
     "com.digitaltangible"  %% "play-guard"                 % "2.4.0",
     "org.quartz-scheduler" % "quartz"                      % "2.3.2"
   )
