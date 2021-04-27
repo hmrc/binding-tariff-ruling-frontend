@@ -1,12 +1,11 @@
 import sbt.Keys.name
 import uk.gov.hmrc.DefaultBuildSettings._
-import uk.gov.hmrc.SbtArtifactory
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "binding-tariff-ruling-frontend"
 
 lazy val plugins: Seq[Plugins] =
-  Seq(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+  Seq(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
 lazy val playSettings: Seq[Setting[_]] = Seq.empty
 
 lazy val microservice = (project in file("."))
@@ -43,7 +42,6 @@ lazy val microservice = (project in file("."))
     addTestReportOption(Test, "test-reports")
   )
   .settings(
-    resolvers += Resolver.bintrayRepo("hmrc", "releases"),
     resolvers += Resolver.jcenterRepo
   )
   .settings(
