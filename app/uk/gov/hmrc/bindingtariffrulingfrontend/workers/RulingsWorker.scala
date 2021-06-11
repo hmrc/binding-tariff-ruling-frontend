@@ -49,7 +49,7 @@ class RulingsWorker @Inject() (
     with Logging {
 
   implicit val ec: ExecutionContext = system.dispatchers.lookup("rulings-worker")
-  implicit val hc: HeaderCarrier    = addAuth(appConfig, HeaderCarrier())
+  implicit val hc: HeaderCarrier    = HeaderCarrier(extraHeaders = authHeaders(appConfig)(HeaderCarrier()))
 
   val StreamPageSize               = 1000
   val StreamPagination: Pagination = SimplePagination(pageSize = StreamPageSize)

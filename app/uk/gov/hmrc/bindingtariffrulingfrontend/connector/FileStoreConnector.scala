@@ -59,41 +59,44 @@ class FileStoreConnector @Inject() (
   def get(attachmentId: String)(implicit headerCarrier: HeaderCarrier): Future[Option[FileMetadata]] =
     withMetricsTimerAsync("get-attachment-metadata") { _ =>
       http
-        .GET[Option[FileMetadata]](s"${appConfig.bindingTariffFileStoreUrl}/file/$attachmentId")
+        .GET[Option[FileMetadata]](s"${appConfig.bindingTariffFileStoreUrl}/file/$attachmentId", headers = authHeaders(appConfig))
         .map(_.filter(_.published))
     }
 
   def get(attachmentIds: Set[String])(implicit headerCarrier: HeaderCarrier): Future[Metadata] =
     withMetricsTimerAsync("get-attachment-metadata-multiple") { _ =>
-      if (attachmentIds.isEmpty)
+      if (attachmentIds.isEmpty) {
         Future.successful(Map.empty)
-      else
+      } else {
         Source(attachmentIds)
           .grouped(BatchSize)
           .mapAsyncUnordered(Runtime.getRuntime().availableProcessors()) { ids =>
-            http.GET[Seq[FileMetadata]](makeQuery(ids))
+            http.GET[Seq[FileMetadata]](makeQuery(ids), headers = authHeaders(appConfig))
           }
           .runFold(noMetadata) {
             case (metadata, newEntries) =>
               metadata ++ newEntries.filter(_.published).map(entry => entry.id -> entry).toMap
           }
+      }
     }
 
   def downloadFile(url: String)(implicit hc: HeaderCarrier): Future[Option[Source[ByteString, _]]] =
     withMetricsTimerAsync("download-file") { _ =>
+      lazy val hcConfig = HeaderCarrier.Config.fromConfig(http.configuration)
+
       val fileStoreResponse = ws
         .url(url)
-        .withHttpHeaders(hc.headers: _*)
-        .withHttpHeaders(authHeaders(appConfig.authorization))
+        .withHttpHeaders(hc.withExtraHeaders(http.authHeaders(appConfig): _*).headersForUrl(hcConfig)(url): _*)
         .get()
 
       fileStoreResponse.flatMap { response =>
-        if (response.status / 100 == 2)
+        if (response.status / 100 == 2) {
           Future.successful(Some(response.bodyAsSource))
-        else if (response.status / 100 > 4)
+        } else if (response.status / 100 > 4) {
           Future.failed(new RuntimeException(s"Unable to retrieve file $url from filestore"))
-        else
+        } else {
           Future.successful(None)
+        }
       }
     }
 }
