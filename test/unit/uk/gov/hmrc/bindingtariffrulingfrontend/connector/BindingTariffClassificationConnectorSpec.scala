@@ -26,7 +26,7 @@ import play.api.libs.ws.WSClient
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.{NoPagination, Paged, SimplePagination}
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, SimplePagination}
 import uk.gov.hmrc.bindingtariffrulingfrontend.utils.CaseQueueBuilder
 import uk.gov.hmrc.bindingtariffrulingfrontend.{TestMetrics, WiremockTestServer}
 import uk.gov.hmrc.play.audit.http.HttpAuditing
@@ -41,33 +41,33 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
   protected val appConfig: AppConfig = mock[AppConfig]
 
-  private val wsClient: WSClient         = app.injector.instanceOf[WSClient]
+  private val wsClient: WSClient = app.injector.instanceOf[WSClient]
   private val httpAuditing: HttpAuditing = app.injector.instanceOf[HttpAuditing]
-  private val client                     = new AuthenticatedHttpClient(httpAuditing, wsClient, actorSystem, realConfig)
-  private val metrics                    = new TestMetrics
+  private val client = new AuthenticatedHttpClient(httpAuditing, wsClient, actorSystem, realConfig)
+  private val metrics = new TestMetrics
 
   private val connector = new BindingTariffClassificationConnector(appConfig, client, metrics)
+  private val xApiToken = "X-Api-Token"
 
   override def beforeAll(): Unit = {
     super.beforeAll()
     Mockito.reset(appConfig)
     given(appConfig.bindingTariffClassificationUrl).willReturn(wireMockUrl)
-
-
+    given(appConfig.authorization).willReturn(xApiToken)
   }
 
   "Connector 'GET Case'" should {
-    val startDate        = Instant.now().plus(10, ChronoUnit.SECONDS)
-    val endDate          = Instant.now()
-    val validDecision    = Decision("code", Some(startDate), Some(endDate), "justification", "description")
+    val startDate = Instant.now().plus(10, ChronoUnit.SECONDS)
+    val endDate = Instant.now()
+    val validDecision = Decision("code", Some(startDate), Some(endDate), "justification", "description")
     val publicAttachment = Attachment("file-id", public = true, shouldPublishToRulings = true)
     val validCase: Case = Case(
-      reference   = "ref",
-      status      = CaseStatus.COMPLETED,
+      reference = "ref",
+      status = CaseStatus.COMPLETED,
       application = Application(`type` = ApplicationType.BTI),
-      decision    = Some(validDecision),
+      decision = Some(validDecision),
       attachments = Seq(publicAttachment),
-      keywords    = Set("keyword")
+      keywords = Set("keyword")
     )
 
     "Get valid case" in {
@@ -86,7 +86,7 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
       verify(
         getRequestedFor(urlEqualTo("/cases/ref"))
-          .withHeader("X-Api-Token", equalTo(realConfig.authorization))
+          .withHeader("X-Api-Token", equalTo(xApiToken))
       )
     }
 
@@ -103,34 +103,34 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
       verify(
         getRequestedFor(urlEqualTo("/cases/ref"))
-          .withHeader("X-Api-Token", equalTo(realConfig.authorization))
+          .withHeader("X-Api-Token", equalTo(xApiToken))
       )
     }
   }
 
   "get newApprovedRulings" should {
 
-    val startDate        = LocalDate.now().atStartOfDay().minusHours(12).toInstant(ZoneOffset.UTC)
-    val endDate          = LocalDate.of(2022, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
-    val validDecision    = Decision("code", Some(startDate), Some(endDate), "justification", "description")
+    val startDate = LocalDate.now().atStartOfDay().minusHours(12).toInstant(ZoneOffset.UTC)
+    val endDate = LocalDate.of(2022, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+    val validDecision = Decision("code", Some(startDate), Some(endDate), "justification", "description")
     val publicAttachment = Attachment("file-id", public = true, shouldPublishToRulings = true)
     val validCase: Case = Case(
-      reference   = "ref",
-      status      = CaseStatus.COMPLETED,
+      reference = "ref",
+      status = CaseStatus.COMPLETED,
       application = Application(`type` = ApplicationType.BTI),
-      decision    = Some(validDecision),
+      decision = Some(validDecision),
       attachments = Seq(publicAttachment),
-      keywords    = Set("keyword")
+      keywords = Set("keyword")
     )
 
     "return new cases with status Completed" in {
 
       val url = buildQueryUrl(
-        types            = Seq(ApplicationType.BTI),
-        statuses         = "COMPLETED",
+        types = Seq(ApplicationType.BTI),
+        statuses = "COMPLETED",
         minDecisionStart = Some(LocalDate.now().atStartOfDay().minusHours(12).toInstant(ZoneOffset.UTC)),
-        minDecisionEnd   = None,
-        pagination       = SimplePagination()
+        minDecisionEnd = None,
+        pagination = SimplePagination()
       )
 
       val responseJSON = Json.toJson(Paged(Seq(validCase))).toString()
@@ -148,18 +148,18 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
       verify(
         getRequestedFor(urlEqualTo(url))
-          .withHeader("X-Api-Token", equalTo(realConfig.authorization))
+          .withHeader("X-Api-Token", equalTo(xApiToken))
       )
     }
 
     "Return Paged(Empty) for 404" in {
 
       val url = buildQueryUrl(
-        types            = Seq(ApplicationType.BTI),
-        statuses         = "COMPLETED",
+        types = Seq(ApplicationType.BTI),
+        statuses = "COMPLETED",
         minDecisionStart = Some(LocalDate.now().atStartOfDay().minusHours(12).toInstant(ZoneOffset.UTC)),
-        minDecisionEnd   = None,
-        pagination       = SimplePagination()
+        minDecisionEnd = None,
+        pagination = SimplePagination()
       )
 
       stubFor(
@@ -175,34 +175,34 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
       verify(
         getRequestedFor(urlEqualTo(url))
-          .withHeader("X-Api-Token", equalTo(realConfig.authorization))
+          .withHeader("X-Api-Token", equalTo(xApiToken))
       )
     }
   }
 
   "get newCanceledRulings" should {
 
-    val startDate        = LocalDate.of(2017, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
-    val endDate          = LocalDate.of(2020, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
-    val validDecision    = Decision("code", Some(startDate), Some(endDate), "justification", "description")
+    val startDate = LocalDate.of(2017, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+    val endDate = LocalDate.of(2020, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+    val validDecision = Decision("code", Some(startDate), Some(endDate), "justification", "description")
     val publicAttachment = Attachment("file-id", public = true, shouldPublishToRulings = true)
     val validCase: Case = Case(
-      reference   = "ref",
-      status      = CaseStatus.CANCELLED,
+      reference = "ref",
+      status = CaseStatus.CANCELLED,
       application = Application(`type` = ApplicationType.BTI),
-      decision    = Some(validDecision),
+      decision = Some(validDecision),
       attachments = Seq(publicAttachment),
-      keywords    = Set("keyword")
+      keywords = Set("keyword")
     )
 
     "return new cases with status CANCELLED" in {
 
       val url = buildQueryUrl(
-        types            = Seq(ApplicationType.BTI),
-        statuses         = "CANCELLED",
+        types = Seq(ApplicationType.BTI),
+        statuses = "CANCELLED",
         minDecisionStart = None,
-        minDecisionEnd   = Some(LocalDate.of(2020, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)),
-        pagination       = SimplePagination()
+        minDecisionEnd = Some(LocalDate.of(2020, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)),
+        pagination = SimplePagination()
       )
 
       val responseJSON = Json.toJson(Paged(Seq(validCase))).toString()
@@ -220,18 +220,18 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
       verify(
         getRequestedFor(urlEqualTo(url))
-          .withHeader("X-Api-Token", equalTo(realConfig.authorization))
+          .withHeader("X-Api-Token", equalTo(xApiToken))
       )
     }
 
     "Return Paged(Empty) for 404" in {
 
       val url = buildQueryUrl(
-        types            = Seq(ApplicationType.BTI),
-        statuses         = "CANCELLED",
+        types = Seq(ApplicationType.BTI),
+        statuses = "CANCELLED",
         minDecisionStart = None,
-        minDecisionEnd   = Some(LocalDate.of(2020, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)),
-        pagination       = SimplePagination()
+        minDecisionEnd = Some(LocalDate.of(2020, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)),
+        pagination = SimplePagination()
       )
 
       stubFor(
@@ -247,7 +247,7 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
       verify(
         getRequestedFor(urlEqualTo(url))
-          .withHeader("X-Api-Token", equalTo(realConfig.authorization))
+          .withHeader("X-Api-Token", equalTo(xApiToken))
       )
     }
   }

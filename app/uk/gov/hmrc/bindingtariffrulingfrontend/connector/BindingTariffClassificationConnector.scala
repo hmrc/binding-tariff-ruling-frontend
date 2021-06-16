@@ -38,7 +38,7 @@ class BindingTariffClassificationConnector @Inject() (
   val metrics: Metrics
 )(
   implicit ec: ExecutionContext
-) extends HasMetrics {
+) extends HasMetrics with InjectAuthHeader {
 
   private lazy val completedStatus: String = COMPLETED.toString
 
@@ -64,7 +64,7 @@ class BindingTariffClassificationConnector @Inject() (
   def get(reference: String)(implicit hc: HeaderCarrier): Future[Option[Case]] =
     withMetricsTimerAsync("get-case") { _ =>
       val url = s"${appConfig.bindingTariffClassificationUrl}/cases/$reference"
-      client.GET[Option[Case]](url)
+      client.GET[Option[Case]](url, headers = authHeaders(appConfig))
     }
 
   def newApprovedRulings(minDecisionStart: Instant, pagination: Pagination)(
@@ -77,7 +77,7 @@ class BindingTariffClassificationConnector @Inject() (
         minDecisionEnd   = None,
         pagination       = pagination
       )
-      client.GET[Paged[Case]](url)
+      client.GET[Paged[Case]](url, headers = authHeaders(appConfig))
     }
 
   def newCanceledRulings(minDecisionEnd: Instant, pagination: Pagination)(
@@ -90,6 +90,6 @@ class BindingTariffClassificationConnector @Inject() (
         minDecisionEnd   = Some(minDecisionEnd),
         pagination       = pagination
       )
-      client.GET[Paged[Case]](url)
+      client.GET[Paged[Case]](url, headers = authHeaders(appConfig))
     }
 }

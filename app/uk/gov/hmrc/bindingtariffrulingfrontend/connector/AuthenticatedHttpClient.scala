@@ -39,66 +39,62 @@ class AuthenticatedHttpClient @Inject() (
   override def doGet(
     url: String,
     headers: Seq[(String, String)]
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
-    super.doGet(url, headers)(addAuth, ec)
+  )(implicit ec: ExecutionContext): Future[HttpResponse] =
+    super.doGet(url, headers)(ec)
 
   override def doPost[A](
     url: String,
     body: A,
     headers: Seq[(String, String)]
-  )(implicit rds: Writes[A], hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
-    super.doPost(url, body, headers)(rds, addAuth, ec)
+  )(implicit writes: Writes[A], ec: ExecutionContext): Future[HttpResponse] =
+    super.doPost(url, body, headers)(writes, ec)
 
   override def doFormPost(url: String, body: Map[String, Seq[String]], headers: Seq[(String, String)])(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext
+    implicit ec: ExecutionContext
   ): Future[HttpResponse] =
-    super.doFormPost(url, body, headers)(addAuth, ec)
+    super.doFormPost(url, body, headers)(ec)
 
   override def doPostString(url: String, body: String, headers: Seq[(String, String)])(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext
+    implicit ec: ExecutionContext
   ): Future[HttpResponse] =
-    super.doPostString(url, body, headers)(addAuth, ec)
+    super.doPostString(url, body, headers)(ec)
 
   override def doEmptyPost[A](
     url: String,
     headers: Seq[(String, String)]
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
-    super.doEmptyPost(url, headers)(addAuth, ec)
+  )(implicit ec: ExecutionContext): Future[HttpResponse] =
+    super.doEmptyPost(url, headers)(ec)
 
   override def doPut[A](
     url: String,
     body: A,
     headers: Seq[(String, String)]
-  )(implicit rds: Writes[A], hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
-    super.doPut(url, body, headers)(rds, addAuth, ec)
+  )(implicit writes: Writes[A], ec: ExecutionContext): Future[HttpResponse] =
+    super.doPut(url, body, headers)(writes, ec)
 
   override def doDelete(
     url: String,
     headers: Seq[(String, String)]
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
-    super.doDelete(url, headers)(addAuth, ec)
+  )(implicit ec: ExecutionContext): Future[HttpResponse] =
+    super.doDelete(url, headers)(ec)
 
   override def doPatch[A](
     url: String,
     body: A,
     headers: Seq[(String, String)]
-  )(implicit rds: Writes[A], hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
-    super.doPatch(url, body, headers)(rds, addAuth, ec)
+  )(implicit writes: Writes[A], ec: ExecutionContext): Future[HttpResponse] =
+    super.doPatch(url, body, headers)(writes, ec)
 }
 
 trait InjectAuthHeader {
 
-  private val headerName: String = "X-Api-Token"
+  def authHeaders(config: AppConfig)(implicit hc: HeaderCarrier): Seq[(String, String)] = {
+    val headerName: String = "X-Api-Token"
 
-  def addAuth(implicit config: AppConfig, hc: HeaderCarrier): HeaderCarrier =
-    hc.headers.toMap.get(headerName) match {
-      case Some(_) => hc
-      case _       => hc.withExtraHeaders(authHeaders(config.authorization))
+    hc.headers(Seq(headerName)) match {
+      case header @ Seq(_) => header
+      case _      => Seq(headerName -> config.authorization)
     }
-
-  def authHeaders(authorization: String): (String, String) =
-    headerName -> authorization
+  }
 
 }
