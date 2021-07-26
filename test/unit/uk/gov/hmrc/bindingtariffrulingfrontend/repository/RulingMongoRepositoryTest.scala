@@ -16,50 +16,43 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
-import java.time.{Clock, Duration, LocalDate, ZoneId, ZoneOffset}
-import org.scalatest.concurrent.Eventually
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
-import reactivemongo.api.{DB, ReadConcern}
-import reactivemongo.play.json.collection.JSONCollection
+import org.mongodb.scala.{MongoCollection, ReadConcern}
+import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.test.Helpers._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
-import uk.gov.hmrc.mongo.MongoSpecSupport
+import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
+import java.time.{Clock, Instant, LocalDate, LocalDateTime, ZoneId, ZoneOffset}
 import scala.concurrent.ExecutionContext.Implicits.global
 
+//scalastyle:off magic.number
 class RulingMongoRepositoryTest
-    extends MongoUnitSpec
-    with BeforeAndAfterAll
-    with BeforeAndAfterEach
-    with MongoSpecSupport
-    with Eventually {
-  self =>
-
-  import Ruling.Mongo.format
+    extends WordSpecLike
+    with GuiceOneAppPerSuite
+    with Matchers
+    with DefaultPlayMongoRepositorySupport[Ruling] {
 
   private val clock = Clock.tickSeconds(ZoneOffset.UTC)
 
-  private val provider: MongoDbProvider = new MongoDbProvider {
-    override val mongo: () => DB = self.mongo
-  }
+  override protected lazy val repository: RulingMongoRepository = new RulingMongoRepository(mongoComponent)
 
-  private def repository            = new RulingMongoRepository(provider)
-  lazy val readConcern: ReadConcern = ReadConcern.Majority
+  lazy val readConcern: ReadConcern = ReadConcern.MAJORITY
+  protected def collection: MongoCollection[Ruling] = repository.collection
 
-  override protected def collection: JSONCollection = repository.collection
+  val startOfToday: LocalDateTime = LocalDate.now().atStartOfDay
+  val zoneOffsetToday: ZoneOffset = ZoneId.of("Europe/London").getRules.getOffset(startOfToday)
+  val today: Instant = startOfToday.toInstant(zoneOffsetToday)
 
-  val startOfToday    = LocalDate.now().atStartOfDay
-  val zoneOffsetToday = ZoneId.of("Europe/London").getRules().getOffset(startOfToday)
-  val today           = startOfToday.toInstant(zoneOffsetToday)
+  val startOfTomorrow: LocalDateTime = LocalDate.now().plusDays(1).atStartOfDay
+  val startOfNextMonth: LocalDateTime = LocalDate.now().plusMonths(1).atStartOfDay
 
-  val startOfTomorrow    = LocalDate.now().plusDays(1).atStartOfDay
-  val startOfNextMonth    = LocalDate.now().plusMonths(1).atStartOfDay
+  val zoneOffsetTomorrow: ZoneOffset = ZoneId.of("Europe/London").getRules.getOffset(startOfTomorrow)
+  val zoneOffsetNextMonth: ZoneOffset = ZoneId.of("Europe/London").getRules.getOffset(startOfNextMonth)
 
-  val zoneOffsetTomorrow = ZoneId.of("Europe/London").getRules().getOffset(startOfTomorrow)
-  val zoneOffsetNextMonth = ZoneId.of("Europe/London").getRules().getOffset(startOfNextMonth)
-
-  val tomorrow           = startOfTomorrow.toInstant(zoneOffsetTomorrow)
-  val nextMonth   = startOfNextMonth.toInstant(zoneOffsetNextMonth)
+  val tomorrow: Instant = startOfTomorrow.toInstant(zoneOffsetTomorrow)
+  val nextMonth: Instant = startOfNextMonth.toInstant(zoneOffsetNextMonth)
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -68,7 +61,7 @@ class RulingMongoRepositoryTest
 
   override def afterEach(): Unit = {
     super.afterEach()
-    await(repository.drop)
+    await(repository.collection.drop().toFuture())
   }
 
   "Update" should {
@@ -126,7 +119,6 @@ class RulingMongoRepositoryTest
     }
   }
 
-
   "Get by SimpleSearch" should {
     "Retrieve None" in {
       await(repository.get(SimpleSearch(Some("ref"), imagesOnly = false, 1, 100))).results shouldBe Seq.empty
@@ -141,11 +133,12 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document2)
       givenAnExistingDocument(document3)
 
-      await(repository.get(SimpleSearch(None, imagesOnly = false, 1, 100))).results shouldBe Seq(
+      await(repository.get(SimpleSearch(Some("0"), imagesOnly = false, 1, 100))).results shouldBe Seq(
         document1,
         document2,
         document3
       )
+
     }
 
     "Retrieve One - by Reference - exact match" in {
@@ -217,9 +210,9 @@ class RulingMongoRepositoryTest
   }
 
   private def givenAnExistingDocument(ruling: Ruling): Unit =
-    await(repository.collection.insert(ordered = false).one(ruling))
+    await(repository.update(ruling, upsert = true))
 
   private def thenTheDocumentCountShouldBe(count: Int): Unit =
-    await(repository.collection.count(None, Some(0), 0, None, readConcern)) shouldBe count
+    await(repository.collection.countDocuments().toFuture()) shouldBe count
 
 }

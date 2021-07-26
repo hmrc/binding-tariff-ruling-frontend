@@ -19,15 +19,14 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 import akka.util.ByteString
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.mockito.BDDMockito._
-import org.scalatest.BeforeAndAfter
 import play.api.libs.ws.WSClient
-import scala.collection.immutable.ListSet
-import uk.gov.hmrc.bindingtariffrulingfrontend.{TestMetrics, WiremockTestServer}
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-import java.nio.charset.StandardCharsets
+import uk.gov.hmrc.bindingtariffrulingfrontend.{TestMetrics, WiremockTestServer}
 
+import java.nio.charset.StandardCharsets
+import scala.collection.immutable.ListSet
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

@@ -17,19 +17,19 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
 import com.google.inject.ImplementedBy
-import java.time.ZoneId
-import java.time.LocalDate
-import javax.inject.{Inject, Singleton}
-import play.api.libs.json._
-import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.api.{Cursor, QueryOpts, ReadConcern}
-import reactivemongo.bson.{BSONDocument, BSONInteger, BSONObjectID}
-import reactivemongo.play.json.ImplicitBSONHandlers._
+import org.mongodb.scala.ReadConcern
+import org.mongodb.scala.bson.conversions.Bson
+import org.mongodb.scala.bson.{BsonArray, BsonDocument}
+import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.Indexes.{ascending, compoundIndex, descending}
+import org.mongodb.scala.model._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
-import uk.gov.hmrc.bindingtariffrulingfrontend.repository.MongoIndexCreator._
-import uk.gov.hmrc.mongo.ReactiveRepository
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
+import java.time.{LocalDate, ZoneId}
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[RulingMongoRepository])
@@ -47,112 +47,84 @@ trait RulingRepository {
 
 }
 
+//scalastyle:off magic.number
 @Singleton
-class RulingMongoRepository @Inject() (mongoDbProvider: MongoDbProvider)(implicit val ec: ExecutionContext)
-    extends ReactiveRepository[Ruling, BSONObjectID](
+class RulingMongoRepository @Inject()(mongoComponent: MongoComponent)(implicit val ec: ExecutionContext)
+    extends PlayMongoRepository[Ruling](
       collectionName = "rulings",
-      mongo          = mongoDbProvider.mongo,
-      domainFormat   = Ruling.Mongo.format
+      mongoComponent = mongoComponent,
+      domainFormat   = Ruling.Mongo.format,
+      indexes = Seq(
+        IndexModel(ascending("reference"), IndexOptions().unique(true).background(false)),
+        IndexModel(ascending("bindingCommodityCode"), IndexOptions().unique(false).background(false)),
+        IndexModel(compoundIndex(
+          Indexes.text("reference"),
+          Indexes.text("bindingCommodityCode"),
+          Indexes.text("bindingCommodityCodeNGrams"),
+          Indexes.text("justification"),
+          Indexes.text("goodsDescription"),
+          Indexes.text("keywords")
+          ),
+          IndexOptions().unique(false).name("textIndex").background(false).weights(
+            BsonDocument("bindingCommodityCode" -> 10,
+              "bindingCommodityCodeNgrams" -> 10,
+              "keywords" -> 5
+            )
+          ))
+      )
     )
     with RulingRepository {
-  import Ruling.Mongo.format
 
-  override lazy val indexes: Seq[Index] = Seq(
-    createSingleFieldAscendingIndex("reference", isUnique = true),
-    createSingleFieldAscendingIndex("bindingCommodityCode"),
-    createCompoundIndex(
-      name = Some("textIndex"),
-      indexFieldMappings = Seq(
-        "reference"                  -> IndexType.Text,
-        "bindingCommodityCode"       -> IndexType.Text,
-        "bindingCommodityCodeNGrams" -> IndexType.Text,
-        "justification"              -> IndexType.Text,
-        "goodsDescription"           -> IndexType.Text,
-        "keywords"                   -> IndexType.Text
-      ),
-      options = BSONDocument(
-        "weights" -> BSONDocument(
-          "bindingCommodityCode"       -> BSONInteger(10),
-          "bindingCommodityCodeNgrams" -> BSONInteger(10),
-          "keywords"                   -> BSONInteger(5)
-        )
-      )
-    )
-  )
+  override def update(ruling: Ruling, upsert: Boolean): Future[Ruling] = {
 
-  override def update(ruling: Ruling, upsert: Boolean): Future[Ruling] =
-    collection
-      .findAndUpdate(
-        selector       = byReference(ruling.reference),
-        update         = ruling,
-        fetchNewObject = true,
-        upsert         = upsert
-      )
-      .map(_.value.map(_.as[Ruling]).get)
+    collection.
+      findOneAndReplace(
+        filter = byReference(ruling.reference),
+        replacement = ruling,
+        options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+        ).toFuture()
+
+}
 
   override def get(reference: String): Future[Option[Ruling]] =
-    collection
-      .find(
-        selector   = byReference(reference),
-        projection = Option.empty[JsObject]
-      )
-      .one[Ruling]
+    collection.find(byReference(reference)).first().toFutureOption()
 
-  override def delete(reference: String): Future[Unit] = collection.findAndRemove(byReference(reference)).map(_ => ())
+
+  override def delete(reference: String): Future[Unit] = collection.findOneAndDelete(byReference(reference)).toFuture().map(_ => ())
 
   override def deleteAll(): Future[Unit] =
-    removeAll().map(_ => ())
+    collection.deleteMany(BsonDocument()).toFuture().map { _ => ()}
 
   override def get(search: SimpleSearch): Future[Paged[Ruling]] = {
     val startOfToday = LocalDate.now().atStartOfDay
-    val zoneOffset   = ZoneId.of("Europe/London").getRules().getOffset(startOfToday)
-    val today        = Json.toJson(startOfToday.toInstant(zoneOffset))(Ruling.Mongo.formatInstant)
+    val zoneOffset   = ZoneId.of("Europe/London").getRules.getOffset(startOfToday)
+    val today        = startOfToday.toInstant(zoneOffset)
 
-    val dateFilter  = gt("effectiveEndDate", today)
-    val textSearch  = search.query.map(text(_)).getOrElse(Json.obj())
-    val imageFilter = if (search.imagesOnly) nonEmpty("images") else Json.obj()
+    val dateFilter  = Seq(Filters.gt("effectiveEndDate", today))
+    val textSearch  = search.query.map(query => Filters.text(query)).toSeq
+    val imageFilter = if (search.imagesOnly) Seq(Filters.gt("images", BsonArray())) else Seq.empty
 
-    val allSearches: JsObject = dateFilter ++ textSearch ++ imageFilter
+    val allSearches: Seq[Bson] = textSearch ++ imageFilter ++ dateFilter
+    val findSearches = if (allSearches.nonEmpty) and(allSearches: _*) else BsonDocument()
 
-    val textScore: JsObject = if(search.query.isDefined)
-      Json.obj("score" -> Json.obj("$meta" -> "textScore")) else Json.obj()
+    val textScore = if(search.query.isDefined) Sorts.metaTextScore("score") else BsonDocument()
 
-    val sortByDate = Json.obj("effectiveEndDate" -> -1)
-
-    val sortBy = textScore ++ sortByDate
 
     for {
       results <- collection
-                  .find[JsObject, JsObject](
-                    selector   = allSearches,
-                    projection = Some(textScore)
-                  )
-                  .options(QueryOpts(skipN = (search.pageIndex - 1) * search.pageSize, batchSizeN = search.pageSize))
-                  .sort(sortBy)
-                  .cursor[JsObject]()
-                  .collect[List](search.pageSize, Cursor.FailOnError[List[JsObject]]())
-                  .map(_.map(_.as[Ruling](Ruling.Mongo.format.reads)))
+                  .find(findSearches)
+                  .projection(Projections.metaTextScore("score"))
+                  .skip((search.pageIndex - 1) * search.pageSize)
+                  .limit(search.pageSize)
+                  .sort(Sorts.orderBy(textScore, descending("effectiveEndDate"))).toFuture()
 
-      count <- collection.count(
-                selector    = Some(allSearches),
-                limit       = None,
-                skip        = 0,
-                hint        = None,
-                readConcern = ReadConcern.Majority
-              )
-
+      count <- collection.withReadConcern(ReadConcern.MAJORITY).countDocuments(
+                findSearches,
+                CountOptions().skip(0)).toFuture()
     } yield Paged(results, search.pageIndex, search.pageSize, count)
   }
 
-  private def byReference(reference: String): JsObject =
-    Json.obj("reference" -> reference)
+  private def byReference(reference: String) =
+    equal("reference", reference)
 
-  private def text(query: String): JsObject =
-    Json.obj("$text" -> Json.obj("$search" -> query))
-
-  private def nonEmpty(field: String): JsObject =
-    gt(field, Json.arr())
-
-  private def gt(field: String, value: JsValue): JsObject =
-    Json.obj(field -> Json.obj("$gt" -> value))
 }

@@ -17,9 +17,9 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
 import java.time.Instant
-
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 case class Ruling(
   reference: String,
@@ -46,20 +46,8 @@ object Ruling {
   }
 
   object Mongo {
-    implicit val formatInstant: OFormat[Instant] = new OFormat[Instant] {
-      override def writes(datetime: Instant): JsObject =
-        Json.obj("$date" -> Json.obj("$numberLong" -> datetime.toEpochMilli()))
 
-      override def reads(json: JsValue): JsResult[Instant] =
-        json match {
-          case JsObject(map) if map.contains("$date") =>
-            map("$date") match {
-              case JsNumber(v) => JsSuccess(Instant.ofEpochMilli(v.toLong))
-              case _           => JsError("Unexpected Instant Format")
-            }
-          case _ => JsError("Unexpected Instant Format")
-        }
-    }
+    implicit val formatInstant: Format[Instant] = MongoJavatimeFormats.instantFormat
 
     implicit val rulingReads: Reads[Ruling] =
       Json.using[Json.WithDefaultValues].format[Ruling]
