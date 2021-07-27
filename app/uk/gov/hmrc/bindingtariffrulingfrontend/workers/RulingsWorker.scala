@@ -20,15 +20,13 @@ import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
 import akka.stream.{ActorAttributes, Materializer, Supervision}
-import org.joda.time.Duration
 import play.api.Logging
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.{BindingTariffClassificationConnector, InjectAuthHeader}
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination, SimplePagination}
-import uk.gov.hmrc.bindingtariffrulingfrontend.repository.LockRepoProvider
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lock.ExclusiveTimePeriodLock
+import uk.gov.hmrc.mongo.lock.{MongoLockRepository, TimePeriodLockService}
 
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -37,15 +35,15 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
+//scalastyle:off magic.number
 @Singleton
 class RulingsWorker @Inject() (
   appConfig: AppConfig,
-  lockRepo: LockRepoProvider,
   bindingTariffClassificationConnector: BindingTariffClassificationConnector,
-  rulingService: RulingService
+  rulingService: RulingService,
+  mongoLockRepository: MongoLockRepository
 )(implicit system: ActorSystem, mat: Materializer)
-    extends ExclusiveTimePeriodLock
-    with InjectAuthHeader
+    extends InjectAuthHeader
     with Logging {
 
   implicit val ec: ExecutionContext = system.dispatchers.lookup("rulings-worker")
@@ -53,11 +51,9 @@ class RulingsWorker @Inject() (
 
   val StreamPageSize               = 1000
   val StreamPagination: Pagination = SimplePagination(pageSize = StreamPageSize)
-  val LocalDateFormatter           = DateTimeFormatter.ISO_LOCAL_DATE
+  val LocalDateFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
-  val repo        = lockRepo.repo()
-  val lockId      = "rulings-worker-lock"
-  val holdLockFor = Duration.standardMinutes(2)
+  val myLock: TimePeriodLockService = TimePeriodLockService(mongoLockRepository, lockId = "rulings-worker-lock", ttl = 2.minutes)
 
   val decider: Supervision.Decider = {
     case NonFatal(e) =>
@@ -73,9 +69,9 @@ class RulingsWorker @Inject() (
         bindingTariffClassificationConnector.newApprovedRulings(minDecisionStart, pagination)
       )
       .throttle(10, 1.second)
-      .mapAsync(Runtime.getRuntime().availableProcessors()) { c =>
+      .mapAsync(Runtime.getRuntime.availableProcessors()) { c =>
         logger.info(s"Refreshing ruling with reference: ${c.reference}")
-        tryToAcquireOrRenewLock {
+        myLock.withRenewedLock {
           rulingService.refresh(c.reference, Some(c))
         }
       }
@@ -88,9 +84,9 @@ class RulingsWorker @Inject() (
         bindingTariffClassificationConnector.newCanceledRulings(minDecisionEnd, pagination)
       )
       .throttle(10, 1.second)
-      .mapAsync(Runtime.getRuntime().availableProcessors()) { c =>
+      .mapAsync(Runtime.getRuntime.availableProcessors()) { c =>
         logger.info(s"Refreshing cancelled ruling with reference: ${c.reference}")
-        tryToAcquireOrRenewLock {
+        myLock.withRenewedLock {
           rulingService.refresh(c.reference, Some(c))
         }
       }

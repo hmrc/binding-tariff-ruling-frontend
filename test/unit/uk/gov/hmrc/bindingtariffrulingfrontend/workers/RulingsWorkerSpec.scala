@@ -17,7 +17,6 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.workers
 
 import akka.Done
-import org.joda.time.Duration
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
 import org.mockito.Mockito.verify
@@ -28,35 +27,32 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination, SimplePagination}
-import uk.gov.hmrc.bindingtariffrulingfrontend.repository.LockRepoProvider
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lock.LockRepository
-import uk.gov.hmrc.mongo.MongoSpecSupport
+import uk.gov.hmrc.mongo.lock.MongoLockRepository
+import uk.gov.hmrc.mongo.test.MongoSupport
 
 import java.time.{Instant, LocalDate, ZoneOffset}
 import scala.concurrent.Future
+import scala.concurrent.duration.Duration
 
-class RulingsWorkerSpec extends BaseSpec with MockitoSugar with BeforeAndAfterAll with MongoSpecSupport { self =>
+//scalastyle:off magic.number
+class RulingsWorkerSpec extends BaseSpec with MockitoSugar with BeforeAndAfterAll with MongoSupport { self =>
 
   private val rulingService = mock[RulingService]
   private val connector     = mock[BindingTariffClassificationConnector]
   private val appConfig     = mock[AppConfig]
-  private val lockRepo      = mock[LockRepository]
+  private val lockRepo      = mock[MongoLockRepository]
 
-  val lockRepoProvider = new LockRepoProvider {
-    def repo = () => lockRepo
-  }
-
-  val rulingWorker: RulingsWorker = new RulingsWorker(appConfig, lockRepoProvider, connector, rulingService)(ac, mat)
+  val rulingWorker: RulingsWorker = new RulingsWorker(appConfig, connector, rulingService, lockRepo)(ac, mat)
 
   val StreamPageSize         = 50
   val pagination: Pagination = SimplePagination(pageSize = StreamPageSize)
 
-  val startDate        = LocalDate.of(2017, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
-  val endDate          = LocalDate.of(2020, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
-  val validDecision    = Decision("code", Some(startDate), Some(endDate), "justification", "description")
-  val publicAttachment = Attachment("file-id", public = true, shouldPublishToRulings = true)
+  val startDate: Instant = LocalDate.of(2017, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+  val endDate: Instant = LocalDate.of(2020, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+  val validDecision: Decision = Decision("code", Some(startDate), Some(endDate), "justification", "description")
+  val publicAttachment: Attachment = Attachment("file-id", public = true, shouldPublishToRulings = true)
   val validCase: Case = Case(
     reference   = "ref",
     status      = CaseStatus.CANCELLED,
@@ -66,23 +62,23 @@ class RulingsWorkerSpec extends BaseSpec with MockitoSugar with BeforeAndAfterAl
     keywords    = Set("keyword")
   )
 
-  val pagedNewCases = Paged(
+  val pagedNewCases: Paged[Case] = Paged(
     results =
       Seq(validCase.copy(reference = "ref1"), validCase.copy(reference = "ref2"), validCase.copy(reference = "ref3")),
     pagination  = pagination,
     resultCount = 3
   )
 
-  val pagedCanceledCases = Paged(
+  val pagedCanceledCases: Paged[Case] = Paged(
     results     = Seq(validCase.copy(reference = "ref4"), validCase.copy(reference = "ref5")),
     pagination  = pagination,
     resultCount = 2
   )
 
   override protected def beforeAll(): Unit = {
-    given(lockRepo.renew(any[String], any[String], any[Duration]))
+    given(lockRepo.refreshExpiry(any[String], any[String], any[Duration]))
       .willReturn(Future.successful(true))
-    given(lockRepo.lock(any[String], any[String], any[Duration]))
+    given(lockRepo.takeLock(any[String], any[String], any[Duration]))
       .willReturn(Future.successful(true))
     given(lockRepo.releaseLock(any[String], any[String]))
       .willReturn(Future.successful(()))

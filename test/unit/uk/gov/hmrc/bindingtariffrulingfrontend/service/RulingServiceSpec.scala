@@ -16,9 +16,6 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
-import java.time.{Instant, LocalDate, ZoneOffset}
-import java.time.temporal.ChronoUnit
-
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{refEq, _}
 import org.mockito.BDDMockito.given
@@ -31,12 +28,13 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination, Ruling}
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
-import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import scala.collection.immutable.ListMap
+import scala.concurrent.Future
 
 class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 

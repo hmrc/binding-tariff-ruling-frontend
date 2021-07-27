@@ -66,8 +66,8 @@ class RulingTest extends BaseSpec {
           "001122334",
           "0011223344"
         ),
-        "effectiveStartDate" -> Json.obj("$date" -> Json.obj("$numberLong" -> 0)),
-        "effectiveEndDate"   -> Json.obj("$date" -> Json.obj("$numberLong" -> 1000)),
+        "effectiveStartDate" -> Json.obj("$date" -> Json.obj("$numberLong" -> "0")),
+        "effectiveEndDate"   -> Json.obj("$date" -> Json.obj("$numberLong" -> "1000")),
         "justification"      -> JsString("justification"),
         "goodsDescription"   -> JsString("goods-description"),
         "keywords"           -> JsArray(Seq(JsString("keyword"))),

@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
 import org.mockito.Mockito._
@@ -50,8 +48,6 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     reset(rulingService)
     reset(fileStoreService)
   }
-
-  private def asDocument(html: String): Document = Jsoup.parse(html)
 
   private def controller(allowlist: AllowListAction = AllowListDisabled()) =
     new SearchController(rulingService, fileStoreService, allowlist, rateLimit, mcc, searchView, realConfig)
@@ -128,7 +124,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       given(appConfig.rateLimiterEnabled) willReturn true
       given(appConfig.rateLimitBucketSize) willReturn 5
       given(appConfig.rateLimitRatePerSecond) willReturn 2
-      val results  = for (_ <- 0 until 100) yield controller().get(Some("foo"), false, 1)(getRequestWithCSRF())
+      val results  = for (_ <- 0 until 100) yield controller().get(Some("foo"), images = false, 1)(getRequestWithCSRF())
       val statuses = await(Future.sequence(results)).map(status)
       atLeast(1, statuses) shouldBe Status.TOO_MANY_REQUESTS
     }
@@ -139,7 +135,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
         .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       given(appConfig.rateLimiterEnabled) willReturn false
-      val results  = for (_ <- 0 until 100) yield controller().get(Some("foo"), false, 1)(getRequestWithCSRF())
+      val results  = for (_ <- 0 until 100) yield controller().get(Some("foo"), images = false, 1)(getRequestWithCSRF())
       val statuses = await(Future.sequence(results)).map(status)
       all(statuses) shouldBe Status.OK
     }
