@@ -17,7 +17,7 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
 
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.stream.Materializer
 import org.mockito.Mockito
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
@@ -32,8 +32,8 @@ class AllowListEnabled(appConfig: AppConfig)(implicit mat: Materializer, ec: Exe
 }
 
 object AllowListEnabled {
-  val system       = ActorSystem.create("testActorSystem")
-  val materializer = ActorMaterializer.create(system)
+  val system: ActorSystem = ActorSystem("Sys")
+  val materializer: Materializer = Materializer(system)
   def apply(): AllowListEnabled =
     new AllowListEnabled(Mockito.mock(classOf[AppConfig]))(materializer, materializer.executionContext)
 }

@@ -17,19 +17,20 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
 import org.mongodb.scala.{MongoCollection, ReadConcern}
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.test.Helpers._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
-import java.time.{Clock, Instant, LocalDate, LocalDateTime, ZoneId, ZoneOffset}
+import java.time._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 //scalastyle:off magic.number
 class RulingMongoRepositoryTest
-    extends WordSpecLike
+    extends AnyWordSpecLike
     with GuiceOneAppPerSuite
     with Matchers
     with DefaultPlayMongoRepositorySupport[Ruling] {

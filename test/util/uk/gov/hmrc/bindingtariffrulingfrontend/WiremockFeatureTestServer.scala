@@ -19,10 +19,11 @@ package uk.gov.hmrc.bindingtariffrulingfrontend
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.{MappingBuilder, WireMock}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import org.scalatest.{BeforeAndAfterEach, FeatureSpec}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 
-trait WiremockFeatureTestServer extends FeatureSpec with BeforeAndAfterEach with GuiceOneServerPerSuite {
+trait WiremockFeatureTestServer extends AnyFeatureSpec with BeforeAndAfterEach with GuiceOneServerPerSuite {
 
   private val wireHost       = "localhost"
   protected val wirePort     = 20001
