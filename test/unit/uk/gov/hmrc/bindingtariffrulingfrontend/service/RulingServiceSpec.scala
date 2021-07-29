@@ -55,7 +55,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     "delegate to repository" in {
       given(repository.deleteAll()) willReturn Future.successful(())
       await(service.deleteAll()) shouldBe ((): Unit)
-      verifyZeroInteractions(auditService)
+      verifyNoInteractions(auditService)
     }
   }
 
@@ -64,7 +64,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     "delegate to repository" in {
       given(repository.delete(refEq("ref"))) willReturn Future.successful(())
       await(service.delete("ref")) shouldBe ((): Unit)
-      verifyZeroInteractions(auditService)
+      verifyNoInteractions(auditService)
     }
   }
 
@@ -73,7 +73,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     "delegate to repository" in {
       given(repository.get("id")) willReturn Future.successful(None)
       await(service.get("id")) shouldBe None
-      verifyZeroInteractions(auditService)
+      verifyNoInteractions(auditService)
     }
   }
 
@@ -83,7 +83,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     "delegate to repository" in {
       given(repository.get(search)) willReturn Future.successful(Paged.empty[Ruling])
       await(service.get(search)) shouldBe Paged.empty[Ruling]
-      verifyZeroInteractions(auditService)
+      verifyNoInteractions(auditService)
     }
   }
 
@@ -180,7 +180,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository, never()).update(any[Ruling], anyBoolean())
-      verifyZeroInteractions(auditService)
+      verifyNoInteractions(auditService)
     }
 
     "create new ruling" in {
@@ -234,7 +234,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       )
       theRulingUpdated shouldBe expectedRuling
 
-      verifyZeroInteractions(auditService)
+      verifyNoInteractions(auditService)
     }
 
     "delete existing ruling" in {
@@ -258,7 +258,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository, never()).update(any[Ruling], anyBoolean())
-      verifyZeroInteractions(auditService)
+      verifyNoInteractions(auditService)
     }
 
     "filter cases not BTT" in {
@@ -270,7 +270,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository, never()).update(any[Ruling], anyBoolean())
-      verifyZeroInteractions(auditService)
+      verifyNoInteractions(auditService)
     }
 
     "filter cases without Decision" in {
@@ -280,7 +280,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository, never()).update(any[Ruling], anyBoolean())
-      verifyZeroInteractions(auditService)
+      verifyNoInteractions(auditService)
     }
 
     "filter cases without Decision Start Date" in {
@@ -292,7 +292,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository, never()).update(any[Ruling], anyBoolean())
-      verifyZeroInteractions(auditService)
+      verifyNoInteractions(auditService)
     }
 
     "filter cases without Decision End Date" in {
@@ -304,7 +304,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       await(service.refresh("ref")) shouldBe ((): Unit)
 
       verify(repository, never()).update(any[Ruling], anyBoolean())
-      verifyZeroInteractions(auditService)
+      verifyNoInteractions(auditService)
     }
 
 
@@ -314,9 +314,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       captor.getValue
     }
 
-    def returnTheRuling: Answer[Future[Ruling]] = new Answer[Future[Ruling]] {
-      override def answer(invocation: InvocationOnMock): Future[Ruling] = Future.successful(invocation.getArgument(0))
-    }
+    def returnTheRuling: Answer[Future[Ruling]] = (invocation: InvocationOnMock) => Future.successful(invocation.getArgument(0))
 
   }
 

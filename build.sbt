@@ -5,7 +5,7 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 val appName = "binding-tariff-ruling-frontend"
 
 lazy val plugins: Seq[Plugins] =
-  Seq(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  Seq(PlayScala, SbtDistributablesPlugin)
 lazy val playSettings: Seq[Setting[_]] = Seq.empty
 
 lazy val microservice = (project in file("."))
@@ -22,7 +22,6 @@ lazy val microservice = (project in file("."))
     scalaVersion := "2.12.12",
     targetJvm := "jvm-1.8",
     libraryDependencies ++= (AppDependencies.compile ++ AppDependencies.test).map(_ withSources ()),
-    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     parallelExecution in Test := false,
     fork in Test := true,
     retrieveManaged := true,
