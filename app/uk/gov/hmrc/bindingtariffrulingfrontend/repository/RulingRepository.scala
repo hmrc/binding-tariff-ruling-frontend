@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,8 @@ class RulingMongoRepository @Inject()(mongoComponent: MongoComponent)(implicit v
       mongoComponent = mongoComponent,
       domainFormat   = Ruling.Mongo.format,
       indexes = Seq(
-        IndexModel(ascending("reference"), IndexOptions().unique(true).background(false)),
-        IndexModel(ascending("bindingCommodityCode"), IndexOptions().unique(false).background(false)),
+        IndexModel(ascending("reference"), IndexOptions().unique(true).background(false).name("reference_Index")),
+        IndexModel(ascending("bindingCommodityCode"), IndexOptions().unique(false).background(false).name("bindingCommodityCode_Index")),
         IndexModel(compoundIndex(
           Indexes.text("reference"),
           Indexes.text("bindingCommodityCode"),

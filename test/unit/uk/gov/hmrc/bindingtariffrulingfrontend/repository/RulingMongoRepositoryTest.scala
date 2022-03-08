@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,12 +134,8 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document2)
       givenAnExistingDocument(document3)
 
-      await(repository.get(SimpleSearch(Some("0"), imagesOnly = false, 1, 100))).results shouldBe Seq(
-        document1,
-        document2,
-        document3
-      )
-
+      val result = await(repository.get(SimpleSearch(Some("0"), imagesOnly = false, 1, 100))).results
+      result should contain theSameElementsAs Seq(document1, document2, document3)
     }
 
     "Retrieve One - by Reference - exact match" in {
