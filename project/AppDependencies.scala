@@ -3,13 +3,15 @@ import sbt._
 
 object AppDependencies {
 
+  val mongoVersion = "0.52.0"
+
   val compile = Seq(
-    "uk.gov.hmrc"          %% "bootstrap-frontend-play-28" % "5.7.0",
-    "uk.gov.hmrc.mongo"    %% "hmrc-mongo-play-28"         % "0.52.0",
-    "uk.gov.hmrc"          %% "play-json-union-formatter"  % "1.13.0-play-27",
+    "uk.gov.hmrc"          %% "bootstrap-frontend-play-28" % "6.2.0",
+    "uk.gov.hmrc.mongo"    %% "hmrc-mongo-play-28"         % mongoVersion,
+    "uk.gov.hmrc"          %% "play-json-union-formatter"  % "1.15.0-play-28",
     "uk.gov.hmrc"          %% "play-allowlist-filter"      % "1.0.0-play-28",
-    "uk.gov.hmrc"          %% "play-frontend-hmrc"         % "0.86.0-play-28",
-    "org.typelevel"        %% "cats-core"                  % "2.6.1",
+    "uk.gov.hmrc"          %% "play-frontend-hmrc"         % "3.21.0-play-28",
+    "org.typelevel"        %% "cats-core"                  % "2.7.0",
     "com.digitaltangible"  %% "play-guard"                 % "2.5.0",
     "org.quartz-scheduler" % "quartz"                      % "2.3.2"
   )
@@ -29,10 +31,9 @@ object AppDependencies {
     "org.scalatestplus"      %% "mockito-3-4"              % "3.2.9.0"        % scope,
     "org.scalatestplus"      %% "scalacheck-1-15"          % "3.2.9.0"        % scope,
     "uk.gov.hmrc"            %% "service-integration-test" % "1.1.0-play-28"  % scope,
-    "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-28"  % "0.52.0"         % scope,
-    //Need to peg this version of jetty to prevent binary compatibility errors
-    "org.eclipse.jetty" % "jetty-server"  % jettyVersion % scope,
-    "org.eclipse.jetty" % "jetty-servlet" % jettyVersion % scope
+    "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-28"  % mongoVersion     % scope,
+    "org.eclipse.jetty"      % "jetty-server"              % jettyVersion     % scope,
+    "org.eclipse.jetty"      % "jetty-servlet"             % jettyVersion     % scope
   )
 
 }

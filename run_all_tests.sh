@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-sbt scalastyle compile coverage test coverageOff coverageReport
+sbt clean scalastyle compile coverage test coverageOff coverageReport

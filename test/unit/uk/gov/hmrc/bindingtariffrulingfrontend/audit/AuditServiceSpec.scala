@@ -22,7 +22,7 @@ import org.mockito.Mockito.verify
 import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditPayloadType._
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
-import uk.gov.hmrc.play.bootstrap.audit.DefaultAuditConnector
+import uk.gov.hmrc.play.audit.DefaultAuditConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
