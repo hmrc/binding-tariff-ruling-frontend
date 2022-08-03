@@ -3,9 +3,9 @@ import sbt._
 
 object AppDependencies {
 
-  val mongoVersion = "0.52.0"
+  val mongoVersion = "0.68.0"
 
-  val compile = Seq(
+  val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"          %% "bootstrap-frontend-play-28" % "6.2.0",
     "uk.gov.hmrc.mongo"    %% "hmrc-mongo-play-28"         % mongoVersion,
     "uk.gov.hmrc"          %% "play-json-union-formatter"  % "1.15.0-play-28",
@@ -16,11 +16,11 @@ object AppDependencies {
     "org.quartz-scheduler" % "quartz"                      % "2.3.2"
   )
 
-  val scope = "test"
+  val scope = Test
 
   val jettyVersion = "9.4.27.v20200227"
 
-  val test = Seq(
+  val test: Seq[ModuleID] = Seq(
     "com.github.tomakehurst" % "wiremock"                  % "2.27.2"         % scope,
     "com.typesafe.play"      %% "play-test"                % current          % scope,
     "org.mockito"            % "mockito-core"              % "3.11.2"         % scope,
@@ -35,5 +35,7 @@ object AppDependencies {
     "org.eclipse.jetty"      % "jetty-server"              % jettyVersion     % scope,
     "org.eclipse.jetty"      % "jetty-servlet"             % jettyVersion     % scope
   )
+
+  def apply(): Seq[ModuleID] = compile ++ test
 
 }
