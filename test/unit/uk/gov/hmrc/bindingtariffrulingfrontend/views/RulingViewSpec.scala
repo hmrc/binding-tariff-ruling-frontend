@@ -41,7 +41,8 @@ class RulingViewSpec extends ViewSpec {
         "ruling.images"                              -> "Images",
         "ruling.attachments"                         -> "Attachments",
         "ruling.justification"                       -> "Justification"
-      ))
+      )
+    )
 
   val ruling = Ruling(
     reference            = "reference",
@@ -102,10 +103,12 @@ class RulingViewSpec extends ViewSpec {
       doc.text() should include(s"Images")
       doc.getElementById("ruling-details") should containElementWithAttribute(
         "href",
-        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id1")
+        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id1"
+      )
       doc.getElementById("ruling-details") should containElementWithAttribute(
         "href",
-        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id2")
+        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id2"
+      )
     }
 
     "render attachments with correct href" in {
@@ -115,10 +118,12 @@ class RulingViewSpec extends ViewSpec {
       doc.text() should include(s"Attachments")
       doc.getElementById("ruling-details") should containElementWithAttribute(
         "href",
-        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/attachment/f1")
+        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/attachment/f1"
+      )
       doc.getElementById("ruling-details") should containElementWithAttribute(
         "href",
-        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/attachment/f2")
+        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/attachment/f2"
+      )
     }
   }
 }

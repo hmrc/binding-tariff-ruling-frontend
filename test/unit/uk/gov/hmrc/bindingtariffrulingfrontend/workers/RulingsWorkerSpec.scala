@@ -49,9 +49,9 @@ class RulingsWorkerSpec extends BaseSpec with MockitoSugar with BeforeAndAfterAl
   val StreamPageSize         = 50
   val pagination: Pagination = SimplePagination(pageSize = StreamPageSize)
 
-  val startDate: Instant = LocalDate.of(2017, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
-  val endDate: Instant = LocalDate.of(2020, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
-  val validDecision: Decision = Decision("code", Some(startDate), Some(endDate), "justification", "description")
+  val startDate: Instant           = LocalDate.of(2017, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+  val endDate: Instant             = LocalDate.of(2020, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+  val validDecision: Decision      = Decision("code", Some(startDate), Some(endDate), "justification", "description")
   val publicAttachment: Attachment = Attachment("file-id", public = true, shouldPublishToRulings = true)
   val validCase: Case = Case(
     reference   = "ref",

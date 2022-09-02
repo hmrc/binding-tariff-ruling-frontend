@@ -36,7 +36,8 @@ class SearchResultsViewSpec extends ViewSpec {
         "search.results.ruling.commodityCode"        -> "Commodity code",
         "search.results.ruling.images"               -> "Images",
         "search.results.ruling.view"                 -> "View ruling {0}"
-      ))
+      )
+    )
 
   val ruling = Ruling(
     reference            = "reference",
@@ -86,14 +87,15 @@ class SearchResultsViewSpec extends ViewSpec {
 
       val doc = view(searchResultsView(None, pagedRuling, fileMetaData))
 
-
       doc.text() should include(s"Images")
       doc.getElementById("search_results-list-0") should containElementWithAttribute(
         "href",
-        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id1")
+        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id1"
+      )
       doc.getElementById("search_results-list-0") should containElementWithAttribute(
         "href",
-        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id2")
+        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id2"
+      )
     }
 
     "render with correct href link" in {
@@ -103,7 +105,8 @@ class SearchResultsViewSpec extends ViewSpec {
       doc.text() should include(s"View ruling ${ruling.reference}")
       doc.getElementById("search_results-list-0") should containElementWithAttribute(
         "href",
-        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}")
+        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}"
+      )
     }
   }
 }

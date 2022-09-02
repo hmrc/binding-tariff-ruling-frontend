@@ -38,7 +38,8 @@ class BindingTariffClassificationConnector @Inject() (
   val metrics: Metrics
 )(
   implicit ec: ExecutionContext
-) extends HasMetrics with InjectAuthHeader {
+) extends HasMetrics
+    with InjectAuthHeader {
 
   private lazy val completedStatus: String = COMPLETED.toString
 

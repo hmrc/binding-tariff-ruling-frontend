@@ -63,7 +63,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
           .get(query = Some("query"), images = false, page = 1)(
             getRequestWithCSRF("/?query=query&page=1").withFormUrlEncodedBody(
               "query" -> "query"
-            ))
+            )
+          )
       )
 
       status(result)      shouldBe Status.OK
@@ -107,7 +108,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
       verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
     }
-    
+
     "return 303 when disallowed" in {
       val result = await(
         controller(allowlist = AllowListEnabled()).get(query = None, images = false, page = 1)(getRequestWithCSRF())
@@ -152,7 +153,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
           .get(query = Some("query"), images = false, page = 1)(
             getRequestWithCSRF().withFormUrlEncodedBody(
               "query" -> "query"
-            ))
+            )
+          )
       )
 
       status(result)      shouldBe Status.OK
@@ -192,7 +194,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
           .get(query = Some(""), images = false, page = 1)(
             getRequestWithCSRF().withFormUrlEncodedBody(
               "query" -> ""
-            ))
+            )
+          )
       )
 
       status(result)      shouldBe Status.OK
