@@ -6,6 +6,7 @@ object AppDependencies {
   private val hmrcMongoPlayVersion = "0.71.0"
   val scope = "test"
   val jettyVersion = "9.4.48.v20220622"
+  private val silencerVersion = "1.7.9"
 
   val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"          %% "bootstrap-frontend-play-28" % "7.1.0",
@@ -16,7 +17,9 @@ object AppDependencies {
     "org.typelevel"        %% "cats-core"                  % "2.8.0",
     "com.digitaltangible"  %% "play-guard"                 % "2.5.0",
     "org.quartz-scheduler" % "quartz"                      % "2.3.2",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"          % "2.13.3"
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"          % "2.13.3",
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
+    "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
   )
 
   val test: Seq[ModuleID] = Seq(
