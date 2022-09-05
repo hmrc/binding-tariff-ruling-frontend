@@ -17,7 +17,7 @@ object AppDependencies {
     "org.typelevel"        %% "cats-core"                  % "2.8.0",
     "com.digitaltangible"  %% "play-guard"                 % "2.5.0",
     "org.quartz-scheduler" % "quartz"                      % "2.3.2",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"          % "2.13.3",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"          % "2.13.4",
     compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
     "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
   )
