@@ -43,11 +43,13 @@ lazy val microservice = (project in file("."))
     // concatenate js
     Concat.groups := Seq(
       "javascripts/application.js" ->
-        group(Seq(
-          "javascripts/jquery.min.js",
-          "javascripts/back-link.js",
-          "javascripts/app.js"
-        ))
+        group(
+          Seq(
+            "javascripts/jquery.min.js",
+            "javascripts/back-link.js",
+            "javascripts/app.js"
+          )
+        )
     ),
     // prevent removal of unused code which generates warning errors due to use of third-party libs
     pipelineStages := Seq(digest),
@@ -60,3 +62,6 @@ lazy val microservice = (project in file("."))
 coverageMinimumStmtTotal := 90
 coverageFailOnMinimum := true
 coverageExcludedPackages := "<empty>;com.kenshoo.play.metrics.*;prod.*;testOnlyDoNotUseInAppConf.*;app.*;uk.gov.hmrc.BuildInfo"
+
+addCommandAlias("scalafmtAll", "all scalafmtSbt scalafmt test:scalafmt")
+addCommandAlias("scalastyleAll", "all scalastyle test:scalastyle")
