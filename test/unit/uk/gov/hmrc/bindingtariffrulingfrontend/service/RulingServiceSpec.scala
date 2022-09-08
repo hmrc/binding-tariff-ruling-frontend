@@ -307,17 +307,15 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       verifyNoInteractions(auditService)
     }
 
-
     def theRulingUpdated: Ruling = {
       val captor = ArgumentCaptor.forClass(classOf[Ruling])
       verify(repository).update(captor.capture(), anyBoolean())
       captor.getValue
     }
 
-    def returnTheRuling: Answer[Future[Ruling]] = (invocation: InvocationOnMock) => Future.successful(invocation.getArgument(0))
+    def returnTheRuling: Answer[Future[Ruling]] =
+      (invocation: InvocationOnMock) => Future.successful(invocation.getArgument(0))
 
   }
-
-
 
 }

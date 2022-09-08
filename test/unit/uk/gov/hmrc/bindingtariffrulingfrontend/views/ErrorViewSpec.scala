@@ -24,7 +24,7 @@ class ErrorViewSpec extends ViewSpec {
   "Error View" should {
     "render error page with correct text" in {
 
-      val doc =  view(errorPage("Title", "Heading", "Message"))
+      val doc = view(errorPage("Title", "Heading", "Message"))
 
       doc.text() should include("Title")
       doc.text() should include("Heading")

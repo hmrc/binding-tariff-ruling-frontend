@@ -32,7 +32,7 @@ class AllowListEnabled(appConfig: AppConfig)(implicit mat: Materializer, ec: Exe
 }
 
 object AllowListEnabled {
-  val system: ActorSystem = ActorSystem("Sys")
+  val system: ActorSystem        = ActorSystem("Sys")
   val materializer: Materializer = Materializer(system)
   def apply(): AllowListEnabled =
     new AllowListEnabled(Mockito.mock(classOf[AppConfig]))(materializer, materializer.executionContext)

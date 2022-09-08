@@ -1,4 +1,3 @@
-import play.core.PlayVersion.current
 import sbt.Keys.name
 import uk.gov.hmrc.DefaultBuildSettings._
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
@@ -22,16 +21,12 @@ lazy val microservice = (project in file("."))
     name := appName,
     scalaVersion := "2.12.16",
     targetJvm := "jvm-1.8",
-    libraryDependencies ++= AppDependencies().map(_ withSources ()),
+    libraryDependencies ++= AppDependencies(),
     Test / parallelExecution := false,
     Test / fork := true,
     retrieveManaged := true,
     // Use the silencer plugin to suppress warnings from unused imports in compiled twirl templates
-    scalacOptions += "-P:silencer:pathFilters=views;routes",
-    libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.9" cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % "1.7.9" % Provided cross CrossVersion.full
-    )
+    scalacOptions += "-P:silencer:pathFilters=views;routes"
   )
   .settings(
     Test / unmanagedSourceDirectories := Seq(
@@ -48,11 +43,13 @@ lazy val microservice = (project in file("."))
     // concatenate js
     Concat.groups := Seq(
       "javascripts/application.js" ->
-        group(Seq(
-          "javascripts/jquery.min.js",
-          "javascripts/back-link.js",
-          "javascripts/app.js"
-        ))
+        group(
+          Seq(
+            "javascripts/jquery.min.js",
+            "javascripts/back-link.js",
+            "javascripts/app.js"
+          )
+        )
     ),
     // prevent removal of unused code which generates warning errors due to use of third-party libs
     pipelineStages := Seq(digest),
@@ -65,3 +62,6 @@ lazy val microservice = (project in file("."))
 coverageMinimumStmtTotal := 90
 coverageFailOnMinimum := true
 coverageExcludedPackages := "<empty>;com.kenshoo.play.metrics.*;prod.*;testOnlyDoNotUseInAppConf.*;app.*;uk.gov.hmrc.BuildInfo"
+
+addCommandAlias("scalafmtAll", "all scalafmtSbt scalafmt test:scalafmt")
+addCommandAlias("scalastyleAll", "all scalastyle test:scalastyle")

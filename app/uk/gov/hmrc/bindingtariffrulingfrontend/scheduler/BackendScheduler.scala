@@ -24,8 +24,6 @@ import org.quartz.TriggerBuilder.newTrigger
 import org.quartz.impl.StdSchedulerFactory
 import play.api.Logging
 import play.api.inject.ApplicationLifecycle
-import uk.gov.hmrc.http.HeaderCarrier
-
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
@@ -35,8 +33,6 @@ class BackendScheduler @Inject() (
   scheduledJobs: ScheduledJobs,
   scheduledJobFactory: ScheduledJobFactory
 ) extends Logging {
-
-  private implicit val headers: HeaderCarrier = HeaderCarrier()
 
   def jobDetail(job: ScheduledJob) =
     newJob(job.getClass).withIdentity(job.jobName).build

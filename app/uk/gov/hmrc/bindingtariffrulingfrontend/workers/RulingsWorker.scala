@@ -49,11 +49,12 @@ class RulingsWorker @Inject() (
   implicit val ec: ExecutionContext = system.dispatchers.lookup("rulings-worker")
   implicit val hc: HeaderCarrier    = HeaderCarrier(extraHeaders = authHeaders(appConfig)(HeaderCarrier()))
 
-  val StreamPageSize               = 1000
-  val StreamPagination: Pagination = SimplePagination(pageSize = StreamPageSize)
+  val StreamPageSize                        = 1000
+  val StreamPagination: Pagination          = SimplePagination(pageSize = StreamPageSize)
   val LocalDateFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
-  val myLock: TimePeriodLockService = TimePeriodLockService(mongoLockRepository, lockId = "rulings-worker-lock", ttl = 2.minutes)
+  val myLock: TimePeriodLockService =
+    TimePeriodLockService(mongoLockRepository, lockId = "rulings-worker-lock", ttl = 2.minutes)
 
   val decider: Supervision.Decider = {
     case NonFatal(e) =>

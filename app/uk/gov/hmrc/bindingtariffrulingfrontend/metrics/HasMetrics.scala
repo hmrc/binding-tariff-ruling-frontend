@@ -56,7 +56,7 @@ trait HasMetrics {
 
   class MetricsTimer(metric: Metric) {
     val timer: Timer.Context = localMetrics.startTimer(metric)
-    val timerRunning = new AtomicBoolean(true)
+    val timerRunning         = new AtomicBoolean(true)
 
     def completeWithSuccess(): Unit =
       if (timerRunning.compareAndSet(true, false)) {

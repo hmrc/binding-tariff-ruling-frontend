@@ -39,20 +39,20 @@ class RulingMongoRepositoryTest
 
   override protected lazy val repository: RulingMongoRepository = new RulingMongoRepository(mongoComponent)
 
-  lazy val readConcern: ReadConcern = ReadConcern.MAJORITY
+  lazy val readConcern: ReadConcern                 = ReadConcern.MAJORITY
   protected def collection: MongoCollection[Ruling] = repository.collection
 
   val startOfToday: LocalDateTime = LocalDate.now().atStartOfDay
   val zoneOffsetToday: ZoneOffset = ZoneId.of("Europe/London").getRules.getOffset(startOfToday)
-  val today: Instant = startOfToday.toInstant(zoneOffsetToday)
+  val today: Instant              = startOfToday.toInstant(zoneOffsetToday)
 
-  val startOfTomorrow: LocalDateTime = LocalDate.now().plusDays(1).atStartOfDay
+  val startOfTomorrow: LocalDateTime  = LocalDate.now().plusDays(1).atStartOfDay
   val startOfNextMonth: LocalDateTime = LocalDate.now().plusMonths(1).atStartOfDay
 
-  val zoneOffsetTomorrow: ZoneOffset = ZoneId.of("Europe/London").getRules.getOffset(startOfTomorrow)
+  val zoneOffsetTomorrow: ZoneOffset  = ZoneId.of("Europe/London").getRules.getOffset(startOfTomorrow)
   val zoneOffsetNextMonth: ZoneOffset = ZoneId.of("Europe/London").getRules.getOffset(startOfNextMonth)
 
-  val tomorrow: Instant = startOfTomorrow.toInstant(zoneOffsetTomorrow)
+  val tomorrow: Instant  = startOfTomorrow.toInstant(zoneOffsetTomorrow)
   val nextMonth: Instant = startOfNextMonth.toInstant(zoneOffsetNextMonth)
 
   override def beforeEach(): Unit = {

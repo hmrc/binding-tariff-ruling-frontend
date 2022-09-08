@@ -25,5 +25,6 @@ class SearchViewSpec extends ViewSpec {
         "search.summary.onematch.landing" -> "Showing 1 result.",
         "search.summary.onepage.landing"  -> "Showing {0} results.",
         "search.summary.manypage.landing" -> "Showing {0} to {1} of {2} results."
-      ))
+      )
+    )
 }

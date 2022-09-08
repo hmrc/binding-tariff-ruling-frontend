@@ -48,7 +48,8 @@ class ResultSummarySpec extends ViewSpec {
           "search.summary.onepage",
           "search.summary.manypage",
           "search.summary.nomatch"
-        ))
+        )
+      )
 
       renderedView.text() should include("There are no rulings that match your search.")
     }
@@ -65,7 +66,8 @@ class ResultSummarySpec extends ViewSpec {
           "search.summary.onepage",
           "search.summary.manypage",
           "search.summary.nomatch"
-        ))
+        )
+      )
 
       renderedView.text() should include("Showing 1 result that matches your search.")
     }
@@ -82,7 +84,8 @@ class ResultSummarySpec extends ViewSpec {
           "search.summary.onepage",
           "search.summary.manypage",
           "search.summary.nomatch"
-        ))
+        )
+      )
 
       renderedView.text() should include("Showing 6 results that match your search.")
     }
@@ -99,7 +102,8 @@ class ResultSummarySpec extends ViewSpec {
           "search.summary.onepage",
           "search.summary.manypage",
           "search.summary.nomatch"
-        ))
+        )
+      )
 
       renderedView.text() should include("Showing 1 to 25 of 100 results that match your search.")
     }
@@ -116,7 +120,8 @@ class ResultSummarySpec extends ViewSpec {
           "search.summary.onepage",
           "search.summary.manypage",
           "search.summary.nomatch"
-        ))
+        )
+      )
 
       renderedView.text() should include("Showing 26 to 50 of 100 results that match your search.")
     }
@@ -132,7 +137,8 @@ class ResultSummarySpec extends ViewSpec {
           "search.summary.onepage.landing",
           "search.summary.manypage.landing",
           "search.summary.nomatch.landing"
-        ))
+        )
+      )
 
       renderedView.text() should include("There are no rulings.")
     }
@@ -149,7 +155,8 @@ class ResultSummarySpec extends ViewSpec {
           "search.summary.onepage.landing",
           "search.summary.manypage.landing",
           "search.summary.nomatch.landing"
-        ))
+        )
+      )
 
       renderedView.text() should include("Showing 1 result.")
     }
@@ -166,7 +173,8 @@ class ResultSummarySpec extends ViewSpec {
           "search.summary.onepage.landing",
           "search.summary.manypage.landing",
           "search.summary.nomatch.landing"
-        ))
+        )
+      )
 
       renderedView.text() should include("Showing 6 results.")
     }
@@ -183,7 +191,8 @@ class ResultSummarySpec extends ViewSpec {
           "search.summary.onepage.landing",
           "search.summary.manypage.landing",
           "search.summary.nomatch.landing"
-        ))
+        )
+      )
 
       renderedView.text() should include("Showing 1 to 25 of 100 results.")
     }
@@ -200,7 +209,8 @@ class ResultSummarySpec extends ViewSpec {
           "search.summary.onepage.landing",
           "search.summary.manypage.landing",
           "search.summary.nomatch.landing"
-        ))
+        )
+      )
 
       renderedView.text() should include("Showing 26 to 50 of 100 results.")
     }

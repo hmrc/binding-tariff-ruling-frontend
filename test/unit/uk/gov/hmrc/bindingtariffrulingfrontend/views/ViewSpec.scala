@@ -35,7 +35,7 @@ abstract class ViewSpec extends UnitSpec with BaseSpec {
 
   implicit val appConfig: AppConfig = realConfig
 
-  implicit val fakeRequest  = FakeRequest()
+  implicit val fakeRequest = FakeRequest()
 
   protected def view(html: Html): Document =
     Jsoup.parse(html.toString())

@@ -93,7 +93,7 @@ trait InjectAuthHeader {
 
     hc.headers(Seq(headerName)) match {
       case header @ Seq(_) => header
-      case _      => Seq(headerName -> config.authorization)
+      case _               => Seq(headerName -> config.authorization)
     }
   }
 

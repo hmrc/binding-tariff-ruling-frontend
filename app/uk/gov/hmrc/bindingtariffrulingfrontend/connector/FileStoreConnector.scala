@@ -59,7 +59,10 @@ class FileStoreConnector @Inject() (
   def get(attachmentId: String)(implicit headerCarrier: HeaderCarrier): Future[Option[FileMetadata]] =
     withMetricsTimerAsync("get-attachment-metadata") { _ =>
       http
-        .GET[Option[FileMetadata]](s"${appConfig.bindingTariffFileStoreUrl}/file/$attachmentId", headers = authHeaders(appConfig))
+        .GET[Option[FileMetadata]](
+          s"${appConfig.bindingTariffFileStoreUrl}/file/$attachmentId",
+          headers = authHeaders(appConfig)
+        )
         .map(_.filter(_.published))
     }
 
