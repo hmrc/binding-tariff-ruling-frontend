@@ -3,9 +3,9 @@ import sbt._
 
 object AppDependencies {
 
+  val scope = "test"
+
   private val hmrcMongoPlayVersion = "0.71.0"
-  val scope                        = "test"
-  val jettyVersion                 = "9.4.48.v20220622"
   private val silencerVersion      = "1.7.9"
 
   val compile: Seq[ModuleID] = Seq(
@@ -25,7 +25,7 @@ object AppDependencies {
   val test: Seq[ModuleID] = Seq(
     "com.github.tomakehurst" % "wiremock"                  % "2.33.2"             % scope,
     "com.typesafe.play"      %% "play-test"                % current              % scope,
-    "org.mockito"            % "mockito-core"              % "4.7.0"              % scope,
+    "org.mockito"            % "mockito-core"              % "4.8.0"              % scope,
     "org.jsoup"              % "jsoup"                     % "1.15.3"             % scope,
     "com.vladsch.flexmark"   % "flexmark-all"              % "0.62.2"             % scope,
     "org.scalatest"          %% "scalatest"                % "3.2.13"             % scope,
