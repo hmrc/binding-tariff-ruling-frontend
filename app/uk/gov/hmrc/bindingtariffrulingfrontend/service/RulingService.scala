@@ -36,6 +36,10 @@ class RulingService @Inject() (
   bindingTariffClassificationConnector: BindingTariffClassificationConnector
 ) extends Logging {
 
+  type ExistingRuling = Option[Ruling]
+  type UpdatedRuling  = Option[Ruling]
+  type RulingUpdate   = (ExistingRuling, UpdatedRuling)
+
   def delete(reference: String): Future[Unit] =
     repository.delete(reference)
 
@@ -52,10 +56,6 @@ class RulingService @Inject() (
     bindingTariffClassificationConnector.get(reference).flatMap(refresh(reference, _))
 
   def refresh(reference: String, updatedCase: Option[Case])(implicit hc: HeaderCarrier): Future[Unit] = {
-
-    type ExistingRuling = Option[Ruling]
-    type UpdatedRuling  = Option[Ruling]
-    type RulingUpdate   = (ExistingRuling, UpdatedRuling)
 
     val rulingUpdate: Future[RulingUpdate] = for {
       existingRuling: ExistingRuling <- repository.get(reference)
