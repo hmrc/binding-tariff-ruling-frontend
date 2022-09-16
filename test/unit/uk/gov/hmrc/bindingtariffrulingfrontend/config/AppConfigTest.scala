@@ -54,7 +54,8 @@ class AppConfigTest extends BaseSpec {
   }
 
   "Build beta feedback unauthenticated url" in {
-    appConfig("contact-frontend.host" -> "host").betaFeedbackUnauthenticatedUrl shouldBe "host/contact/beta-feedback-unauthenticated?service=AdvanceTariffRulings"
+    appConfig("contact-frontend.host" -> "host").betaFeedbackUnauthenticatedUrl shouldBe
+      "host/contact/beta-feedback-unauthenticated?service=AdvanceTariffRulings"
   }
 
   "Build admin enabled" in {
