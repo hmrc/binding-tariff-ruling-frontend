@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
-import play.api.libs.json.{JsResultException, Json}
+import play.api.libs.json.{JsObject, JsResultException, Json}
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
-import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged.{reads, writes}
 
+// scalastyle:off magic.number
 class PagedTest extends BaseSpec {
 
   "Paged" should {
@@ -39,7 +39,6 @@ class PagedTest extends BaseSpec {
       Paged(Seq("")).isEmpty                  shouldBe false
     }
 
-    // scalastyle:off magic.number
     "calculate pageCount" in {
       Paged.empty.pageCount shouldBe 0
       Paged(results = Seq(), pageIndex   = 1, pageSize = 1, resultCount = 1).pageCount shouldBe 1
@@ -51,7 +50,6 @@ class PagedTest extends BaseSpec {
       Paged(results = Seq(), resultCount = 100).pageCount shouldBe 1
       Paged(results = Seq(), resultCount = 1000).pageCount shouldBe 10
     }
-    // scalastyle:on magic.number
 
     "calculate nonEmpty" in {
       Paged.empty.nonEmpty                     shouldBe false
@@ -59,99 +57,38 @@ class PagedTest extends BaseSpec {
       Paged(Seq("")).nonEmpty                  shouldBe true
     }
 
-    "valid results when results are provided" in {
-      val validPaged = Json
-        .obj(
-          "results"     -> Seq(""),
-          "pageIndex"   -> 1,
-          "pageSize"    -> 1,
-          "resultCount" -> 1
-        )
-        .as[Paged[String]]
-
-      validPaged shouldBe Paged(Seq(""), 1, 1, 1)
+    "parse valid json to paged object" in {
+      val validPaged         = buildPagedJson(Seq(""), 1, 1, 1).as[Paged[String]]
+      val expectedPageResult = Paged(Seq(""), 1, 1, 1)
+      validPaged shouldBe expectedPageResult
     }
 
-    "invalid results when no results provided" in {
-      val exception = intercept[JsResultException] {
-        Json
-          .obj(
-            "pageIndex"   -> 1,
-            "pageSize"    -> 1,
-            "resultCount" -> 1
-          )
-          .as[Paged[String]]
+    Seq("results", "pageIndex", "pageSize", "resultCount").foreach { key =>
+      s"raise exception when parsing json missing $key value" in {
+        val exception = intercept[JsResultException] {
+          (buildPagedJson - key).as[Paged[String]]
+        }
+
+        exception.errors.flatMap(_._2.flatMap(_.messages)) shouldBe List(s"invalid $key")
       }
-
-      exception.errors.size                              shouldBe 1
-      exception.errors.flatMap(_._2.flatMap(_.messages)) shouldBe List("invalid results")
-    }
-
-    "invalid json when no pageIndex provided" in {
-      val exception = intercept[JsResultException] {
-        Json
-          .obj(
-            "results"     -> Seq(""),
-            "pageSize"    -> 1,
-            "resultCount" -> 1
-          )
-          .as[Paged[String]]
-      }
-
-      exception.errors.size                              shouldBe 1
-      exception.errors.flatMap(_._2.flatMap(_.messages)) shouldBe List("invalid pageIndex")
-    }
-
-    "invalid json when no pageSize provided" in {
-      val exception = intercept[JsResultException] {
-        Json
-          .obj(
-            "results"     -> Seq(""),
-            "pageIndex"   -> 1,
-            "resultCount" -> 1
-          )
-          .as[Paged[String]]
-      }
-
-      exception.errors.size                              shouldBe 1
-      exception.errors.flatMap(_._2.flatMap(_.messages)) shouldBe List("invalid pageSize")
-    }
-
-    "invalid json when no resultCount provided" in {
-      val exception = intercept[JsResultException] {
-        Json
-          .obj(
-            "results"   -> Seq(""),
-            "pageIndex" -> 1,
-            "pageSize"  -> 1
-          )
-          .as[Paged[String]]
-      }
-
-      exception.errors.size                              shouldBe 1
-      exception.errors.flatMap(_._2.flatMap(_.messages)) shouldBe List("invalid resultCount")
     }
 
     "json created from Paged model" in {
-      val jsonCreated = Json.toJson(Paged(Seq(""), 1, 1, 1))
-      jsonCreated shouldBe Json.obj(
-        "results"     -> Json.arr(""),
-        "pageIndex"   -> 1,
-        "pageSize"    -> 1,
-        "resultCount" -> 1
-      )
+      val jsonCreated  = Json.toJson(Paged(Seq(""), 1, 1, 1))
+      val expectedJson = buildPagedJson(Seq(""), 1, 1, 1)
+      jsonCreated shouldBe expectedJson
     }
 
     "json created from Paged model when no values given" in {
-      val jsonCreated = Json.toJson(Paged(Seq("")))
-      jsonCreated shouldBe Json.obj(
-        "results"     -> Json.arr(""),
-        "pageIndex"   -> 1,
-        "pageSize"    -> 100,
-        "resultCount" -> 1
-      )
+      val jsonCreated  = Json.toJson(Paged(Seq("")))
+      val expectedJson = buildPagedJson(Seq(""), 1, 100, 1)
+      jsonCreated shouldBe expectedJson
     }
 
   }
-
+  private def buildPagedJson: JsObject =
+    buildPagedJson(Seq(""), 1, 1, 1)
+  private def buildPagedJson(results: Seq[String], pageIndex: Int, pageSize: Int, resultCount: Long): JsObject =
+    Json.obj("results" -> results, "pageIndex" -> pageIndex, "pageSize" -> pageSize, "resultCount" -> resultCount)
 }
+// scalastyle:on magic.number
