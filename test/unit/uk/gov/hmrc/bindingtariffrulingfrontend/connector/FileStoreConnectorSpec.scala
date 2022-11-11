@@ -19,6 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 import akka.util.ByteString
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.mockito.BDDMockito._
+import play.api.http.Status
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
@@ -132,6 +133,21 @@ class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer {
             }
           )
       ) shouldBe ByteString(content)
+    }
+
+    "Fail to download file from a URL" in {
+
+      stubFor(
+        get(urlEqualTo("/digital-tariffs-local/717f3a7a-db8e-11e9-8a34-2a2ae2dbcce4"))
+          .willReturn(
+            aResponse()
+              .withStatus(Status.INTERNAL_SERVER_ERROR)
+          )
+      )
+
+      intercept[RuntimeException] {
+        await(connector.downloadFile(s"$wireMockUrl/digital-tariffs-local/717f3a7a-db8e-11e9-8a34-2a2ae2dbcce4"))
+      }.getMessage shouldBe "Unable to retrieve file from filestore"
     }
   }
 }
