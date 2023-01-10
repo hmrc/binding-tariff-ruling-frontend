@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,44 +49,44 @@ trait RulingRepository {
 
 //scalastyle:off magic.number
 @Singleton
-class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit val ec: ExecutionContext)
-    extends PlayMongoRepository[Ruling](
-      collectionName = "rulings",
-      mongoComponent = mongoComponent,
-      domainFormat   = Ruling.Mongo.format,
-      indexes = Seq(
-        IndexModel(ascending("reference"), IndexOptions().unique(true).background(false).name("reference_Index")),
-        IndexModel(
-          ascending("bindingCommodityCode"),
-          IndexOptions().unique(false).background(false).name("bindingCommodityCode_Index")
+class RulingMongoRepository @Inject()(mongoComponent: MongoComponent)(implicit val ec: ExecutionContext)
+  extends PlayMongoRepository[Ruling](
+    collectionName = "rulings",
+    mongoComponent = mongoComponent,
+    domainFormat = Ruling.Mongo.format,
+    indexes = Seq(
+      IndexModel(ascending("reference"), IndexOptions().unique(true).background(false).name("reference_Index")),
+      IndexModel(
+        ascending("bindingCommodityCode"),
+        IndexOptions().unique(false).background(false).name("bindingCommodityCode_Index")
+      ),
+      IndexModel(
+        compoundIndex(
+          Indexes.text("reference"),
+          Indexes.text("bindingCommodityCode"),
+          Indexes.text("bindingCommodityCodeNGrams"),
+          Indexes.text("justification"),
+          Indexes.text("goodsDescription"),
+          Indexes.text("keywords")
         ),
-        IndexModel(
-          compoundIndex(
-            Indexes.text("reference"),
-            Indexes.text("bindingCommodityCode"),
-            Indexes.text("bindingCommodityCodeNGrams"),
-            Indexes.text("justification"),
-            Indexes.text("goodsDescription"),
-            Indexes.text("keywords")
-          ),
-          IndexOptions()
-            .unique(false)
-            .name("textIndex")
-            .background(false)
-            .weights(
-              BsonDocument("bindingCommodityCode" -> 10, "bindingCommodityCodeNgrams" -> 10, "keywords" -> 5)
-            )
-        )
+        IndexOptions()
+          .unique(false)
+          .name("textIndex")
+          .background(false)
+          .weights(
+            BsonDocument("bindingCommodityCode" -> 10, "bindingCommodityCodeNgrams" -> 10, "keywords" -> 5)
+          )
       )
     )
+  )
     with RulingRepository {
 
   override def update(ruling: Ruling, upsert: Boolean): Future[Ruling] =
     collection
       .findOneAndReplace(
-        filter      = byReference(ruling.reference),
+        filter = byReference(ruling.reference),
         replacement = ruling,
-        options     = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+        options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       )
       .toFuture()
 
@@ -100,32 +100,41 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
     collection.deleteMany(BsonDocument()).toFuture().map(_ => ())
 
   override def get(search: SimpleSearch): Future[Paged[Ruling]] = {
-    val startOfToday = LocalDate.now().atStartOfDay
-    val zoneOffset   = ZoneId.of("Europe/London").getRules.getOffset(startOfToday)
-    val today        = startOfToday.toInstant(zoneOffset)
 
-    val dateFilter  = Seq(Filters.gt("effectiveEndDate", today))
-    val textSearch  = search.query.map(query => Filters.text(query)).toSeq
+    val startOfToday = LocalDate.now().atStartOfDay
+    val zoneOffset = ZoneId.of("Europe/London").getRules.getOffset(startOfToday)
+    val today = startOfToday.toInstant(zoneOffset)
+
+    val textSearch = search.query.map(query => Filters.text(query)).toSeq
     val imageFilter = if (search.imagesOnly) Seq(Filters.gt("images", BsonArray())) else Seq.empty
+    val dateFilter = Seq(Filters.gt("effectiveEndDate", today))
 
     val allSearches: Seq[Bson] = textSearch ++ imageFilter ++ dateFilter
-    val findSearches           = if (allSearches.nonEmpty) and(allSearches: _*) else BsonDocument()
+    val findSearches = if (allSearches.nonEmpty) and(allSearches: _*) else BsonDocument()
 
     val textScore = if (search.query.isDefined) Sorts.metaTextScore("score") else BsonDocument()
 
-    for {
-      results <- collection
-                  .find(findSearches)
-                  .projection(Projections.metaTextScore("score"))
-                  .skip((search.pageIndex - 1) * search.pageSize)
-                  .limit(search.pageSize)
-                  .sort(Sorts.orderBy(textScore, descending("effectiveEndDate")))
-                  .toFuture()
+    val withOrWithoutProjectionSearch =
+      if (textSearch.isEmpty) {
+        collection
+          .find(findSearches)
+      } else {
+        collection
+          .find(findSearches)
+          .projection(Projections.metaTextScore("score"))
+      }
 
+    for {
+      results <-
+        withOrWithoutProjectionSearch
+          .skip((search.pageIndex - 1) * search.pageSize)
+          .limit(search.pageSize)
+          .sort(Sorts.orderBy(textScore, descending("effectiveEndDate")))
+          .toFuture()
       count <- collection
-                .withReadConcern(ReadConcern.MAJORITY)
-                .countDocuments(findSearches, CountOptions().skip(0))
-                .toFuture()
+        .withReadConcern(ReadConcern.MAJORITY)
+        .countDocuments(and(allSearches: _*), CountOptions().skip(0))
+        .toFuture()
     } yield Paged(results, search.pageIndex, search.pageSize, count)
   }
 

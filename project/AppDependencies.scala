@@ -5,15 +5,15 @@ object AppDependencies {
 
   val scope = "test"
 
-  private val hmrcMongoPlayVersion = "0.73.0"
+  private val hmrcMongoPlayVersion = "0.74.0"
   private val silencerVersion      = "1.7.12"
 
   val compile: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc"                  %% "bootstrap-frontend-play-28" % "7.11.0",
+    "uk.gov.hmrc"                  %% "bootstrap-frontend-play-28" % "7.12.0",
     "uk.gov.hmrc.mongo"            %% "hmrc-mongo-play-28"         % hmrcMongoPlayVersion,
-    "uk.gov.hmrc"                  %% "play-json-union-formatter"  % "1.15.0-play-28",
+    "uk.gov.hmrc"                  %% "play-json-union-formatter"  % "1.17.0-play-28",
     "uk.gov.hmrc"                  %% "play-allowlist-filter"      % "1.1.0",
-    "uk.gov.hmrc"                  %% "play-frontend-hmrc"         % "3.32.0-play-28",
+    "uk.gov.hmrc"                  %% "play-frontend-hmrc"         % "5.5.0-play-28",
     "org.typelevel"                %% "cats-core"                  % "2.8.0",
     "com.digitaltangible"          %% "play-guard"                 % "2.5.0",
     "org.quartz-scheduler"         % "quartz"                      % "2.3.2",

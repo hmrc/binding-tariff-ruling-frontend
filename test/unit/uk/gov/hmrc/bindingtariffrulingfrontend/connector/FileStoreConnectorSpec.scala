@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,15 +59,16 @@ class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer {
           )
       )
 
-      await(connector.get("d4897c0a-b92d-4cf7-8990-f40fe158be68")) shouldBe Some(
-        FileMetadata(
-          "d4897c0a-b92d-4cf7-8990-f40fe158be68",
-          Some("IMG_1721.JPG"),
-          Some("image/jpeg"),
-          Some("http://localhost:4572/digital-tariffs-local/d4897c0a-b92d-4cf7-8990-f40fe158be68"),
-          published = true
+      await(connector.get("d4897c0a-b92d-4cf7-8990-f40fe158be68")) shouldBe
+        Some(
+          FileMetadata(
+            "d4897c0a-b92d-4cf7-8990-f40fe158be68",
+            Some("IMG_1721.JPG"),
+            Some("image/jpeg"),
+            Some("http://localhost:4572/digital-tariffs-local/d4897c0a-b92d-4cf7-8990-f40fe158be68"),
+            published = true
+          )
         )
-      )
     }
 
     "call the filestore for multiple IDs" in {
@@ -90,7 +91,7 @@ class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer {
             "9a7a1787-4ec1-40d7-aa75-50cb276e3d28"
           )
         )
-      ) shouldBe (
+      ) shouldBe
         Map(
           "006491c2-a60b-46cc-9e73-5e180d3bf1ce" -> FileMetadata(
             "006491c2-a60b-46cc-9e73-5e180d3bf1ce",
@@ -107,11 +108,10 @@ class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer {
             published = true
           )
         )
-      )
-
     }
 
     "download a file from the given URL" in {
+
       val content = "Some content".getBytes(StandardCharsets.UTF_8)
 
       stubFor(
