@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,37 +57,30 @@ class RulingService @Inject() (
 
   def refresh(reference: String, updatedCase: Option[Case])(implicit hc: HeaderCarrier): Future[Unit] = {
 
-    val rulingUpdate: Future[RulingUpdate] = for {
-      existingRuling: ExistingRuling <- repository.get(reference)
+    val rulingUpdate: Future[RulingUpdate] =
+      for {
+        existingRuling: ExistingRuling <- repository.get(reference)
+        validCase = updatedCase
+          .filter(_.application.`type` == ApplicationType.BTI)
+          .filter(_.status == CaseStatus.COMPLETED)
+          .filter(_.decision.isDefined)
+          .filter(_.decision.flatMap(_.effectiveStartDate).isDefined)
+          .filter(_.decision.flatMap(_.effectiveEndDate).isDefined)
+        fileMetaData <- validCase
+                         .map(_.attachments.map(_.id))
+                         .map(fileStoreService.get(_))
+                         .getOrElse(Future.successful(Map.empty[String, FileMetadata]))
+        updatedRuling: UpdatedRuling = validCase.map(toRuling(_, fileMetaData))
+        result: RulingUpdate         = (existingRuling, updatedRuling)
+      } yield result
 
-      validCase = updatedCase
-        .filter(_.application.`type` == ApplicationType.BTI)
-        .filter(_.status == CaseStatus.COMPLETED)
-        .filter(_.decision.isDefined)
-        .filter(_.decision.flatMap(_.effectiveStartDate).isDefined)
-        .filter(_.decision.flatMap(_.effectiveEndDate).isDefined)
-
-      fileMetaData <- validCase
-                       .map(_.attachments.map(_.id))
-                       .map(fileStoreService.get(_))
-                       .getOrElse(Future.successful(Map.empty[String, FileMetadata]))
-
-      updatedRuling: UpdatedRuling = validCase.map(toRuling(_, fileMetaData))
-
-      result: RulingUpdate = (existingRuling, updatedRuling)
-
-    } yield result
-
-    rulingUpdate flatMap {
-
+    rulingUpdate.flatMap {
       case (Some(_), None) =>
         for {
           _ <- repository.delete(reference)
           _ = auditService.auditRulingDeleted(reference)
           _ = logger.info(s"Ruling has been deleted for case with reference: $reference")
-
         } yield ()
-
       case (None, Some(u)) =>
         for {
           _ <- repository.update(u, upsert = true)
