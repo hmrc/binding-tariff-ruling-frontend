@@ -27,9 +27,7 @@ lazy val microservice = (project in file("."))
     libraryDependencies ++= AppDependencies(),
     Test / parallelExecution := false,
     Test / fork := true,
-    retrieveManaged := true,
-    // Use the silencer plugin to suppress warnings from unused imports in compiled twirl templates
-    scalacOptions += "-P:silencer:pathFilters=views;routes"
+    retrieveManaged := true
   )
   .settings(
     Test / unmanagedSourceDirectories := Seq(

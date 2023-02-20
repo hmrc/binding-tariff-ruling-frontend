@@ -6,23 +6,22 @@ object AppDependencies {
   val scope = "test"
 
   private val hmrcMongoPlayVersion = "0.74.0"
-  private val silencerVersion      = "1.7.12"
+  private val bootstrapVersion     = "7.13.0"
 
   val compile: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc"                  %% "bootstrap-frontend-play-28" % "7.13.0",
+    "uk.gov.hmrc"                  %% "bootstrap-frontend-play-28" % bootstrapVersion,
     "uk.gov.hmrc.mongo"            %% "hmrc-mongo-play-28"         % hmrcMongoPlayVersion,
     "uk.gov.hmrc"                  %% "play-json-union-formatter"  % "1.18.0-play-28",
     "uk.gov.hmrc"                  %% "play-allowlist-filter"      % "1.1.0",
-    "uk.gov.hmrc"                  %% "play-frontend-hmrc"         % "6.5.0-play-28",
+    "uk.gov.hmrc"                  %% "play-frontend-hmrc"         % "6.6.0-play-28",
     "org.typelevel"                %% "cats-core"                  % "2.9.0",
     "com.digitaltangible"          %% "play-guard"                 % "2.5.0",
     "org.quartz-scheduler"         % "quartz"                      % "2.3.2",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"       % "2.14.2",
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
-    "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"       % "2.14.2"
   )
 
   val test: Seq[ModuleID] = Seq(
+    "uk.gov.hmrc"            %% "bootstrap-test-play-28"   % bootstrapVersion     % scope,
     "com.github.tomakehurst" % "wiremock"                  % "2.33.2"             % scope,
     "com.typesafe.play"      %% "play-test"                % current              % scope,
     "org.mockito"            % "mockito-core"              % "4.11.0"             % scope,
