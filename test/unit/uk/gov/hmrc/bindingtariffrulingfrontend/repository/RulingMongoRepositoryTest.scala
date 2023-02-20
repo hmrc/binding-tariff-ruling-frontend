@@ -29,8 +29,11 @@ import java.time._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 //scalastyle:off magic.number
-class RulingMongoRepositoryTest extends AnyWordSpecLike with GuiceOneAppPerSuite
-  with Matchers with DefaultPlayMongoRepositorySupport[Ruling] {
+class RulingMongoRepositoryTest
+    extends AnyWordSpecLike
+    with GuiceOneAppPerSuite
+    with Matchers
+    with DefaultPlayMongoRepositorySupport[Ruling] {
 
   private val clock = Clock.tickSeconds(ZoneOffset.UTC)
 
@@ -42,15 +45,15 @@ class RulingMongoRepositoryTest extends AnyWordSpecLike with GuiceOneAppPerSuite
 
   val startOfToday: LocalDateTime = LocalDate.now().atStartOfDay
   val zoneOffsetToday: ZoneOffset = ZoneId.of("Europe/London").getRules.getOffset(startOfToday)
-  val today: Instant = startOfToday.toInstant(zoneOffsetToday)
+  val today: Instant              = startOfToday.toInstant(zoneOffsetToday)
 
-  val startOfTomorrow: LocalDateTime = LocalDate.now().plusDays(1).atStartOfDay
+  val startOfTomorrow: LocalDateTime  = LocalDate.now().plusDays(1).atStartOfDay
   val startOfNextMonth: LocalDateTime = LocalDate.now().plusMonths(1).atStartOfDay
 
-  val zoneOffsetTomorrow: ZoneOffset = ZoneId.of("Europe/London").getRules.getOffset(startOfTomorrow)
+  val zoneOffsetTomorrow: ZoneOffset  = ZoneId.of("Europe/London").getRules.getOffset(startOfTomorrow)
   val zoneOffsetNextMonth: ZoneOffset = ZoneId.of("Europe/London").getRules.getOffset(startOfNextMonth)
 
-  val tomorrow: Instant = startOfTomorrow.toInstant(zoneOffsetTomorrow)
+  val tomorrow: Instant  = startOfTomorrow.toInstant(zoneOffsetTomorrow)
   val nextMonth: Instant = startOfNextMonth.toInstant(zoneOffsetNextMonth)
 
   override def beforeEach(): Unit = {
@@ -145,9 +148,12 @@ class RulingMongoRepositoryTest extends AnyWordSpecLike with GuiceOneAppPerSuite
     }
 
     "Sort Rulings based on effectiveEndDate - latest end date first, earliest end date last" in {
-      val document1 = Ruling(reference = "ref1", "0", clock.instant(), tomorrow.plusSeconds(2), "justification", "exacting")
-      val document2 = Ruling(reference = "ref2", "0", clock.instant(), tomorrow.plusSeconds(1), "justification", "exactly")
-      val document3 = Ruling(reference = "ref3", "0", clock.instant(), tomorrow.plusSeconds(3), "justification", "fountain pen")
+      val document1 =
+        Ruling(reference = "ref1", "0", clock.instant(), tomorrow.plusSeconds(2), "justification", "exacting")
+      val document2 =
+        Ruling(reference = "ref2", "0", clock.instant(), tomorrow.plusSeconds(1), "justification", "exactly")
+      val document3 =
+        Ruling(reference = "ref3", "0", clock.instant(), tomorrow.plusSeconds(3), "justification", "fountain pen")
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
       givenAnExistingDocument(document3)
@@ -181,7 +187,7 @@ class RulingMongoRepositoryTest extends AnyWordSpecLike with GuiceOneAppPerSuite
       givenAnExistingDocument(document2)
 
       await(repository.get(SimpleSearch(Some("FOUNTAIN"), imagesOnly = false, 1, 100))).results shouldBe Seq(document1)
-      await(repository.get(SimpleSearch(Some("lapTOP"), imagesOnly = false, 1, 100))).results shouldBe Seq(document2)
+      await(repository.get(SimpleSearch(Some("lapTOP"), imagesOnly   = false, 1, 100))).results shouldBe Seq(document2)
     }
 
     "Retrieve Multiple - by Goods Description - word stems" in {
@@ -199,13 +205,13 @@ class RulingMongoRepositoryTest extends AnyWordSpecLike with GuiceOneAppPerSuite
     "Retrieve One - by Goods Description - images only" in {
       val document1 =
         Ruling(
-          reference = "ref1",
+          reference            = "ref1",
           bindingCommodityCode = "0",
-          effectiveStartDate = clock.instant(),
-          effectiveEndDate = tomorrow,
-          justification = "justification",
-          goodsDescription = "exacting",
-          images = Seq("id1, id2")
+          effectiveStartDate   = clock.instant(),
+          effectiveEndDate     = tomorrow,
+          justification        = "justification",
+          goodsDescription     = "exacting",
+          images               = Seq("id1, id2")
         )
 
       val document2 = Ruling(reference = "ref2", "0", clock.instant(), tomorrow, "justification", "exactly")

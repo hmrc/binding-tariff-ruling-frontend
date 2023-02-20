@@ -14,12 +14,15 @@ lazy val microservice = (project in file("."))
   .settings(playSettings: _*)
   .settings(scalaSettings: _*)
   .settings(publishingSettings: _*)
+  // To resolve a bug with version 2.x.x of the scoverage plugin - https://github.com/sbt/sbt/issues/6997
+  // Try to remove when sbt 1.8.0+ and scoverage is 2.0.7+
+  .settings(libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always))
   .settings(defaultSettings(): _*)
   .settings(majorVersion := 0)
   .settings(PlayKeys.playDefaultPort := 9586)
   .settings(
     name := appName,
-    scalaVersion := "2.12.16",
+    scalaVersion := "2.13.10",
     targetJvm := "jvm-1.8",
     libraryDependencies ++= AppDependencies(),
     Test / parallelExecution := false,
