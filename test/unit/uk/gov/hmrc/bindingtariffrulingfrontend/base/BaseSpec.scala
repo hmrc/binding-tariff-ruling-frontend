@@ -18,7 +18,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.base
 
 import akka.actor.ActorSystem
 import akka.stream.Materializer
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.{Lang, MessagesApi}

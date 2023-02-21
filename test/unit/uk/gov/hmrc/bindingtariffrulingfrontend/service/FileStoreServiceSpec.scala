@@ -17,7 +17,6 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
 import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito._
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.FileStoreConnector
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged

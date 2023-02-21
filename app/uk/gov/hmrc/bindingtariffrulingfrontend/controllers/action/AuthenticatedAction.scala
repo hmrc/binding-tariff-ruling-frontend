@@ -21,9 +21,9 @@ import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
 
-class AuthenticatedAction @Inject() (appConfig: AppConfig) extends ActionRefiner[Request, Request] {
+class AuthenticatedAction @Inject() (appConfig: AppConfig)(implicit ec: ExecutionContext)
+    extends ActionRefiner[Request, Request] {
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] =
     if (request.headers.get("X-Api-Token").contains(appConfig.authorization)) {
@@ -32,5 +32,5 @@ class AuthenticatedAction @Inject() (appConfig: AppConfig) extends ActionRefiner
       Future.successful(Left(Results.Forbidden))
     }
 
-  override protected def executionContext: ExecutionContext = global
+  override protected def executionContext: ExecutionContext = ec
 }

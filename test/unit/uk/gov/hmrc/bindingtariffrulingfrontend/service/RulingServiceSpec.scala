@@ -17,7 +17,8 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{refEq, _}
+import org.mockito.ArgumentMatchers._
+import org.mockito.MockitoSugar
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
@@ -37,7 +38,7 @@ import scala.collection.immutable.ListMap
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
+class RulingServiceSpec extends BaseSpec with MockitoSugar with BeforeAndAfterEach {
 
   private val connector        = mock[BindingTariffClassificationConnector]
   private val repository       = mock[RulingRepository]
@@ -48,7 +49,10 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
   override protected def afterEach(): Unit = {
     super.afterEach()
-    reset(repository, connector, auditService, fileStoreService)
+    reset(repository)
+    reset(connector)
+    reset(auditService)
+    reset(fileStoreService)
   }
 
   "Service DELETE ALL" should {
@@ -180,7 +184,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
-      verify(repository, never()).update(any[Ruling], anyBoolean())
+      verify(repository, never).update(any[Ruling], anyBoolean())
       verifyNoInteractions(auditService)
     }
 
@@ -258,7 +262,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
-      verify(repository, never()).update(any[Ruling], anyBoolean())
+      verify(repository, never).update(any[Ruling], anyBoolean())
       verifyNoInteractions(auditService)
     }
 
@@ -270,7 +274,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
-      verify(repository, never()).update(any[Ruling], anyBoolean())
+      verify(repository, never).update(any[Ruling], anyBoolean())
       verifyNoInteractions(auditService)
     }
 
@@ -280,7 +284,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
-      verify(repository, never()).update(any[Ruling], anyBoolean())
+      verify(repository, never).update(any[Ruling], anyBoolean())
       verifyNoInteractions(auditService)
     }
 
@@ -292,7 +296,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
-      verify(repository, never()).update(any[Ruling], anyBoolean())
+      verify(repository, never).update(any[Ruling], anyBoolean())
       verifyNoInteractions(auditService)
     }
 
@@ -304,7 +308,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
-      verify(repository, never()).update(any[Ruling], anyBoolean())
+      verify(repository, never).update(any[Ruling], anyBoolean())
       verifyNoInteractions(auditService)
     }
 
