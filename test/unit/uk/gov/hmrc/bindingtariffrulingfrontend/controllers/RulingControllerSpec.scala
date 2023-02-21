@@ -17,7 +17,6 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import java.time.Instant
-
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
 import play.api.http.Status
@@ -28,10 +27,10 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 
-class RulingControllerSpec extends ControllerSpec {
+class RulingControllerSpec(implicit ec: ExecutionContext) extends ControllerSpec {
 
   private val rulingService    = mock[RulingService]
   private val fileStoreService = mock[FileStoreService]
