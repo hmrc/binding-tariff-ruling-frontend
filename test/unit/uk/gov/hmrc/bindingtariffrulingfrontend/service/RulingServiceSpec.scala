@@ -34,9 +34,10 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import scala.collection.immutable.ListMap
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class RulingServiceSpec(implicit ec: ExecutionContext) extends BaseSpec with BeforeAndAfterEach {
+class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
   private val connector        = mock[BindingTariffClassificationConnector]
   private val repository       = mock[RulingRepository]

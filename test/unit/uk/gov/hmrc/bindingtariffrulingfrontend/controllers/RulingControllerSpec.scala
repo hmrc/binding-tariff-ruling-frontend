@@ -27,10 +27,11 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
+import scala.concurrent.ExecutionContext.Implicits.global
 
-class RulingControllerSpec(implicit ec: ExecutionContext) extends ControllerSpec {
+class RulingControllerSpec extends ControllerSpec {
 
   private val rulingService    = mock[RulingService]
   private val fileStoreService = mock[FileStoreService]
