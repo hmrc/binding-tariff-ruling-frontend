@@ -5,13 +5,10 @@ val appName = "binding-tariff-ruling-frontend"
 
 lazy val plugins: Seq[Plugins] =
   Seq(PlayScala, SbtDistributablesPlugin)
-lazy val playSettings: Seq[Setting[_]] = Seq.empty
 
 lazy val microservice = (project in file("."))
   .enablePlugins(plugins: _*)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
-  .settings(playSettings: _*)
-  .settings(scalaSettings: _*)
   .settings(scalacOptions ++= Seq("-Wconf:src=routes/.*:s", "-Wconf:cat=unused-imports&src=html/.*:s"))
   // To resolve a bug with version 2.x.x of the scoverage plugin - https://github.com/sbt/sbt/issues/6997
   // Try to remove when sbt 1.8.0+ and scoverage is 2.0.7+
@@ -35,9 +32,6 @@ lazy val microservice = (project in file("."))
     ),
     Test / resourceDirectory := baseDirectory.value / "test" / "resources",
     addTestReportOption(Test, "test-reports")
-  )
-  .settings(
-    resolvers += Resolver.jcenterRepo
   )
   .settings(
     // concatenate js
