@@ -23,9 +23,9 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{ErrorCode, JsErr
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.Future.successful
-import scala.concurrent.ExecutionContext.Implicits.global
 
-class AdminAction @Inject() (appConfig: AppConfig) extends ActionRefiner[Request, Request] {
+class AdminAction @Inject() (appConfig: AppConfig)(implicit ec: ExecutionContext)
+    extends ActionRefiner[Request, Request] {
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] =
     if (appConfig.adminEnabled) {
@@ -40,5 +40,5 @@ class AdminAction @Inject() (appConfig: AppConfig) extends ActionRefiner[Request
       )
     }
 
-  override protected def executionContext: ExecutionContext = global
+  override protected def executionContext: ExecutionContext = ec
 }

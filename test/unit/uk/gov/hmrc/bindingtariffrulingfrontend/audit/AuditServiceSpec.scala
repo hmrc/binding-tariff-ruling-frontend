@@ -18,7 +18,6 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.audit
 
 import java.time.Instant
 
-import org.mockito.Mockito.verify
 import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditPayloadType._
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling

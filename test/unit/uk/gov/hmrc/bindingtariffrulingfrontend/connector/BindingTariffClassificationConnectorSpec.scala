@@ -17,6 +17,7 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
 import akka.actor.ActorSystem
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.apache.http.HttpStatus
 import org.mockito.BDDMockito._
@@ -84,7 +85,7 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
       await(connector.get("ref")) shouldBe Some(validCase)
 
-      verify(
+      WireMock.verify(
         getRequestedFor(urlEqualTo("/cases/ref"))
           .withHeader("X-Api-Token", equalTo(xApiToken))
       )
@@ -101,7 +102,7 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
       await(connector.get("ref")) shouldBe None
 
-      verify(
+      WireMock.verify(
         getRequestedFor(urlEqualTo("/cases/ref"))
           .withHeader("X-Api-Token", equalTo(xApiToken))
       )
@@ -146,7 +147,7 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
       await(connector.newApprovedRulings(startDate, SimplePagination())) shouldBe Paged(Seq(validCase))
 
-      verify(
+      WireMock.verify(
         getRequestedFor(urlEqualTo(url))
           .withHeader("X-Api-Token", equalTo(xApiToken))
       )
@@ -173,7 +174,7 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
       await(connector.newApprovedRulings(startDate, SimplePagination())) shouldBe Paged.empty[Case]
 
-      verify(
+      WireMock.verify(
         getRequestedFor(urlEqualTo(url))
           .withHeader("X-Api-Token", equalTo(xApiToken))
       )
@@ -218,7 +219,7 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
       await(connector.newCanceledRulings(endDate, SimplePagination())) shouldBe Paged(Seq(validCase))
 
-      verify(
+      WireMock.verify(
         getRequestedFor(urlEqualTo(url))
           .withHeader("X-Api-Token", equalTo(xApiToken))
       )
@@ -245,7 +246,7 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
 
       await(connector.newCanceledRulings(endDate, SimplePagination())) shouldBe Paged.empty[Case]
 
-      verify(
+      WireMock.verify(
         getRequestedFor(urlEqualTo(url))
           .withHeader("X-Api-Token", equalTo(xApiToken))
       )

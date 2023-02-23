@@ -21,10 +21,10 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.DefaultAuditConnector
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class AuditService @Inject() (auditConnector: DefaultAuditConnector) {
+class AuditService @Inject() (auditConnector: DefaultAuditConnector)(implicit ec: ExecutionContext) {
 
   import AuditPayloadType._
 

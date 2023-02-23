@@ -17,7 +17,6 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import java.time.Instant
-
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
 import play.api.http.Status
@@ -30,6 +29,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RulingControllerSpec extends ControllerSpec {
 

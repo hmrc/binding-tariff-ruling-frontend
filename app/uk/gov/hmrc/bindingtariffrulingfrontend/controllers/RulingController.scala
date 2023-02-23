@@ -17,6 +17,7 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import cats.data.OptionT
+
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
@@ -27,8 +28,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RulingController @Inject() (
@@ -41,7 +41,8 @@ class RulingController @Inject() (
   notFoundView: views.html.not_found,
   mcc: MessagesControllerComponents,
   implicit val appConfig: AppConfig
-) extends FrontendController(mcc)
+)(implicit ec: ExecutionContext)
+    extends FrontendController(mcc)
     with I18nSupport {
 
   type Metadata = Map[String, FileMetadata]

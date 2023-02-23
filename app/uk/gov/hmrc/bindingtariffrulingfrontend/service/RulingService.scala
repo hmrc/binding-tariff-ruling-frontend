@@ -26,15 +26,15 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class RulingService @Inject() (
   repository: RulingRepository,
   auditService: AuditService,
   fileStoreService: FileStoreService,
   bindingTariffClassificationConnector: BindingTariffClassificationConnector
-) extends Logging {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   type ExistingRuling = Option[Ruling]
   type UpdatedRuling  = Option[Ruling]
