@@ -75,8 +75,9 @@ class FileStoreServiceSpec extends BaseSpec with BeforeAndAfterEach {
     "delegate to connector" in {
       val rulings = Paged((0 until 5).map(makeRuling))
       service.get(rulings)
-      val ids = Seq("file1", "file2", "image1", "image2")
-      verify(connector).get(Seq.fill(5)(ids).flatten.toSet)
+      val ids              = Seq("file1", "file2", "image1", "image2")
+      val amountOfElements = 5
+      verify(connector).get(Seq.fill(amountOfElements)(ids).flatten.toSet)
     }
   }
 

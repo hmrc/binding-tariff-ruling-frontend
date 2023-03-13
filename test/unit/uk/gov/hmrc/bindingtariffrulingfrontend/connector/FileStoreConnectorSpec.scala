@@ -36,7 +36,8 @@ class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer {
   val httpClient           = app.injector.instanceOf[AuthenticatedHttpClient]
   val metrics              = new TestMetrics
   val wsClient             = app.injector.instanceOf[WSClient]
-  given(appConfig.maxUriLength).willReturn(2048L)
+  val maxUriLenght         = 2048L
+  given(appConfig.maxUriLength).willReturn(maxUriLenght)
   given(appConfig.bindingTariffFileStoreUrl).willReturn(wireMockUrl)
   val connector = new FileStoreConnector(appConfig, httpClient, wsClient, metrics)
 

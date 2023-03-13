@@ -51,8 +51,8 @@ class SearchController @Inject() (
 
   private def renderView(
     form: Form[SimpleSearch],
-    rulings: Option[Paged[Ruling]] = None,
-    fileMetadata: Metadata         = Map.empty
+    rulings: Option[Paged[Ruling]],
+    fileMetadata: Metadata
   )(implicit request: Request[_]) =
     Future.successful(Ok(search(form, rulings, fileMetadata)))
 

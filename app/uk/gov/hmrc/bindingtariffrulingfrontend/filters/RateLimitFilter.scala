@@ -28,7 +28,7 @@ class RateLimitFilter @Inject() (appConfig: AppConfig)(implicit val executionCon
   val TrueClientIP = "True-Client-IP"
 
   private lazy val filter = new RateLimitActionFilter[Request](
-    rateLimiter    = new RateLimiter(appConfig.rateLimitBucketSize, appConfig.rateLimitRatePerSecond, "IP"),
+    rateLimiter    = new RateLimiter(appConfig.rateLimitBucketSize, appConfig.rateLimitRatePerSecond.toFloat, "IP"),
     keyFromRequest = request => request.headers.get(TrueClientIP).getOrElse(request.remoteAddress),
     rejectResponse = _ => Future.successful(Results.TooManyRequests)
   )

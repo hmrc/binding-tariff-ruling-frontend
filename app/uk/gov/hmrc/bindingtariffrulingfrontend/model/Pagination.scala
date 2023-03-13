@@ -24,6 +24,8 @@ trait Pagination {
       NoPagination(page, pageSize)
     case SimplePagination(_, pageSize) =>
       SimplePagination(page, pageSize)
+    case _ =>
+      NoPagination(1, Integer.MAX_VALUE)
   }
 }
 
