@@ -35,6 +35,8 @@ class AppConfig @Inject() (val configuration: Configuration) extends ServicesCon
   lazy val bindingTariffFileStoreUrl: String      = baseUrl("binding-tariff-filestore")
   lazy val adminEnabled: Boolean                  = getBoolean("admin-mode")
   lazy val ukGlobalTariffHost: String             = loadConfig[String]("uk-global-tariff.host")
+  lazy val helpMakeGovUkBetterUrl: String         = loadConfig[String]("urls.helpMakeGovUkBetterUrl")
+  lazy val displayMakeGovUkBetterUrl: Boolean     = loadConfig[Boolean]("toggle.displayResearchBanner")
 
   lazy val maxUriLength: Long = configuration.underlying.getBytes("akka.http.parsing.max-uri-length")
 
