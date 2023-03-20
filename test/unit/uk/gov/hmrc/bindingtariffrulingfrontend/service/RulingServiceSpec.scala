@@ -93,19 +93,20 @@ class RulingServiceSpec extends BaseSpec with MockitoSugar with BeforeAndAfterEa
   }
 
   "Service Refresh" should {
-    val startDate = Instant.now().plus(10, ChronoUnit.SECONDS)
-    val endDate   = Instant.now()
+    val tenMinutes = 10
+    val startDate  = Instant.now().plus(tenMinutes, ChronoUnit.SECONDS)
+    val endDate    = Instant.now()
 
     val validDecision = Decision("code", Some(startDate), Some(endDate), "justification", "description")
 
-    val publicAttachment       = Attachment("public-file-id", public     = true, shouldPublishToRulings  = true)
-    val publicImage            = Attachment("public-image-id", public    = true, shouldPublishToRulings  = true)
-    val privateAttachment      = Attachment("private-file-id", public    = false, shouldPublishToRulings = false)
-    val privateImage           = Attachment("private-image-id", public   = false, shouldPublishToRulings = false)
-    val nonPublishAttachment   = Attachment("nopublish-file-id", public  = true, shouldPublishToRulings  = false)
-    val nonPublishImage        = Attachment("nopublish-image-id", public = true, shouldPublishToRulings  = false)
-    val invalidStateAttachment = Attachment("invalid-file-id", public    = false, shouldPublishToRulings = true)
-    val invalidStateImage      = Attachment("invalid-image-id", public   = false, shouldPublishToRulings = true)
+    val publicAttachment       = Attachment("public-file-id", public = true, shouldPublishToRulings = true)
+    val publicImage            = Attachment("public-image-id", public = true, shouldPublishToRulings = true)
+    val privateAttachment      = Attachment("private-file-id")
+    val privateImage           = Attachment("private-image-id")
+    val nonPublishAttachment   = Attachment("nopublish-file-id", public = true)
+    val nonPublishImage        = Attachment("nopublish-image-id", public = true)
+    val invalidStateAttachment = Attachment("invalid-file-id", shouldPublishToRulings = true)
+    val invalidStateImage      = Attachment("invalid-image-id", shouldPublishToRulings = true)
 
     val attachments = Seq(
       publicAttachment,

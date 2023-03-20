@@ -24,7 +24,7 @@ class ResultSummarySpec extends ViewSpec {
 
   val ruling = Ruling(reference = "ref1", "0", Instant.now, Instant.now(), "justification", "exacting")
 
-  override val testMessages = Map(
+  override val testMessages: Map[String, Map[String, String]] = Map(
     "default" -> Map(
       "search.summary.nomatch"          -> "There are no rulings that match your search.",
       "search.summary.onematch"         -> "Showing 1 result that matches your search.",
@@ -73,8 +73,8 @@ class ResultSummarySpec extends ViewSpec {
     }
 
     "render search results when there is 1 page of results for the search query" in {
-
-      val results = Paged(Seq.fill(6)(ruling))
+      val collectionElements = 6
+      val results            = Paged(Seq.fill(collectionElements)(ruling))
 
       val renderedView = view(
         html.components.result_summary(
@@ -91,8 +91,12 @@ class ResultSummarySpec extends ViewSpec {
     }
 
     "render search results for first page when there are multiple pages" in {
+      val pageIndex          = 1
+      val pageSize           = 25
+      val collectionElements = 25
+      val resultCount        = 100
 
-      val results = Paged(Seq.fill(25)(ruling), SimplePagination(1, 25), 100)
+      val results = Paged(Seq.fill(collectionElements)(ruling), SimplePagination(pageIndex, pageSize), resultCount)
 
       val renderedView = view(
         html.components.result_summary(
@@ -109,8 +113,12 @@ class ResultSummarySpec extends ViewSpec {
     }
 
     "render search results for second page when there are multiple pages" in {
+      val pageIndex          = 2
+      val pageSize           = 25
+      val collectionElements = 25
+      val resultCount        = 100
 
-      val results = Paged(Seq.fill(25)(ruling), SimplePagination(2, 25), 100)
+      val results = Paged(Seq.fill(collectionElements)(ruling), SimplePagination(pageIndex, pageSize), resultCount)
 
       val renderedView = view(
         html.components.result_summary(
@@ -180,8 +188,12 @@ class ResultSummarySpec extends ViewSpec {
     }
 
     "render search results for first page when there are multiple pages" in {
+      val pageIndex          = 1
+      val pageSize           = 25
+      val collectionElements = 25
+      val resultCount        = 100
 
-      val results = Paged(Seq.fill(25)(ruling), SimplePagination(1, 25), 100)
+      val results = Paged(Seq.fill(collectionElements)(ruling), SimplePagination(pageIndex, pageSize), resultCount)
 
       val renderedView = view(
         html.components.result_summary(
