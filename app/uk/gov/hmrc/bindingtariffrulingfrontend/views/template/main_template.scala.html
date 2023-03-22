@@ -22,8 +22,7 @@
 
 @this(
   config: AppConfig,
-  govukLayout: GovukLayout,
-  twoThirdsMainContent: TwoThirdsMainContent,
+  govukTemplate: GovukTemplate,
   hmrcHeader: HmrcHeader,
   hmrcStandardFooter: HmrcStandardFooter,
   hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
@@ -58,7 +57,6 @@
 @headerBlock = {
   @hmrcHeader(Header(
     homepageUrl = "https://www.gov.uk",
-    language = if(messages.lang.code == "cy") Cy else En,
     serviceName = Some(messages("service.name")),
     serviceUrl = routes.SearchController.get().path,
     userResearchBanner = userResearchBanner
@@ -72,12 +70,13 @@
   </div>
 }
 
-@govukLayout(
-    pageTitle = Some(title.fold(messages("site.title.suffix"))(_ + " - " + messages("site.title.suffix"))),
-    headBlock = Some(headBlock),
-    headerBlock = Some(headerBlock),
-    scriptsBlock = Some(scriptsBlock),
-    footerBlock = Some(hmrcStandardFooter()),
-    mainContentLayout = Some(twoThirdsMainContent(_))
+@govukTemplate(
+  htmlLang = Some(messages.lang.code),
+  pageTitle = Some(title.fold(messages("site.title.suffix"))(_ + " - " + messages("site.title.suffix"))),
+  headBlock = Some(headBlock),
+  headerBlock = headerBlock,
+  bodyEndBlock = Some(scriptsBlock),
+  mainClasses = Some("govuk-main-wrapper--auto-spacing"),
+  footerBlock = hmrcStandardFooter()
 )(contentBlock)
 
