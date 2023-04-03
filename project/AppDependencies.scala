@@ -6,13 +6,13 @@ object AppDependencies {
   val scope = "test"
 
   private val hmrcMongoPlayVersion = "0.74.0"
-  private val bootstrapVersion     = "7.14.0"
+  private val bootstrapVersion     = "7.15.0"
 
   val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"                  %% "bootstrap-frontend-play-28" % bootstrapVersion,
     "uk.gov.hmrc.mongo"            %% "hmrc-mongo-play-28"         % hmrcMongoPlayVersion,
     "uk.gov.hmrc"                  %% "play-allowlist-filter"      % "1.1.0",
-    "uk.gov.hmrc"                  %% "play-frontend-hmrc"         % "6.8.0-play-28",
+    "uk.gov.hmrc"                  %% "play-frontend-hmrc"         % "7.3.0-play-28",
     "org.typelevel"                %% "cats-core"                  % "2.9.0",
     "com.digitaltangible"          %% "play-guard"                 % "2.5.0",
     "org.quartz-scheduler"         % "quartz"                      % "2.3.2",

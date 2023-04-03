@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.{error_summary, input_search, pagination, result_summary, search_results}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
+@import views.html.helper.CSPNonce
 
 @this(
   mainTemplate: main_template,
@@ -74,7 +75,7 @@
         onChange = page => routes.SearchController.get(query = form.value.flatMap(_.query), images = form.value.exists(_.imagesOnly), page = page)
     )
 
-    <script>
+    <script @CSPNonce.attr >
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({ 'search_results_atar_ruling': @results.resultCount });
 
