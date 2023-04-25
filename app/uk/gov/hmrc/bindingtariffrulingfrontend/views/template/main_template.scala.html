@@ -33,7 +33,7 @@
 @(
     title: Option[String],
     isUserResearchBannerVisible: Boolean = config.displayMakeGovUkBetterUrl
-)(content: Html)(implicit request: Request[_], requestHeader: RequestHeader, messages: Messages)
+)(content: Html)(implicit request: Request[_], messages: Messages)
 
 @headBlock = {
   @hmrcTrackingConsentSnippet()
