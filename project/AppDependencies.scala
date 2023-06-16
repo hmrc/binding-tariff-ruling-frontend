@@ -21,7 +21,7 @@ object AppDependencies {
 
   val test: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % bootstrapVersion     % scope,
-    "com.github.tomakehurst" % "wiremock"                 % "2.33.2"             % scope,
+    "com.github.tomakehurst" % "wiremock-jre8"            % "2.35.0"             % scope,
     "com.typesafe.play"      %% "play-test"               % current              % scope,
     "org.jsoup"              % "jsoup"                    % "1.16.1"             % scope,
     "com.vladsch.flexmark"   % "flexmark-all"             % "0.64.4"             % scope,
