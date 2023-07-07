@@ -81,6 +81,10 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
     )
     with RulingRepository {
 
+  //ATAR is holding data for long period of time, now it is set to 3 years but other ATAR services don't have the
+  //the index so we'll skip this one as well, as this index should be implemented the same way in all other ATAR services
+  override lazy val requiresTtlIndex: Boolean = false
+
   override def update(ruling: Ruling, upsert: Boolean): Future[Ruling] =
     collection
       .findOneAndReplace(
