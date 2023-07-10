@@ -56,16 +56,6 @@ class RulingMongoRepositoryTest
   val tomorrow: Instant  = startOfTomorrow.toInstant(zoneOffsetTomorrow)
   val nextMonth: Instant = startOfNextMonth.toInstant(zoneOffsetNextMonth)
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    await(repository.ensureIndexes)
-  }
-
-  override def afterEach(): Unit = {
-    super.afterEach()
-    await(repository.collection.drop().toFuture())
-  }
-
   private def givenAnExistingDocument(ruling: Ruling): Unit =
     await(repository.update(ruling, upsert = true))
 

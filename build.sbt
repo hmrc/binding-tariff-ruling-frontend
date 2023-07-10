@@ -58,5 +58,5 @@ coverageMinimumStmtTotal := 90
 coverageFailOnMinimum := true
 coverageExcludedPackages := "<empty>;com.kenshoo.play.metrics.*;prod.*;testOnlyDoNotUseInAppConf.*;app.*;uk.gov.hmrc.BuildInfo"
 
-addCommandAlias("scalafmtAll", "all scalafmtSbt scalafmt test:scalafmt")
-addCommandAlias("scalastyleAll", "all scalastyle test:scalastyle")
+addCommandAlias("scalafmtAll", "all scalafmtSbt scalafmt Test/scalafmt A11y/scalafmt")
+addCommandAlias("scalastyleAll", "all scalastyle Test/scalastyle A11y/scalastyle")

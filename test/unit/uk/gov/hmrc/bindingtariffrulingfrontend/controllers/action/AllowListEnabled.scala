@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AllowListEnabled(appConfig: AppConfig)(implicit mat: Materializer, ec: ExecutionContext)
     extends AllowListAction(appConfig, new AllowListFilter(appConfig)) {
   override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] =
-    Future.successful(allowList.response)
+    Future.successful(allowList.response(request))
 }
 
 object AllowListEnabled {
