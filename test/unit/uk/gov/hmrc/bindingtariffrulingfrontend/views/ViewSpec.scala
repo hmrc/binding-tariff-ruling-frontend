@@ -19,6 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.views
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.i18n.{DefaultMessagesApi, Messages, MessagesApi}
+import play.api.mvc.AnyContent
 import play.api.test.{FakeRequest, Helpers}
 import play.twirl.api.Html
 import uk.gov.hmrc.bindingtariffrulingfrontend.UnitSpec
@@ -35,7 +36,7 @@ abstract class ViewSpec extends UnitSpec with BaseSpec {
 
   implicit val appConfig: AppConfig = realConfig
 
-  implicit val fakeRequest = FakeRequest()
+  implicit val fakeRequest: FakeRequest[AnyContent] = FakeRequest()
 
   protected def view(html: Html): Document =
     Jsoup.parse(html.toString())
