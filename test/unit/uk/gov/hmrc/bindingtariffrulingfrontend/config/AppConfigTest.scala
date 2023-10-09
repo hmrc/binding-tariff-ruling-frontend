@@ -33,29 +33,12 @@ class AppConfigTest extends BaseSpec {
     ).assetsPrefix shouldBe "http://localhost:9032/assets/4.5.0"
   }
 
-  "Build analytics token" in {
-    appConfig("google-analytics.token" -> "N/A").analyticsToken shouldBe "N/A"
-  }
-
-  "Build analytics host" in {
-    appConfig("google-analytics.host" -> "auto").analyticsHost shouldBe "auto"
-  }
-
   "Build report url" in {
     appConfig("contact-frontend.host" -> "host").reportAProblemPartialUrl shouldBe "host/contact/problem_reports_ajax?service=AdvanceTariffRulings"
   }
 
   "Build report non-json url" in {
     appConfig("contact-frontend.host" -> "host").reportAProblemNonJSUrl shouldBe "host/contact/problem_reports_nonjs?service=AdvanceTariffRulings"
-  }
-
-  "Build beta feedback url" in {
-    appConfig("contact-frontend.host" -> "host").betaFeedbackUrl shouldBe "host/contact/beta-feedback?service=AdvanceTariffRulings"
-  }
-
-  "Build beta feedback unauthenticated url" in {
-    appConfig("contact-frontend.host" -> "host").betaFeedbackUnauthenticatedUrl shouldBe
-      "host/contact/beta-feedback-unauthenticated?service=AdvanceTariffRulings"
   }
 
   "Build admin enabled" in {

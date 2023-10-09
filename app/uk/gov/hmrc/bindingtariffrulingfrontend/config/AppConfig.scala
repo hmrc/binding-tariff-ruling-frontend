@@ -16,20 +16,18 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.config
 
-import javax.inject.{Inject, Singleton}
 import play.api.{ConfigLoader, Configuration}
-import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class AppConfig @Inject() (val configuration: Configuration) extends ServicesConfig(configuration) {
 
-  private lazy val contactHost             = configuration.getOptional[String](s"contact-frontend.host").getOrElse("")
+  private lazy val contactHost             = configuration.getOptional[String]("contact-frontend.host").getOrElse("")
   private val contactFormServiceIdentifier = "AdvanceTariffRulings"
 
-  lazy val assetsPrefix: String                   = loadConfig[String](s"assets.url") + loadConfig[String](s"assets.version")
-  lazy val analyticsToken: String                 = loadConfig[String](s"google-analytics.token")
-  lazy val analyticsHost: String                  = loadConfig[String](s"google-analytics.host")
+  lazy val assetsPrefix: String                   = loadConfig[String]("assets.url") + loadConfig[String]("assets.version")
   lazy val authorization: String                  = loadConfig[String]("auth.api-token")
   lazy val bindingTariffClassificationUrl: String = baseUrl("binding-tariff-classification")
   lazy val bindingTariffFileStoreUrl: String      = baseUrl("binding-tariff-filestore")
@@ -40,8 +38,8 @@ class AppConfig @Inject() (val configuration: Configuration) extends ServicesCon
 
   lazy val maxUriLength: Long = configuration.underlying.getBytes("akka.http.parsing.max-uri-length")
 
-  lazy val allowListEnabled     = loadConfig[Boolean]("filters.allowlist.enabled")
-  lazy val allowListDestination = loadConfig[String]("filters.allowlist.destination")
+  lazy val allowListEnabled: Boolean    = loadConfig[Boolean]("filters.allowlist.enabled")
+  lazy val allowListDestination: String = loadConfig[String]("filters.allowlist.destination")
   lazy val allowList: Set[String] =
     loadConfig[String]("filters.allowlist.ips")
       .split(",")
@@ -54,18 +52,9 @@ class AppConfig @Inject() (val configuration: Configuration) extends ServicesCon
   lazy val reportAProblemNonJSUrl: String =
     s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
 
-  lazy val betaFeedbackUrl = s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier"
-  lazy val betaFeedbackUnauthenticatedUrl =
-    s"$contactHost/contact/beta-feedback-unauthenticated?service=$contactFormServiceIdentifier"
-
   lazy val rateLimitBucketSize: Int    = loadConfig[Int]("filters.rateLimit.bucketSize")
   lazy val rateLimitRatePerSecond: Int = loadConfig[Int]("filters.rateLimit.ratePerSecond")
   lazy val rateLimiterEnabled: Boolean = loadConfig[Boolean]("filters.rateLimit.enabled")
-
-  lazy val accessibilityBaseUrl: String             = loadConfig[String](s"accessibility-statement.baseUrl")
-  lazy private val accessibilityRedirectUrl: String = loadConfig[String](s"accessibility-statement.redirectUrl")
-  def accessibilityStatementUrl(referrer: String) =
-    s"$accessibilityBaseUrl/accessibility-statement$accessibilityRedirectUrl?referrerUrl=${SafeRedirectUrl(accessibilityBaseUrl + referrer).encodedUrl}"
 
   private def loadConfig[A](key: String)(implicit loader: ConfigLoader[A]) =
     configuration.getOptional[A](key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
