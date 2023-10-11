@@ -16,16 +16,14 @@
 
 import org.scalacheck.Arbitrary
 import play.api.data.Form
-import play.api.mvc.RequestHeader
 import play.twirl.api.Html
-import play.api.data.Forms._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model._
-import uk.gov.hmrc.scalatestaccessibilitylinter.views.AutomaticAccessibilitySpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
+import uk.gov.hmrc.scalatestaccessibilitylinter.views.AutomaticAccessibilitySpec
 
 import java.time.Instant
 
