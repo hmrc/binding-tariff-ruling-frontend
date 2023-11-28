@@ -18,17 +18,16 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action._
-import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
-import uk.gov.hmrc.bindingtariffrulingfrontend.views
-import uk.gov.hmrc.http.HeaderCarrier
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
+import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
+import uk.gov.hmrc.bindingtariffrulingfrontend.views
+import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
@@ -36,8 +35,8 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
   private val imageView        = app.injector.instanceOf[views.html.image]
   private val notFoundView     = app.injector.instanceOf[views.html.not_found]
 
-  private def controller(allowlist: AllowListAction = AllowListDisabled()) =
-    new ImageController(fileStoreService, allowlist, mcc, imageView, notFoundView, realConfig)
+  private def controller() =
+    new ImageController(fileStoreService, mcc, imageView, notFoundView, realConfig)
 
   override protected def afterEach(): Unit = {
     super.afterEach()
@@ -102,10 +101,6 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
     }
 
-    "return 303 when disallowed" in {
-      val result = await(controller(allowlist = AllowListEnabled()).get(rulingReference, fileId)(getRequestWithCSRF()))
-      status(result) shouldBe Status.SEE_OTHER
-    }
   }
 
 }

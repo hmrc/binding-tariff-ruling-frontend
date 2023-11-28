@@ -23,7 +23,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AdminAction, AllowListAction, AuthenticatedAction}
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AdminAction, AuthenticatedAction}
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -34,7 +34,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class RulingController @Inject() (
   rulingService: RulingService,
   fileStoreService: FileStoreService,
-  allowlist: AllowListAction,
   authenticate: AuthenticatedAction,
   verifyAdmin: AdminAction,
   rulingView: views.html.ruling,
@@ -47,7 +46,7 @@ class RulingController @Inject() (
 
   type Metadata = Map[String, FileMetadata]
 
-  def get(id: String): Action[AnyContent] = (Action andThen allowlist).async { implicit request =>
+  def get(id: String): Action[AnyContent] = Action.async { implicit request =>
     val maybeRulingDetails = for {
       ruling       <- OptionT(rulingService.get(id))
       fileMetadata <- OptionT.liftF[Future, Metadata](fileStoreService.get(ruling))

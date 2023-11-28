@@ -21,7 +21,6 @@ import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowListAction
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
@@ -33,7 +32,6 @@ import scala.util.control.NonFatal
 @Singleton
 class AttachmentController @Inject() (
   fileStoreService: FileStoreService,
-  allowlist: AllowListAction,
   mcc: MessagesControllerComponents,
   notFoundView: views.html.not_found,
   implicit val appConfig: AppConfig
@@ -42,24 +40,23 @@ class AttachmentController @Inject() (
     with I18nSupport
     with Logging {
 
-  def get(rulingReference: String, fileId: String): Action[AnyContent] = (Action andThen allowlist).async {
-    implicit request =>
-      val fileStoreResponse = for {
-        meta     <- OptionT(fileStoreService.get(fileId))
-        url      <- OptionT.fromOption[Future](meta.url)
-        mimeType <- OptionT.fromOption[Future](meta.mimeType)
-        fileName <- OptionT.fromOption[Future](meta.fileName)
-        content  <- OptionT(fileStoreService.downloadFile(url))
-      } yield Ok
-        .streamed(content, None, contentType = Some(mimeType))
-        .withHeaders(
-          "Content-Disposition" -> s"filename=$fileName"
-        )
+  def get(rulingReference: String, fileId: String): Action[AnyContent] = Action.async { implicit request =>
+    val fileStoreResponse = for {
+      meta     <- OptionT(fileStoreService.get(fileId))
+      url      <- OptionT.fromOption[Future](meta.url)
+      mimeType <- OptionT.fromOption[Future](meta.mimeType)
+      fileName <- OptionT.fromOption[Future](meta.fileName)
+      content  <- OptionT(fileStoreService.downloadFile(url))
+    } yield Ok
+      .streamed(content, None, contentType = Some(mimeType))
+      .withHeaders(
+        "Content-Disposition" -> s"filename=$fileName"
+      )
 
-      fileStoreResponse.getOrElse(NotFound(notFoundView())).recover {
-        case NonFatal(e) =>
-          logger.error("Exception while calling binding-tariff-filestore", e)
-          BadGateway
-      }
+    fileStoreResponse.getOrElse(NotFound(notFoundView())).recover {
+      case NonFatal(e) =>
+        logger.error("Exception while calling binding-tariff-filestore", e)
+        BadGateway
+    }
   }
 }

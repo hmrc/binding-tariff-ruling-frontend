@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.views
 
-import java.time.Instant
-
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling, SimplePagination}
+
+import java.time.Instant
 
 class ResultSummarySpec extends ViewSpec {
 
-  val ruling = Ruling(reference = "ref1", "0", Instant.now, Instant.now(), "justification", "exacting")
+  val ruling: Ruling = Ruling(reference = "ref1", "0", Instant.now, Instant.now(), "justification", "exacting")
 
   override val testMessages: Map[String, Map[String, String]] = Map(
     "default" -> Map(
@@ -134,6 +134,7 @@ class ResultSummarySpec extends ViewSpec {
       renderedView.text() should include("Showing 26 to 50 of 100 results that match your search.")
     }
   }
+
   "result summary when landing on the page for the first time" should {
     "render search results when there are no results" in {
 
@@ -227,4 +228,5 @@ class ResultSummarySpec extends ViewSpec {
       renderedView.text() should include("Showing 26 to 50 of 100 results.")
     }
   }
+
 }

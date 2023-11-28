@@ -39,14 +39,12 @@ class RulingControllerSpec extends ControllerSpec {
   private val notFoundView     = app.injector.instanceOf[views.html.not_found]
 
   private def controller(
-    allowlist: AllowListAction = AllowListDisabled(),
-    auth: AuthenticatedAction  = SuccessfulAuth(),
-    admin: AdminAction         = AdminEnabled()
+    auth: AuthenticatedAction = SuccessfulAuth(),
+    admin: AdminAction        = AdminEnabled()
   ) =
     new RulingController(
       rulingService,
       fileStoreService,
-      allowlist,
       auth,
       admin,
       rulingView,
@@ -78,11 +76,6 @@ class RulingControllerSpec extends ControllerSpec {
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
       bodyOf(result)      should include("not_found-heading")
-    }
-
-    "return 303 when not allowed" in {
-      val result = await(controller(allowlist = AllowListEnabled()).get("id")(getRequestWithCSRF()))
-      status(result) shouldBe Status.SEE_OTHER
     }
   }
 

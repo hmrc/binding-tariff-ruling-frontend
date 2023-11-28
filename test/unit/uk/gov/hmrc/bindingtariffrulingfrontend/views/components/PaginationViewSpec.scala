@@ -16,12 +16,11 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.views.components
 
-import org.mockito.ArgumentMatchers
 import org.mockito.BDDMockito.given
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
+import org.mockito.{ArgumentMatchers, MockitoSugar}
 import org.scalatest.BeforeAndAfterEach
-import org.mockito.MockitoSugar
 import play.api.mvc.Call
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.ViewMatchers._
@@ -35,10 +34,7 @@ class PaginationViewSpec extends ViewSpec with MockitoSugar with BeforeAndAfterE
   override def beforeEach(): Unit = {
 
     def returnThePage: Answer[Call] =
-      new Answer[Call] {
-        override def answer(invocation: InvocationOnMock): Call =
-          Call(method = "GET", url = "/page=" + invocation.getArgument(0))
-      }
+      (invocation: InvocationOnMock) => Call(method = "GET", url = "/page=" + invocation.getArgument(0))
 
     super.beforeEach()
     given(goToPage.apply(ArgumentMatchers.any[Int])) will returnThePage

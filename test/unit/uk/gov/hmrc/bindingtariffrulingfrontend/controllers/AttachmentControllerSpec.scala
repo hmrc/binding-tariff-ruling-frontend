@@ -20,26 +20,25 @@ import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
-import java.nio.charset.StandardCharsets
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action._
-import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
-import uk.gov.hmrc.bindingtariffrulingfrontend.views
-import uk.gov.hmrc.http.HeaderCarrier
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
+import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
+import uk.gov.hmrc.bindingtariffrulingfrontend.views
+import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import java.nio.charset.StandardCharsets
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   private val fileStoreService = mock[FileStoreService]
   private val notFoundView     = app.injector.instanceOf[views.html.not_found]
 
-  private def controller(allowlist: AllowListAction = AllowListDisabled()) =
-    new AttachmentController(fileStoreService, allowlist, mcc, notFoundView, realConfig)
+  private def controller() =
+    new AttachmentController(fileStoreService, mcc, notFoundView, realConfig)
 
   override protected def afterEach(): Unit = {
     super.afterEach()
@@ -170,10 +169,5 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       verify(fileStoreService).downloadFile(refEq(url))(any[HeaderCarrier])
     }
 
-    "return 303 when disallowed" in {
-      val result = await(controller(allowlist = AllowListEnabled()).get(rulingReference, fileId)(getRequestWithCSRF()))
-      status(result) shouldBe Status.SEE_OTHER
-    }
   }
-
 }
