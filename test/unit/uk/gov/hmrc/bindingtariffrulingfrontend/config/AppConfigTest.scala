@@ -46,12 +46,6 @@ class AppConfigTest extends BaseSpec {
     appConfig("admin-mode" -> "true").adminEnabled  shouldBe true
   }
 
-  "Build allowlist" in {
-    appConfig(
-      "filters.allowlist.ips" -> "ip1, ip2"
-    ).allowList shouldBe Set("ip1", "ip2")
-  }
-
   "Build Classification Backend URL" in {
     appConfig(
       "microservice.services.binding-tariff-classification.port"     -> "8080",

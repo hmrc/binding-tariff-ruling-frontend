@@ -22,7 +22,6 @@ import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowListAction
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
@@ -33,7 +32,6 @@ import scala.util.control.NonFatal
 @Singleton
 class ImageController @Inject() (
   fileStoreService: FileStoreService,
-  allowlist: AllowListAction,
   mcc: MessagesControllerComponents,
   imageView: views.html.image,
   notFoundView: views.html.not_found,
@@ -43,17 +41,16 @@ class ImageController @Inject() (
     with I18nSupport
     with Logging {
 
-  def get(rulingReference: String, imageId: String): Action[AnyContent] = (Action andThen allowlist).async {
-    implicit request =>
-      val fileStoreResponse = for {
-        meta     <- OptionT(fileStoreService.get(imageId))
-        fileName <- OptionT.fromOption[Future](meta.fileName)
-      } yield Ok(imageView(rulingReference, imageId, fileName))
+  def get(rulingReference: String, imageId: String): Action[AnyContent] = Action.async { implicit request =>
+    val fileStoreResponse = for {
+      meta     <- OptionT(fileStoreService.get(imageId))
+      fileName <- OptionT.fromOption[Future](meta.fileName)
+    } yield Ok(imageView(rulingReference, imageId, fileName))
 
-      fileStoreResponse.getOrElse(NotFound(notFoundView())).recover {
-        case NonFatal(e) =>
-          logger.error("Exception while calling binding-tariff-filestore", e)
-          BadGateway
-      }
+    fileStoreResponse.getOrElse(NotFound(notFoundView())).recover {
+      case NonFatal(e) =>
+        logger.error("Exception while calling binding-tariff-filestore", e)
+        BadGateway
+    }
   }
 }

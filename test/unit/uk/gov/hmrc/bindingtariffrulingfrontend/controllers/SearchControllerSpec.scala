@@ -23,7 +23,6 @@ import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.{AllowListAction, AllowListDisabled, AllowListEnabled}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.filters.RateLimitFilter
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
@@ -48,8 +47,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     reset(fileStoreService)
   }
 
-  private def controller(allowlist: AllowListAction = AllowListDisabled()) =
-    new SearchController(rulingService, fileStoreService, allowlist, rateLimit, mcc, searchView, realConfig)
+  private def controller() =
+    new SearchController(rulingService, fileStoreService, rateLimit, mcc, searchView, realConfig)
 
   "GET /" should {
     "return 200 with a valid query" in {
@@ -106,14 +105,6 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
       verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
       verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
-    }
-
-    "return 303 when disallowed" in {
-      val result = await(
-        controller(allowlist = AllowListEnabled()).get(query = None, images = false, page = 1)(getRequestWithCSRF())
-      )
-
-      status(result) shouldBe Status.SEE_OTHER
     }
 
     "return 429 when too many requests are made" in {

@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.views
 
-import java.time.Instant
-
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.utils.Dates
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.ViewMatchers._
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.search_results
+
+import java.time.Instant
 
 class SearchResultsViewSpec extends ViewSpec {
 
@@ -39,7 +39,7 @@ class SearchResultsViewSpec extends ViewSpec {
       )
     )
 
-  val ruling = Ruling(
+  val ruling: Ruling = Ruling(
     reference            = "reference",
     bindingCommodityCode = "bindingCommodityCode",
     effectiveStartDate   = Instant.now,
@@ -51,16 +51,16 @@ class SearchResultsViewSpec extends ViewSpec {
     images               = Seq("id1", "id2")
   )
 
-  val fileMetaData = Map(
-    "id1" -> FileMetadata("id1", Some("image1"), None, Some("url"), true),
-    "id2" -> FileMetadata("id2", Some("image1"), None, Some("url"), true),
-    "f1"  -> FileMetadata("f1", Some("file1"), None, None, false),
-    "f2"  -> FileMetadata("f2", Some("file2"), None, None, false)
+  val fileMetaData: Map[String, FileMetadata] = Map(
+    "id1" -> FileMetadata("id1", Some("image1"), None, Some("url"), published = true),
+    "id2" -> FileMetadata("id2", Some("image1"), None, Some("url"), published = true),
+    "f1"  -> FileMetadata("f1", Some("file1"), None, None),
+    "f2"  -> FileMetadata("f2", Some("file2"), None, None)
   )
 
-  val pagedRuling = Paged(Seq(ruling))
+  val pagedRuling: Paged[Ruling] = Paged(Seq(ruling))
 
-  val searchResultsView = app.injector.instanceOf[search_results]
+  val searchResultsView: search_results = app.injector.instanceOf[search_results]
 
   "Search Results View" should {
 

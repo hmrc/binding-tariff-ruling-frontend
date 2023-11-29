@@ -8,7 +8,7 @@ The frontend for the public Search For Advance Tariff Rulings service, use by im
 
 1) [Service Manager 2](https://github.com/hmrc/sm2) installed
 2) [SBT](https://www.scala-sbt.org) Version `>=1.x` installed
-3) [MongoDB](https://www.mongodb.com/) version `>=4.4<5` installed and running on port 27017
+3) [MongoDB](https://www.mongodb.com/) version `5.0` installed and running on port 27017
 4) [Localstack](https://github.com/localstack/localstack) installed and running on port 4572
 5) Create an S3 bucket in localstack by using `awslocal s3 mb s3://digital-tariffs-local` within the localstack container
 
@@ -17,7 +17,7 @@ The easiest way to run MongoDB and Localstack for local development is to use [D
 #### To run MongoDB
 
 ```
-> docker run --restart unless-stopped -d -p 27017-27019:27017-27019 --name mongodb mongo:4.4.21
+> docker run --restart unless-stopped -d -p 27017-27019:27017-27019 --name mongodb mongo:5.0
 ```
 
 #### To run Localstack and create the S3 bucket

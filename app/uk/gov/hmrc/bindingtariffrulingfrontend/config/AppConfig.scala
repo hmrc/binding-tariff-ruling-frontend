@@ -38,15 +38,6 @@ class AppConfig @Inject() (val configuration: Configuration) extends ServicesCon
 
   lazy val maxUriLength: Long = configuration.underlying.getBytes("akka.http.parsing.max-uri-length")
 
-  lazy val allowListEnabled: Boolean    = loadConfig[Boolean]("filters.allowlist.enabled")
-  lazy val allowListDestination: String = loadConfig[String]("filters.allowlist.destination")
-  lazy val allowList: Set[String] =
-    loadConfig[String]("filters.allowlist.ips")
-      .split(",")
-      .map(_.trim)
-      .filter(_.nonEmpty)
-      .toSet
-
   lazy val reportAProblemPartialUrl: String =
     s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
   lazy val reportAProblemNonJSUrl: String =

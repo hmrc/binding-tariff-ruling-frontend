@@ -15,20 +15,36 @@
  */
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.views
+import play.api.test.FakeRequest
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.error
 
 class ErrorViewSpec extends ViewSpec {
 
-  val errorPage: error = app.injector.instanceOf[error]
+  private val page = app.injector.instanceOf[error]
+  val viewViaApply: () => HtmlFormat.Appendable =
+    () => page("Title", "Heading", "Message")(FakeRequest(), messages)
+  val viewViaRender: () => HtmlFormat.Appendable =
+    () => page.render("Title", "Heading", "Message", FakeRequest(), messages)
+  val viewViaF: () => HtmlFormat.Appendable =
+    () => page.f("Title", "Heading", "Message")(FakeRequest(), messages)
 
-  "Error View" should {
-    "render error page with correct text" in {
+  "ErrorView" should {
+    def test(method: String, viewMethod: () => HtmlFormat.Appendable): Unit =
+      s"$method" in {
+        val doc = view(viewMethod())
 
-      val doc = view(errorPage("Title", "Heading", "Message"))
+        doc.text() should include("Title")
+        doc.text() should include("Heading")
+        doc.text() should include("Message")
+      }
 
-      doc.text() should include("Title")
-      doc.text() should include("Heading")
-      doc.text() should include("Message")
-    }
+    val input: Seq[(String, () => HtmlFormat.Appendable)] = Seq(
+      (".apply", viewViaApply),
+      (".render", viewViaRender),
+      (".f", viewViaF)
+    )
+
+    input.foreach(args => (test _).tupled(args))
   }
 }

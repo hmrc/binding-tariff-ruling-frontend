@@ -78,7 +78,7 @@ class RulingsWorkerSpec extends BaseSpec with MockitoSugar with BeforeAndAfterAl
     given(lockRepo.refreshExpiry(any[String], any[String], any[Duration]))
       .willReturn(Future.successful(true))
     given(lockRepo.takeLock(any[String], any[String], any[Duration]))
-      .willReturn(Future.successful(true))
+      .willReturn(Future.successful(None))
     given(lockRepo.releaseLock(any[String], any[String]))
       .willReturn(Future.successful(()))
     given(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))

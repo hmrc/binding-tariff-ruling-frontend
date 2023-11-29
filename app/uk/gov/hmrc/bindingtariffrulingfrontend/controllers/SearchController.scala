@@ -22,7 +22,6 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.AllowListAction
 import uk.gov.hmrc.bindingtariffrulingfrontend.filters.RateLimitFilter
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
@@ -37,7 +36,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class SearchController @Inject() (
   rulingService: RulingService,
   fileStoreService: FileStoreService,
-  allowList: AllowListAction,
   rateLimit: RateLimitFilter,
   mcc: MessagesControllerComponents,
   search: views.html.search,
@@ -62,7 +60,7 @@ class SearchController @Inject() (
     page: Int,
     enableTrackingConsent: Boolean = false
   ): Action[AnyContent] =
-    (Action andThen allowList andThen rateLimit).async { implicit request =>
+    (Action andThen rateLimit).async { implicit request =>
       val form = SimpleSearch.form.bindFromRequest()
 
       form.fold(
