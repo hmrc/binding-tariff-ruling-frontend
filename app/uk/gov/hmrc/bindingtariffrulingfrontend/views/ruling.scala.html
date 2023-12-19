@@ -118,7 +118,7 @@
         value = Value(HtmlContent(rulingKeywords))
       ))
     } ++ {
-      if (ruling.images.isEmpty)
+      if (!appConfig.displayImages || ruling.images.isEmpty)
         Seq.empty
       else Seq(SummaryListRow(
         key = Key(Text(messages("ruling.images")), classes = "valign-top"),

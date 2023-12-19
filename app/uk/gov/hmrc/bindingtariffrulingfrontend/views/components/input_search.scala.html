@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
@@ -26,7 +27,7 @@
   govukCheckBoxes: GovukCheckboxes,
 )
 
-@(form: Form[SimpleSearch])(implicit messages: Messages)
+@(form: Form[SimpleSearch])(implicit messages: Messages, appConfig: AppConfig)
 
 @defining(form("query").id + "-hint") { hintId =>
   @govukLabel(Label(
@@ -50,17 +51,19 @@
     errorMessage = form.errors.asTextErrorMessageForField(fieldKey = "query")
   ))
 
-  @govukCheckBoxes(Checkboxes(
-    name = "images-check",
-    errorMessage = form.errors.asTextErrorMessageForField(fieldKey = "images"),
-    items = Seq(CheckboxItem(
-      id = Some(form("images").id),
-      name = Some(form("images").name),
-      value = "true",
-      checked = form("images").value.contains("true"),
-      content = Text(messages("search.form.images")),
-    ))
-  ))
+  @if(appConfig.displayImages) {
+      @govukCheckBoxes(Checkboxes(
+        name = "images-check",
+        errorMessage = form.errors.asTextErrorMessageForField(fieldKey = "images"),
+        items = Seq(CheckboxItem(
+          id = Some(form("images").id),
+          name = Some(form("images").name),
+          value = "true",
+          checked = form("images").value.contains("true"),
+          content = Text(messages("search.form.images")),
+        ))
+      ))
+  }
 
   @govukButton(Button(
     attributes = Map("id" -> "submit"),

@@ -32,7 +32,7 @@ case class Ruling(
   attachments: Seq[String] = Seq.empty,
   images: Seq[String]      = Seq.empty
 ) {
-  lazy val bindingCommodityCodeNgrams = bindingCommodityCode
+  lazy val bindingCommodityCodeNgrams: Seq[String] = bindingCommodityCode
     .scanLeft("") {
       case (ngram, char) => ngram + char
     }

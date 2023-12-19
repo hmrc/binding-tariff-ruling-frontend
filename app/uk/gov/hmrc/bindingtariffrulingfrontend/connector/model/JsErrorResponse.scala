@@ -18,6 +18,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.connector.model
 
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json.{JsObject, Json}
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model
 
 object JsErrorResponse {
 
@@ -31,5 +32,5 @@ object JsErrorResponse {
 object ErrorCode extends Enumeration {
   type ErrorCode = Value
 
-  val FORBIDDEN = Value("FORBIDDEN")
+  val FORBIDDEN: model.ErrorCode.Value = Value("FORBIDDEN")
 }

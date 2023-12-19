@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.views
 
+import org.mockito.BDDMockito.`given`
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.utils.Dates
@@ -25,6 +27,8 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.search_resu
 import java.time.Instant
 
 class SearchResultsViewSpec extends ViewSpec {
+
+  override implicit val appConfig: AppConfig = mock[AppConfig]
 
   override protected val testMessages: Map[String, Map[String, String]] =
     Map(
@@ -83,7 +87,9 @@ class SearchResultsViewSpec extends ViewSpec {
       ruling.keywords.map(keyword => doc.text() should include(keyword))
     }
 
-    "render images with correct href" in {
+    "render images with correct href (toggle images on)" in {
+
+      given(appConfig.displayImages) willReturn true
 
       val doc = view(searchResultsView(None, pagedRuling, fileMetaData))
 
@@ -93,6 +99,23 @@ class SearchResultsViewSpec extends ViewSpec {
         s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id1"
       )
       doc.getElementById("search_results-list-0") should containElementWithAttribute(
+        "href",
+        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id2"
+      )
+    }
+
+    "render images with correct href (toggle images off)" in {
+
+      given(appConfig.displayImages) willReturn false
+
+      val doc = view(searchResultsView(None, pagedRuling, fileMetaData))
+
+      doc.text() shouldNot include(s"Images")
+      doc.getElementById("search_results-list-0") shouldNot containElementWithAttribute(
+        "href",
+        s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id1"
+      )
+      doc.getElementById("search_results-list-0") shouldNot containElementWithAttribute(
         "href",
         s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id2"
       )

@@ -19,7 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.model
 trait Pagination {
   val pageIndex: Int
   val pageSize: Int
-  def withPage(page: Int) = this match {
+  def withPage(page: Int): Pagination = this match {
     case NoPagination(_, pageSize) =>
       NoPagination(page, pageSize)
     case SimplePagination(_, pageSize) =>

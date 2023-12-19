@@ -103,7 +103,7 @@
               value = Value(HtmlContent(commodityCodeLink(result)))
             ),
           ) ++ {
-            if (result.images.isEmpty)
+            if (!appConfig.displayImages || result.images.isEmpty)
               Seq.empty
             else Seq(SummaryListRow(
               key = Key(Text(messages("search.results.ruling.images")), classes = "valign-top"),

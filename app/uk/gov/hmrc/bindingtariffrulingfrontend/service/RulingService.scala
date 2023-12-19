@@ -36,9 +36,9 @@ class RulingService @Inject() (
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  type ExistingRuling = Option[Ruling]
-  type UpdatedRuling  = Option[Ruling]
-  type RulingUpdate   = (ExistingRuling, UpdatedRuling)
+  private type ExistingRuling = Option[Ruling]
+  private type UpdatedRuling  = Option[Ruling]
+  private type RulingUpdate   = (ExistingRuling, UpdatedRuling)
 
   def delete(reference: String): Future[Unit] =
     repository.delete(reference)

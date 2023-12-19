@@ -26,14 +26,12 @@ case class FileMetadata(
   published: Boolean  = false
 ) {
   def isImage: Boolean =
-    mimeType
-      .map {
-        case "image/png"  => true
-        case "image/jpeg" => true
-        case "image/gif"  => true
-        case _            => false
-      }
-      .getOrElse(false)
+    mimeType.exists {
+      case "image/png"  => true
+      case "image/jpeg" => true
+      case "image/gif"  => true
+      case _            => false
+    }
 }
 
 object FileMetadata {

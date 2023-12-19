@@ -15,8 +15,10 @@
  */
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.views
+import org.mockito.BDDMockito.`given`
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.utils.Dates
@@ -26,6 +28,8 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.ruling
 import java.time.Instant
 
 class RulingViewSpec extends ViewSpec {
+
+  override implicit val appConfig: AppConfig = mock[AppConfig]
 
   override protected val testMessages: Map[String, Map[String, String]] =
     Map(
@@ -106,7 +110,9 @@ class RulingViewSpec extends ViewSpec {
           doc.text() should include(s"${ruling.justification}")
         }
 
-        "render images with correct href" in {
+        "render images with correct href (images toggle on)" in {
+
+          given(appConfig.displayImages) willReturn true
 
           val doc = view(viewMethod())
 
@@ -116,6 +122,23 @@ class RulingViewSpec extends ViewSpec {
             s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id1"
           )
           doc.getElementById("ruling-details") should containElementWithAttribute(
+            "href",
+            s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id2"
+          )
+        }
+
+        "do not render images with correct href (images toggle off)" in {
+
+          given(appConfig.displayImages) willReturn false
+
+          val doc = view(viewMethod())
+
+          doc.text() shouldNot include(s"Images")
+          doc.getElementById("ruling-details") shouldNot containElementWithAttribute(
+            "href",
+            s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id1"
+          )
+          doc.getElementById("ruling-details") shouldNot containElementWithAttribute(
             "href",
             s"/search-for-advance-tariff-rulings/ruling/${ruling.reference}/image/id2"
           )

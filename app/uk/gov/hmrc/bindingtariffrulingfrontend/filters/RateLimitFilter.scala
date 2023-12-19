@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RateLimitFilter @Inject() (appConfig: AppConfig)(implicit val executionContext: ExecutionContext)
     extends ActionFilter[Request] {
-  val TrueClientIP = "True-Client-IP"
+  private val TrueClientIP = "True-Client-IP"
 
   private lazy val filter = new RateLimitActionFilter[Request](
     rateLimiter    = new RateLimiter(appConfig.rateLimitBucketSize, appConfig.rateLimitRatePerSecond.toFloat, "IP"),
