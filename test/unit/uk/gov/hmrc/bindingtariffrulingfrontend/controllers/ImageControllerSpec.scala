@@ -18,9 +18,11 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
+import org.mockito.Mockito
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
@@ -31,9 +33,10 @@ import scala.concurrent.Future
 
 class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
-  private val fileStoreService = mock[FileStoreService]
-  private val imageView        = app.injector.instanceOf[views.html.image]
-  private val notFoundView     = app.injector.instanceOf[views.html.not_found]
+  private val fileStoreService            = mock[FileStoreService]
+  override lazy val realConfig: AppConfig = mock[AppConfig]
+  private val imageView                   = app.injector.instanceOf[views.html.image]
+  private val notFoundView                = app.injector.instanceOf[views.html.not_found]
 
   private def controller() =
     new ImageController(fileStoreService, mcc, imageView, notFoundView, realConfig)
@@ -41,6 +44,12 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
   override protected def afterEach(): Unit = {
     super.afterEach()
     reset(fileStoreService)
+  }
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    Mockito.reset(realConfig)
+    given(realConfig.displayImages).willReturn(true)
   }
 
   "GET /" should {
@@ -54,6 +63,15 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       url       = Some("http://localhost:4572/digital-tariffs-local/d4897c0a-b92d-4cf7-8990-f40fe158be68"),
       published = true
     )
+
+    "return 303 when given a valid image id (toggle images off)" in {
+      given(realConfig.displayImages).willReturn(false)
+
+      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(Some(metadata))
+      val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
+
+      status(result) shouldBe Status.SEE_OTHER
+    }
 
     "return 200 when given a valid image id" in {
       given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(Some(metadata))
