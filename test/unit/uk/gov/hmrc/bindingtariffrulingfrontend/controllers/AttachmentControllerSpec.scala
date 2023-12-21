@@ -20,9 +20,11 @@ import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
+import org.mockito.Mockito
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers._
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
@@ -34,8 +36,9 @@ import scala.concurrent.Future
 
 class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
-  private val fileStoreService = mock[FileStoreService]
-  private val notFoundView     = app.injector.instanceOf[views.html.not_found]
+  private val fileStoreService            = mock[FileStoreService]
+  override lazy val realConfig: AppConfig = mock[AppConfig]
+  private val notFoundView                = app.injector.instanceOf[views.html.not_found]
 
   private def controller() =
     new AttachmentController(fileStoreService, mcc, notFoundView, realConfig)
@@ -43,6 +46,12 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
   override protected def afterEach(): Unit = {
     super.afterEach()
     reset(fileStoreService)
+  }
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    Mockito.reset(realConfig)
+    given(realConfig.displayImages).willReturn(true)
   }
 
   "GET /" should {
@@ -56,6 +65,20 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       url       = Some("http://localhost:4572/digital-tariffs-local/d4897c0a-b92d-4cf7-8990-f40fe158be68"),
       published = true
     )
+
+    "return 303 when given a valid attachment id (images toggled off)" in {
+      given(realConfig.displayImages).willReturn(false)
+
+      val url     = metadata.url.get
+      val pngData = "png data".getBytes(StandardCharsets.UTF_8)
+      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(Some(metadata))
+      given(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier])) willReturn Future.successful(
+        Some(Source.single(ByteString(pngData)))
+      )
+      val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
+
+      status(result) shouldBe Status.SEE_OTHER
+    }
 
     "return 200 when given a valid attachment id" in {
       val url     = metadata.url.get
