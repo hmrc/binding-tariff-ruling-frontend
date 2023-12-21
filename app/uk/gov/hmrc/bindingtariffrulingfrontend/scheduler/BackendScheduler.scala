@@ -18,12 +18,13 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.scheduler
 
 import org.quartz.CronScheduleBuilder.dailyAtHourAndMinute
 import org.quartz.JobBuilder.newJob
-import org.quartz.JobDetail
+import org.quartz.{JobDetail, Scheduler, Trigger}
 import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.TriggerBuilder.newTrigger
 import org.quartz.impl.StdSchedulerFactory
 import play.api.Logging
 import play.api.inject.ApplicationLifecycle
+
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
@@ -34,10 +35,10 @@ class BackendScheduler @Inject() (
   scheduledJobFactory: ScheduledJobFactory
 ) extends Logging {
 
-  def jobDetail(job: ScheduledJob) =
+  private def jobDetail(job: ScheduledJob): JobDetail =
     newJob(job.getClass).withIdentity(job.jobName).build
 
-  def jobTrigger(job: ScheduledJob, jobDetails: JobDetail) =
+  private def jobTrigger(job: ScheduledJob, jobDetails: JobDetail): Trigger =
     newTrigger()
       .withIdentity(s"${job.jobName} trigger")
       .startNow()
@@ -50,7 +51,7 @@ class BackendScheduler @Inject() (
       .forJob(jobDetails)
       .build()
 
-  lazy val quartz = StdSchedulerFactory.getDefaultScheduler
+  lazy val quartz: Scheduler = StdSchedulerFactory.getDefaultScheduler
   quartz.setJobFactory(scheduledJobFactory)
   scheduledJobs.jobs.foreach { job =>
     val details = jobDetail(job)

@@ -29,7 +29,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mongo.lock.{MongoLockRepository, TimePeriodLockService}
 
 import java.time.Instant
-import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -49,14 +48,13 @@ class RulingsWorker @Inject() (
   implicit val ec: ExecutionContext = system.dispatchers.lookup("rulings-worker")
   implicit val hc: HeaderCarrier    = HeaderCarrier(extraHeaders = authHeaders(appConfig)(HeaderCarrier()))
 
-  val StreamPageSize                        = 1000
-  val StreamPagination: Pagination          = SimplePagination(pageSize = StreamPageSize)
-  val LocalDateFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+  val StreamPageSize                       = 1000
+  private val StreamPagination: Pagination = SimplePagination(pageSize = StreamPageSize)
 
-  val myLock: TimePeriodLockService =
+  private val myLock: TimePeriodLockService =
     TimePeriodLockService(mongoLockRepository, lockId = "rulings-worker-lock", ttl = 2.minutes)
 
-  val decider: Supervision.Decider = {
+  private val decider: Supervision.Decider = {
     case NonFatal(e) =>
       logger.error("Skipping RulingsWorker updates due to error", e)
       Supervision.resume

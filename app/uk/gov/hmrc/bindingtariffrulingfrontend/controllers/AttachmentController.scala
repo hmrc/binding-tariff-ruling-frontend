@@ -41,22 +41,26 @@ class AttachmentController @Inject() (
     with Logging {
 
   def get(rulingReference: String, fileId: String): Action[AnyContent] = Action.async { implicit request =>
-    val fileStoreResponse = for {
-      meta     <- OptionT(fileStoreService.get(fileId))
-      url      <- OptionT.fromOption[Future](meta.url)
-      mimeType <- OptionT.fromOption[Future](meta.mimeType)
-      fileName <- OptionT.fromOption[Future](meta.fileName)
-      content  <- OptionT(fileStoreService.downloadFile(url))
-    } yield Ok
-      .streamed(content, None, contentType = Some(mimeType))
-      .withHeaders(
-        "Content-Disposition" -> s"filename=$fileName"
-      )
+    if (appConfig.displayImages) {
+      val fileStoreResponse = for {
+        meta     <- OptionT(fileStoreService.get(fileId))
+        url      <- OptionT.fromOption[Future](meta.url)
+        mimeType <- OptionT.fromOption[Future](meta.mimeType)
+        fileName <- OptionT.fromOption[Future](meta.fileName)
+        content  <- OptionT(fileStoreService.downloadFile(url))
+      } yield Ok
+        .streamed(content, None, contentType = Some(mimeType))
+        .withHeaders(
+          "Content-Disposition" -> s"filename=$fileName"
+        )
 
-    fileStoreResponse.getOrElse(NotFound(notFoundView())).recover {
-      case NonFatal(e) =>
-        logger.error("Exception while calling binding-tariff-filestore", e)
-        BadGateway
+      fileStoreResponse.getOrElse(NotFound(notFoundView())).recover {
+        case NonFatal(e) =>
+          logger.error("Exception while calling binding-tariff-filestore", e)
+          BadGateway
+      }
+    } else {
+      Future.successful(Redirect(controllers.routes.Default.redirect()))
     }
   }
 }

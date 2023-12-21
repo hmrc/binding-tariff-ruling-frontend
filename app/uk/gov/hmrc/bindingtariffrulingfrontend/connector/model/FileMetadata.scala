@@ -25,15 +25,8 @@ case class FileMetadata(
   url: Option[String] = None,
   published: Boolean  = false
 ) {
-  def isImage: Boolean =
-    mimeType
-      .map {
-        case "image/png"  => true
-        case "image/jpeg" => true
-        case "image/gif"  => true
-        case _            => false
-      }
-      .getOrElse(false)
+  def isImage: Boolean = mimeType.exists(Set("image/png", "image/jpeg", "image/gif"))
+
 }
 
 object FileMetadata {
