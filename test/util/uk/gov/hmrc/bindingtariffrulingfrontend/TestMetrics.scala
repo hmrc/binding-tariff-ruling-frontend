@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend
-
-import com.kenshoo.play.metrics.Metrics
 import com.codahale.metrics.MetricRegistry
 
+trait Metrics {
+  def defaultRegistry: MetricRegistry
+  def toJson: String
+}
+
 class TestMetrics extends Metrics {
-  override def defaultRegistry: MetricRegistry = new MetricRegistry
-  override def toJson: String                  = ""
+  override val defaultRegistry: MetricRegistry = new MetricRegistry
+  override def toJson: String =
+    ""
 }

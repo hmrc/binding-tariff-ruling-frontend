@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Writes
 import play.api.libs.ws.WSClient

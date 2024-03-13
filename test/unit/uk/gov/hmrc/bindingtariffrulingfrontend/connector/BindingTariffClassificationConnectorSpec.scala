@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.apache.http.HttpStatus
@@ -29,9 +29,9 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, SimplePagination}
 import uk.gov.hmrc.bindingtariffrulingfrontend.utils.CaseQueueBuilder
-import uk.gov.hmrc.bindingtariffrulingfrontend.{TestMetrics, WiremockTestServer}
+import uk.gov.hmrc.bindingtariffrulingfrontend.{WiremockTestServer, metrics}
 import uk.gov.hmrc.play.audit.http.HttpAuditing
-
+import com.codahale.metrics.MetricRegistry
 import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate, ZoneOffset}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -45,7 +45,7 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
   private val wsClient: WSClient         = app.injector.instanceOf[WSClient]
   private val httpAuditing: HttpAuditing = app.injector.instanceOf[HttpAuditing]
   private val client                     = new AuthenticatedHttpClient(httpAuditing, wsClient, actorSystem, realConfig)
-  private val metrics                    = new TestMetrics
+  private val metrics                    = new MetricRegistry
 
   private val connector = new BindingTariffClassificationConnector(appConfig, client, metrics)
   private val xApiToken = "X-Api-Token"

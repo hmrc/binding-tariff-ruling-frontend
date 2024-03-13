@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import akka.util.ByteString
+import org.apache.pekko.util.ByteString
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.mockito.BDDMockito._
 import play.api.http.Status
@@ -24,8 +24,8 @@ import play.api.libs.ws.WSClient
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-import uk.gov.hmrc.bindingtariffrulingfrontend.{TestMetrics, WiremockTestServer}
-
+import uk.gov.hmrc.bindingtariffrulingfrontend.{WiremockTestServer, metrics}
+import com.codahale.metrics.MetricRegistry
 import java.nio.charset.StandardCharsets
 import scala.collection.immutable.ListSet
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,7 +34,7 @@ import scala.concurrent.Future
 class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer {
   val appConfig: AppConfig = mock[AppConfig]
   val httpClient           = app.injector.instanceOf[AuthenticatedHttpClient]
-  val metrics              = new TestMetrics
+  val metrics              = new MetricRegistry
   val wsClient             = app.injector.instanceOf[WSClient]
   val maxUriLenght         = 2048L
   given(appConfig.maxUriLength).willReturn(maxUriLenght)

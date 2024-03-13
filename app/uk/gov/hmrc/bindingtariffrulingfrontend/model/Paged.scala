@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
-import akka.stream.scaladsl.Source
+import org.apache.pekko.stream.scaladsl.Source
 import play.api.libs.json.{Format, JsArray, JsDefined, JsError, JsNumber, JsResult, JsSuccess, JsValue, Json, Reads, Writes}
 
 import scala.concurrent.{ExecutionContext, Future}

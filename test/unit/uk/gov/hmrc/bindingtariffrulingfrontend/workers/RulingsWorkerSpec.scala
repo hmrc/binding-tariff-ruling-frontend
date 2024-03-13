@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.workers
 
-import akka.Done
+import org.apache.pekko.Done
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
 import org.scalatest.BeforeAndAfterAll

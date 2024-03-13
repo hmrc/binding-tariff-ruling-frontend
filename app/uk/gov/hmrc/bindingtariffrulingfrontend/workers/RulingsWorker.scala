@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.workers
 
-import akka.Done
-import akka.actor.ActorSystem
-import akka.stream.scaladsl.Sink
-import akka.stream.{ActorAttributes, Materializer, Supervision}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.scaladsl.Sink
+import org.apache.pekko.stream.{ActorAttributes, Materializer, Supervision}
 import play.api.Logging
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.{BindingTariffClassificationConnector, InjectAuthHeader}
