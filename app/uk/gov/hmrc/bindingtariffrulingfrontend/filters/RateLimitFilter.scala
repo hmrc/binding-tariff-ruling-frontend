@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.filters
 
-import com.digitaltangible.playguard.{RateLimitActionFilter, RateLimiter}
+import com.digitaltangible.playguard.RateLimitActionFilter
+import com.digitaltangible.ratelimit.RateLimiter
 import javax.inject.Inject
 import play.api.mvc.{ActionFilter, Request, Result, Results}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RateLimitFilter @Inject() (appConfig: AppConfig)(implicit val executionContext: ExecutionContext)
