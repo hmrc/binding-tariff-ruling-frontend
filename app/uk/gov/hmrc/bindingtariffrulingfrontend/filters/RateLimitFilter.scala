@@ -21,8 +21,6 @@ import com.digitaltangible.ratelimit.RateLimiter
 import javax.inject.Inject
 import play.api.mvc.{ActionFilter, Request, Result, Results}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RateLimitFilter @Inject() (appConfig: AppConfig)(implicit val executionContext: ExecutionContext)
@@ -41,11 +39,6 @@ class RateLimitFilter @Inject() (appConfig: AppConfig)(implicit val executionCon
         Future.successful(Results.TooManyRequests)
     }
   }
-//    new RateLimitActionFilter[Request](
-//    rateLimiter    = new RateLimiter(appConfig.rateLimitBucketSize, appConfig.rateLimitRatePerSecond.toFloat, "IP"),
-//    keyFromRequest = request => request.headers.get(TrueClientIP).getOrElse(request.remoteAddress),
-//    rejectResponse = _ => Future.successful(Results.TooManyRequests)
-//  )
 
   override protected def filter[A](request: Request[A]): Future[Option[Result]] =
     if (appConfig.rateLimiterEnabled) filter.filter(request) else Future.successful(None)

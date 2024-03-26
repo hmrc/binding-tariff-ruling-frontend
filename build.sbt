@@ -1,5 +1,3 @@
-import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
-
 val appName = "binding-tariff-ruling-frontend"
 
 ThisBuild / majorVersion := 0
@@ -9,20 +7,13 @@ lazy val microservice = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(scalacOptions ++= Seq("-Wconf:src=routes/.*:s", "-Wconf:cat=unused-imports&src=html/.*:s"))
-  // To resolve a bug with version 2.x.x of the scoverage plugin - https://github.com/sbt/sbt/issues/6997
-  // Try to remove when sbt 1.8.0+ and scoverage is 2.0.7+
-  .settings(libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always))
-  // To resolve dependency clash between flexmark v0.64.4+ and play-language to run accessibility tests, remove when versions align
   .settings(PlayKeys.playDefaultPort := 9586)
   .settings(
     name := appName,
     libraryDependencies ++= AppDependencies()
   )
   .settings(
-    Test / unmanagedSourceDirectories := Seq(
-      (Test / baseDirectory).value / "test",
-      (Test / baseDirectory).value / "test/util"
-    ),
+    Test / unmanagedSourceDirectories += baseDirectory.value / "test/util",
     Test / resourceDirectory := baseDirectory.value / "test" / "resources"
   )
   .settings(

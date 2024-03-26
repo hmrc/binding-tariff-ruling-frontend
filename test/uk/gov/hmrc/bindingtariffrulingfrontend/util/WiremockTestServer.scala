@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend
+package uk.gov.hmrc.bindingtariffrulingfrontend.util
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.{MappingBuilder, WireMock}

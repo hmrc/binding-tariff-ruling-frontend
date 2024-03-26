@@ -22,9 +22,9 @@ import play.api.i18n.{DefaultMessagesApi, Messages, MessagesApi}
 import play.api.mvc.AnyContent
 import play.api.test.{FakeRequest, Helpers}
 import play.twirl.api.Html
-import uk.gov.hmrc.bindingtariffrulingfrontend.UnitSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.bindingtariffrulingfrontend.util.UnitSpec
 
 abstract class ViewSpec extends UnitSpec with BaseSpec {
 

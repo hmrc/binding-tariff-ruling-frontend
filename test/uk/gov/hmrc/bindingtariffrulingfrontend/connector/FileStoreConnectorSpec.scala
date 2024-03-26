@@ -24,8 +24,8 @@ import play.api.libs.ws.WSClient
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-import uk.gov.hmrc.bindingtariffrulingfrontend.WiremockTestServer
 import com.codahale.metrics.MetricRegistry
+import uk.gov.hmrc.bindingtariffrulingfrontend.util.WiremockTestServer
 import java.nio.charset.StandardCharsets
 import scala.collection.immutable.ListSet
 import scala.concurrent.ExecutionContext.Implicits.global

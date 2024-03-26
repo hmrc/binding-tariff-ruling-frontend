@@ -25,7 +25,7 @@ import play.api.i18n.{Lang, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.UnitSpec
+import uk.gov.hmrc.bindingtariffrulingfrontend.util.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
 trait BaseSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar {

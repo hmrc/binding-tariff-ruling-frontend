@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import com.codahale.metrics.MetricRegistry
+package uk.gov.hmrc.bindingtariffrulingfrontend.util
 
-trait Metrics {
-  def defaultRegistry: MetricRegistry
-  def toJson: String
-}
+import scala.io.Source
 
-class TestMetrics extends Metrics {
-  override val defaultRegistry: MetricRegistry = new MetricRegistry
-  override def toJson: String =
-    ""
+trait ResourceFiles {
+
+  protected def fromResource(path: String): String = {
+    val url = getClass.getClassLoader.getResource(path)
+    Source.fromURL(url, "UTF-8").getLines().mkString
+  }
+
 }

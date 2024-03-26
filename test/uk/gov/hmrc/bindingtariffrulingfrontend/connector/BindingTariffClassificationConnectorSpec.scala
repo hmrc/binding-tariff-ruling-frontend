@@ -29,9 +29,9 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, SimplePagination}
 import uk.gov.hmrc.bindingtariffrulingfrontend.utils.CaseQueueBuilder
-import uk.gov.hmrc.bindingtariffrulingfrontend.WiremockTestServer
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import com.codahale.metrics.MetricRegistry
+import uk.gov.hmrc.bindingtariffrulingfrontend.util.WiremockTestServer
 import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate, ZoneOffset}
 import scala.concurrent.ExecutionContext.Implicits.global
