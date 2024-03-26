@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import com.kenshoo.play.metrics.Metrics
+import com.codahale.metrics.MetricRegistry
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType.ApplicationType
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.CaseStatus._
@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class BindingTariffClassificationConnector @Inject() (
   appConfig: AppConfig,
   client: AuthenticatedHttpClient,
-  val metrics: Metrics
+  val metrics: MetricRegistry
 )(
   implicit ec: ExecutionContext
 ) extends HasMetrics

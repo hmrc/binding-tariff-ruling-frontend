@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import akka.stream.Materializer
-import akka.stream.scaladsl.Source
-import akka.util.ByteString
-import com.kenshoo.play.metrics.Metrics
+import org.apache.pekko.stream.Materializer
+import org.apache.pekko.stream.scaladsl.Source
+import org.apache.pekko.util.ByteString
+import com.codahale.metrics.MetricRegistry
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
@@ -35,7 +35,7 @@ class FileStoreConnector @Inject() (
   appConfig: AppConfig,
   http: AuthenticatedHttpClient,
   ws: WSClient,
-  val metrics: Metrics
+  val metrics: MetricRegistry
 )(implicit mat: Materializer)
     extends InjectAuthHeader
     with HasMetrics {

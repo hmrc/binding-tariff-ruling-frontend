@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,14 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.{error_summary, input_search, pagination, result_summary, search_results}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
 @import views.html.helper.CSPNonce
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 
 @this(
   mainTemplate: main_template,
   errorSummary: error_summary,
   searchInput: input_search,
-  searchResultsView: search_results
+  searchResultsView: search_results,
+  formWithCSRF: FormWithCSRF
 )
 
 @(form: Form[SimpleSearch],
@@ -39,8 +41,7 @@
 
   @errorSummary(form)
 
-  @helper.form(action = routes.SearchController.get()) {
-    @helper.CSRF.formField
+  @formWithCSRF(action = routes.SearchController.get()) {
     @searchInput(form)
   }
 

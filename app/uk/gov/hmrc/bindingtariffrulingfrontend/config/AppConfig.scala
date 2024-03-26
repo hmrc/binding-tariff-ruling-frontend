@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class AppConfig @Inject() (val configuration: Configuration) extends ServicesCon
   lazy val displayMakeGovUkBetterUrl: Boolean     = loadConfig[Boolean]("toggle.displayResearchBanner")
   lazy val displayImages: Boolean                 = loadConfig[Boolean]("toggle.displayImages")
 
-  lazy val maxUriLength: Long = configuration.underlying.getBytes("akka.http.parsing.max-uri-length")
+  lazy val maxUriLength: Long = configuration.underlying.getBytes("pekko.http.parsing.max-uri-length")
 
   lazy val reportAProblemPartialUrl: String =
     s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
