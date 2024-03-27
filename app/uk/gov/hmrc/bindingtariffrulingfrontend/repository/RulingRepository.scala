@@ -28,7 +28,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
-import java.time.{LocalDate, ZoneId}
+import java.time.{LocalDate, LocalDateTime, ZoneId}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -105,7 +105,7 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
 
   override def get(search: SimpleSearch): Future[Paged[Ruling]] = {
 
-    val startOfToday = LocalDate.now().atStartOfDay
+    val startOfToday = LocalDateTime.now()
     val zoneOffset   = ZoneId.of("Europe/London").getRules.getOffset(startOfToday)
     val today        = startOfToday.toInstant(zoneOffset)
 
