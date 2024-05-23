@@ -17,7 +17,7 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
 import org.apache.pekko.stream.scaladsl.Source
-import play.api.libs.json.{Format, JsArray, JsDefined, JsError, JsNumber, JsResult, JsSuccess, JsValue, Json, Reads, Writes}
+import play.api.libs.json._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -38,15 +38,17 @@ object Paged {
       .unfoldAsync(initialPagination) { pagination =>
         fetchPage(pagination).map { page =>
           if (page.isEmpty) None
-          else Some((pagination.withPage(pagination.pageIndex + 1), page))
+          else {
+//            println("[Paged] " + page)
+            Some((pagination.withPage(pagination.pageIndex + 1), page))
+          }
         }
       }
       .flatMapConcat(page => Source(page.results.toList))
 
   def empty[T]: Paged[T]                         = Paged(Seq.empty, 1, 0, 0)
   def empty[T](pagination: Pagination): Paged[T] = Paged(Seq.empty, pagination, 0)
-  def apply[T](results: Seq[T], pagination: Pagination, resultCount: Int): Paged[T] =
-    Paged(results, pagination.pageIndex, pagination.pageSize, resultCount)
+  def apply[T](results: Seq[T], pagination: Pagination, resultCount: Int): Paged[T] = Paged(results, pagination.pageIndex, pagination.pageSize, resultCount)
   def apply[T](results: Seq[T]): Paged[T]                   = Paged(results, SimplePagination(), results.size)
   def apply[T](results: Seq[T], resultCount: Int): Paged[T] = Paged(results, SimplePagination(), resultCount)
 

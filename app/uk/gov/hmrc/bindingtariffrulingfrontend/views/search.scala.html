@@ -21,23 +21,32 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.{error_summary, input_search, pagination, result_summary, search_results}
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.template.main_template
+
+@import uk.gov.hmrc.bindingtariffrulingfrontend.views.PaginationViewModel
+
 @import views.html.helper.CSPNonce
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components._
 
 @this(
   mainTemplate: main_template,
   errorSummary: error_summary,
   searchInput: input_search,
   searchResultsView: search_results,
-  formWithCSRF: FormWithCSRF
+  formWithCSRF: FormWithCSRF,
+  paginationViewModel:PaginationViewModel,
+  govukPagination: GovukPagination
 )
 
-@(form: Form[SimpleSearch],
+@(
+  form: Form[SimpleSearch],
   searchResults: Option[Paged[Ruling]] = None,
   fileMetadata: Map[String, FileMetadata] = Map.empty
 )(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
-@mainTemplate(title = form("query").value.map(v=>messages("search.title", v))) {
+@mainTemplate(title = form("query").value.map(v => messages("search.title", v))) {
 
   @errorSummary(form)
 
@@ -46,39 +55,38 @@
   }
 
 
-  @searchResults.map { results =>
+  @searchResults.map { pagedRulings =>
 
     @if(form.hasErrors || !form.value.exists(_.query.isDefined)){
         @result_summary(
             id = "search-summary_top",
-            pager = results,
+            pager = pagedRulings,
             oneMatchKey = "search.summary.onematch.landing",
             onePageKey = "search.summary.onepage.landing",
             manyPageKey = "search.summary.manypage.landing",
             noMatchKey = "search.summary.nomatch.landing"
             )
-    } else{
+    } else {
         @result_summary(
             id = "search-summary_top",
-            pager = results,
+            pager = pagedRulings,
             oneMatchKey = "search.summary.onematch",
             onePageKey = "search.summary.onepage",
             manyPageKey = "search.summary.manypage",
             noMatchKey = "search.summary.nomatch"
         )
     }
+    @println(form.value)
+    @searchResultsView(form.value, pagedRulings, fileMetadata)
 
-    @searchResultsView(form.value, results, fileMetadata)
-
-    @pagination(
-        id = "search-pagination_bottom",
-        pager = results,
-        onChange = page => routes.SearchController.get(query = form.value.flatMap(_.query), images = form.value.exists(_.imagesOnly), page = page)
+    @govukPagination(
+        paginationViewModel.pagination(routes.SearchController.get(query = form.value.flatMap(_.query), images = form.value.exists(_.imagesOnly), _), pagedRulings)
     )
 
-    <script @CSPNonce.attr >
+
+<script @CSPNonce.attr >
       window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({ 'search_results_atar_ruling': @results.resultCount });
+      window.dataLayer.push({ 'search_pagedRulings_atar_ruling': @pagedRulings.resultCount });
 
       const urlParams = new URLSearchParams(window.location.search);
       const searchParam = urlParams.get('query');

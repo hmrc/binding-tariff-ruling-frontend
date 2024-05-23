@@ -19,6 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.config
 import javax.inject.{Inject, Provider}
 import play.api.inject.Binding
 import play.api.{Configuration, Environment}
+import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.scheduler.{BackendScheduler, ScheduledJobs, UpdateCanceledRulingsJob, UpdateNewRulingsJob}
 import uk.gov.hmrc.bindingtariffrulingfrontend.workers.RulingsWorker
 

@@ -138,12 +138,14 @@ class RulingMongoRepositoryTest
     }
 
     "Sort Rulings based on effectiveEndDate - latest end date first, earliest end date last" in {
+
       val document1 =
         Ruling(reference = "ref1", "0", clock.instant(), tomorrow.plusSeconds(2), "justification", "exacting")
       val document2 =
         Ruling(reference = "ref2", "0", clock.instant(), tomorrow.plusSeconds(1), "justification", "exactly")
       val document3 =
         Ruling(reference = "ref3", "0", clock.instant(), tomorrow.plusSeconds(3), "justification", "fountain pen")
+
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
       givenAnExistingDocument(document3)

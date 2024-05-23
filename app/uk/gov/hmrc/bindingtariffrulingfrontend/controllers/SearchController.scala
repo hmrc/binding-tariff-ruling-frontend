@@ -51,8 +51,10 @@ class SearchController @Inject() (
     form: Form[SimpleSearch],
     rulings: Option[Paged[Ruling]],
     fileMetadata: Metadata
-  )(implicit request: Request[_]) =
+  )(implicit request: Request[_]) = {
+//    println("[renderView] " + rulings)
     Future.successful(Ok(search(form, rulings, fileMetadata)))
+  }
 
   def get(
     query: Option[String],
@@ -60,17 +62,22 @@ class SearchController @Inject() (
     page: Int,
     enableTrackingConsent: Boolean = false
   ): Action[AnyContent] =
+
     (Action andThen rateLimit).async { implicit request =>
+
       val form = SimpleSearch.form.bindFromRequest()
 
       form.fold(
         formWithErrors => allResultsView(formWithErrors, 1),
-        search =>
+        (search: SimpleSearch) => {
           for {
-            paged        <- rulingService.get(search)
+            paged: Paged[Ruling] <- rulingService.get(search)
+            _ =           println("\n paged: " + paged.pageIndex)
+            _ =           println("\n paged: " + paged.results)
             fileMetadata <- fileStoreService.get(paged)
-            html         <- renderView(form, Some(paged), fileMetadata)
+            html <- renderView(form, Some(paged), fileMetadata)
           } yield html
+        }
       )
     }
 
