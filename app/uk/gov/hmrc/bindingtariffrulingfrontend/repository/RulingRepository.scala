@@ -132,9 +132,7 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
       results <- withOrWithoutProjectionSearch
                   .skip((search.pageIndex - 1) * search.pageSize)
                   .limit(search.pageSize)
-                  .sort(Sorts.orderBy(textScore))
-                  .sort(Sorts.orderBy(descending("effectiveEndDate")))
-                  .sort(Sorts.orderBy(descending("reference")))
+                  .sort(Sorts.orderBy(textScore, descending("effectiveEndDate"), descending("reference")))
                   .toFuture()
       count <- collection
                 .withReadConcern(ReadConcern.MAJORITY)

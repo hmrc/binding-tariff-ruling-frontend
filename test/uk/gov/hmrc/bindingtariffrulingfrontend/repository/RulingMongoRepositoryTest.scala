@@ -145,12 +145,13 @@ class RulingMongoRepositoryTest
         Ruling(reference = "ref2", "0", clock.instant(), tomorrow.plusSeconds(1), "justification", "exactly")
       val document3 =
         Ruling(reference = "ref3", "0", clock.instant(), tomorrow.plusSeconds(3), "justification", "fountain pen")
+
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
       givenAnExistingDocument(document3)
 
       val result = await(repository.get(SimpleSearch(Some("0"), imagesOnly = false, 1, 100))).results
-      result shouldBe Seq(document3, document2, document1)
+      result shouldBe Seq(document3, document1, document2)
     }
 
     "Retrieve One - by Reference - exact match" in {
@@ -191,7 +192,7 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document3)
 
       await(repository.get(SimpleSearch(Some("exact"), imagesOnly = false, 1, 100))).results shouldBe
-        Seq(document2, document1)
+        Seq(document1, document2)
     }
 
     "Retrieve One - by Goods Description - images only" in {

@@ -26,10 +26,10 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.views
 
 @Singleton
 class ErrorHandler @Inject() (
-                               val messagesApi: MessagesApi,
-                               val errorTemplate: views.html.error,
-                               implicit val appConfig: AppConfig
-                             ) extends FrontendErrorHandler {
+  val messagesApi: MessagesApi,
+  val errorTemplate: views.html.error,
+  implicit val appConfig: AppConfig
+) extends FrontendErrorHandler {
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(
     implicit request: Request[_]
   ): Html =
