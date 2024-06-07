@@ -126,6 +126,7 @@ class RulingMongoRepositoryTest
     }
 
     "Retrieve Multiple - no query" in {
+
       val document1 = Ruling(reference = "ref1", "0", clock.instant(), tomorrow, "justification", "exacting")
       val document2 = Ruling(reference = "ref2", "0", clock.instant(), tomorrow, "justification", "exactly")
       val document3 = Ruling(reference = "ref3", "0", clock.instant(), tomorrow, "justification", "fountain pen")
@@ -134,7 +135,7 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document3)
 
       val result = await(repository.get(SimpleSearch(Some("0"), imagesOnly = false, 1, 100))).results
-      result should contain theSameElementsAs Seq(document1, document2, document3)
+      result should contain theSameElementsAs Seq(document3, document2, document1)
     }
 
     "Sort Rulings based on effectiveEndDate - latest end date first, earliest end date last" in {
@@ -149,7 +150,7 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document3)
 
       val result = await(repository.get(SimpleSearch(Some("0"), imagesOnly = false, 1, 100))).results
-      result shouldBe Seq(document3, document1, document2)
+      result shouldBe Seq(document3, document2, document1)
     }
 
     "Retrieve One - by Reference - exact match" in {
@@ -181,6 +182,7 @@ class RulingMongoRepositoryTest
     }
 
     "Retrieve Multiple - by Goods Description - word stems" in {
+
       val document1 = Ruling(reference = "ref1", "0", clock.instant(), nextMonth, "justification", "exacting")
       val document2 = Ruling(reference = "ref2", "0", clock.instant(), tomorrow, "justification", "exactly")
       val document3 = Ruling(reference = "ref3", "0", clock.instant(), tomorrow, "justification", "fountain pen")
@@ -189,7 +191,7 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document3)
 
       await(repository.get(SimpleSearch(Some("exact"), imagesOnly = false, 1, 100))).results shouldBe
-        Seq(document1, document2)
+        Seq(document2, document1)
     }
 
     "Retrieve One - by Goods Description - images only" in {
