@@ -126,6 +126,7 @@ class RulingMongoRepositoryTest
     }
 
     "Retrieve Multiple - no query" in {
+
       val document1 = Ruling(reference = "ref1", "0", clock.instant(), tomorrow, "justification", "exacting")
       val document2 = Ruling(reference = "ref2", "0", clock.instant(), tomorrow, "justification", "exactly")
       val document3 = Ruling(reference = "ref3", "0", clock.instant(), tomorrow, "justification", "fountain pen")
@@ -134,7 +135,7 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document3)
 
       val result = await(repository.get(SimpleSearch(Some("0"), imagesOnly = false, 1, 100))).results
-      result should contain theSameElementsAs Seq(document1, document2, document3)
+      result should contain theSameElementsAs Seq(document3, document2, document1)
     }
 
     "Sort Rulings based on effectiveEndDate - latest end date first, earliest end date last" in {
@@ -144,6 +145,7 @@ class RulingMongoRepositoryTest
         Ruling(reference = "ref2", "0", clock.instant(), tomorrow.plusSeconds(1), "justification", "exactly")
       val document3 =
         Ruling(reference = "ref3", "0", clock.instant(), tomorrow.plusSeconds(3), "justification", "fountain pen")
+
       givenAnExistingDocument(document1)
       givenAnExistingDocument(document2)
       givenAnExistingDocument(document3)
@@ -181,6 +183,7 @@ class RulingMongoRepositoryTest
     }
 
     "Retrieve Multiple - by Goods Description - word stems" in {
+
       val document1 = Ruling(reference = "ref1", "0", clock.instant(), nextMonth, "justification", "exacting")
       val document2 = Ruling(reference = "ref2", "0", clock.instant(), tomorrow, "justification", "exactly")
       val document3 = Ruling(reference = "ref3", "0", clock.instant(), tomorrow, "justification", "fountain pen")
