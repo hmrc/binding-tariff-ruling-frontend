@@ -1,20 +1,20 @@
 val appName = "binding-tariff-ruling-frontend"
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.13"
+ThisBuild / scalaVersion := "2.13.14"
 
 lazy val microservice = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
-  .settings(scalacOptions ++= Seq("-Wconf:src=routes/.*:s", "-Wconf:cat=unused-imports&src=html/.*:s"))
-  .settings(PlayKeys.playDefaultPort := 9586)
   .settings(
     name := appName,
-    libraryDependencies ++= AppDependencies()
-  )
-  .settings(
-    Test / unmanagedSourceDirectories += baseDirectory.value / "test/util",
-    Test / resourceDirectory := baseDirectory.value / "test" / "resources"
+    libraryDependencies ++= AppDependencies(),
+    PlayKeys.playDefaultPort := 9586,
+    scalacOptions ++= Seq(
+      "-feature",
+      "-Wconf:src=routes/.*:s",
+      "-Wconf:cat=unused-imports&src=html/.*:s"
+    )
   )
   .settings(
     // concatenate js

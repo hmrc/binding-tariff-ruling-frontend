@@ -21,6 +21,7 @@ import org.apache.pekko.util.ByteString
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
 import org.mockito.Mockito
+import org.mockito.Mockito.{reset, times, verify}
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers._
@@ -40,7 +41,7 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
   override lazy val realConfig: AppConfig = mock[AppConfig]
   private val notFoundView                = app.injector.instanceOf[views.html.not_found]
 
-  private def controller() =
+  private def controller(): AttachmentController =
     new AttachmentController(fileStoreService, mcc, notFoundView, realConfig)
 
   override protected def afterEach(): Unit = {

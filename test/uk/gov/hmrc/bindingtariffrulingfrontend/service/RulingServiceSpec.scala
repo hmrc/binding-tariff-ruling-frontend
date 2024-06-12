@@ -18,7 +18,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
-import org.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock

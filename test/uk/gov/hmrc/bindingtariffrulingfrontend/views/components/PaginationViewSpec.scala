@@ -19,8 +19,9 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.views.components
 import org.mockito.BDDMockito.given
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import org.mockito.{ArgumentMatchers, MockitoSugar}
+import org.mockito.ArgumentMatchers
 import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Call
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.ViewMatchers._

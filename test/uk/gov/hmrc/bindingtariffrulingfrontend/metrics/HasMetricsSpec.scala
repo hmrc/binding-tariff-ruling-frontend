@@ -20,11 +20,12 @@ import com.codahale.metrics.Timer
 import com.codahale.metrics.MetricRegistry
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito
+import org.mockito.Mockito.{times, verifyNoMoreInteractions, when}
 import org.scalatest.compatible.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, OptionValues}
-import org.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{MessagesAbstractController, Results}
 import play.api.test.{FakeRequest, Helpers}
 
