@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.audit
 
-import java.time.Instant
+import org.mockito.Mockito.verify
 
+import java.time.Instant
 import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditPayloadType._
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
@@ -29,7 +30,7 @@ class AuditServiceSpec extends BaseSpec {
 
   private val auditConnector: DefaultAuditConnector = mock[DefaultAuditConnector]
 
-  private val service = new AuditService(auditConnector)
+  private val service: AuditService = new AuditService(auditConnector)
 
   "AuditService" should {
 

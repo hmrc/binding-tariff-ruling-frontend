@@ -18,6 +18,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
+import org.mockito.Mockito.{reset, verify}
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers._
@@ -47,7 +48,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     reset(fileStoreService)
   }
 
-  private def controller() =
+  private def controller(): SearchController =
     new SearchController(rulingService, fileStoreService, rateLimit, mcc, searchView, realConfig)
 
   "GET /" should {

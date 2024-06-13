@@ -67,12 +67,6 @@
 </ul>
 }
 
-@rulingKeywords(result: Ruling) = {
-  @result.keywords.map { keyword =>
-    <span class="govuk-tag govuk-tag--grey">@keyword</span>
-  }
-}
-
 @if(results.nonEmpty) {
   <ol role="list" id="search_results-list" class="govuk-list border-top">
     @for((result: Ruling, index: Int) <- results.results.zipWithIndex) {

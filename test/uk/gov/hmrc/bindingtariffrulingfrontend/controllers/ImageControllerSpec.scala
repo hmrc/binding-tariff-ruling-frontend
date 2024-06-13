@@ -19,6 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
 import org.mockito.Mockito
+import org.mockito.Mockito.{reset, verify}
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers._
@@ -38,7 +39,7 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
   private val imageView                   = app.injector.instanceOf[views.html.image]
   private val notFoundView                = app.injector.instanceOf[views.html.not_found]
 
-  private def controller() =
+  private def controller(): ImageController =
     new ImageController(fileStoreService, mcc, imageView, notFoundView, realConfig)
 
   override protected def afterEach(): Unit = {

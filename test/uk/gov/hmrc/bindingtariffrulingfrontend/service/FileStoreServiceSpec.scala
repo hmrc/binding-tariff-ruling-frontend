@@ -17,19 +17,21 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
 import org.mockito.ArgumentMatchers._
+import org.mockito.Mockito.{reset, verify}
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.FileStoreConnector
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
+
 import java.time.Instant
 import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.http.HeaderCarrier
 
 class FileStoreServiceSpec extends BaseSpec with BeforeAndAfterEach {
-  val connector = mock[FileStoreConnector]
-  val service   = new FileStoreService(connector)
+  val connector: FileStoreConnector = mock[FileStoreConnector]
+  val service: FileStoreService     = new FileStoreService(connector)
 
-  def makeRuling(id: Int = 0) = Ruling(
+  def makeRuling(id: Int = 0): Ruling = Ruling(
     "ref" + id,
     "10101010",
     Instant.now,
