@@ -23,8 +23,7 @@ lazy val microservice = (project in file("."))
         group(
           Seq(
             "javascripts/jquery.min.js",
-            "javascripts/back-link.js",
-            "javascripts/app.js"
+            "javascripts/back-link.js"
           )
         )
     ),
