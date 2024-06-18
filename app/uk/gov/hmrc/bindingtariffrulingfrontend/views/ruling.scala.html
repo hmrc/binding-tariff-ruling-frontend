@@ -42,10 +42,14 @@
   </a>
 }
 
-@rulingKeywords = {
-  @ruling.keywords.map { keyword =>
-    <span class="govuk-tag govuk-tag--grey">@keyword</span>
-  }
+@keywordList = {
+  <ul id="keyword-list" role="list" class="govuk-list govuk-list--inline">
+    @ruling.keywords.map { keyword =>
+    <li role="listitem">
+      <span class="govuk-tag govuk-tag-atar govuk-tag--grey">@keyword</span>
+    </li>
+    }
+  </ul>
 }
 
 @rulingAttachments = {
@@ -115,7 +119,7 @@
         Seq.empty
       else Seq(SummaryListRow(
         key = Key(Text(messages("ruling.keywords"))),
-        value = Value(HtmlContent(rulingKeywords))
+        value = Value(HtmlContent(keywordList))
       ))
     } ++ {
       if (!appConfig.displayImages || ruling.images.isEmpty)
