@@ -18,7 +18,6 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
-import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
@@ -38,12 +37,12 @@ import scala.collection.immutable.ListMap
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RulingServiceSpec extends BaseSpec with MockitoSugar with BeforeAndAfterEach {
+class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
-  private val connector        = mock[BindingTariffClassificationConnector]
-  private val repository       = mock[RulingRepository]
-  private val fileStoreService = mock[FileStoreService]
-  private val auditService     = mock[AuditService]
+  private val connector        = mock(classOf[BindingTariffClassificationConnector])
+  private val repository       = mock(classOf[RulingRepository])
+  private val fileStoreService = mock(classOf[FileStoreService])
+  private val auditService     = mock(classOf[AuditService])
 
   private val service = new RulingService(repository, auditService, fileStoreService, connector)
 
@@ -120,12 +119,12 @@ class RulingServiceSpec extends BaseSpec with MockitoSugar with BeforeAndAfterEa
     )
 
     val validCase: Case = Case(
-      reference   = "ref",
-      status      = CaseStatus.COMPLETED,
+      reference = "ref",
+      status = CaseStatus.COMPLETED,
       application = Application(`type` = ApplicationType.BTI),
-      decision    = Some(validDecision),
+      decision = Some(validDecision),
       attachments = attachments,
-      keywords    = Set("keyword")
+      keywords = Set("keyword")
     )
 
     val fileMetadata = ListMap(

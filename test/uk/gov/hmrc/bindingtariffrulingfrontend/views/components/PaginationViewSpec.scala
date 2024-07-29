@@ -20,17 +20,17 @@ import org.mockito.BDDMockito.given
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.mockito.ArgumentMatchers
+import org.mockito.Mockito.mock
 import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Call
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.ViewMatchers._
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.ViewSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.pagination
 
-class PaginationViewSpec extends ViewSpec with MockitoSugar with BeforeAndAfterEach {
+class PaginationViewSpec extends ViewSpec with BeforeAndAfterEach {
 
-  private val goToPage: Int => Call = mock[Int => Call]
+  private val goToPage: Int => Call = mock(classOf[Int => Call])
 
   override def beforeEach(): Unit = {
 
@@ -47,8 +47,8 @@ class PaginationViewSpec extends ViewSpec with MockitoSugar with BeforeAndAfterE
 
       val doc = view(
         pagination(
-          id       = "ID",
-          pager    = Paged(Seq.empty[String], pageIndex = 1, pageSize = 1, resultCount = 0),
+          id = "ID",
+          pager = Paged(Seq.empty[String], pageIndex = 1, pageSize = 1, resultCount = 0),
           onChange = goToPage
         )
       )
@@ -59,8 +59,8 @@ class PaginationViewSpec extends ViewSpec with MockitoSugar with BeforeAndAfterE
     "Render multiple pages" in {
       val doc = view(
         pagination(
-          id       = "ID",
-          pager    = Paged(Seq("", ""), pageIndex = 1, pageSize = 2, resultCount = 6),
+          id = "ID",
+          pager = Paged(Seq("", ""), pageIndex = 1, pageSize = 2, resultCount = 6),
           onChange = goToPage
         )
       )

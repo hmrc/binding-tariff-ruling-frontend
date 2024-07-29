@@ -34,7 +34,6 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-//scalastyle:off magic.number
 @Singleton
 class RulingsWorker @Inject() (
   appConfig: AppConfig,

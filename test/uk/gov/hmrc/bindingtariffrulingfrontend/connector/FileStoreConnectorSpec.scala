@@ -16,35 +16,34 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import org.apache.pekko.util.ByteString
+import com.codahale.metrics.MetricRegistry
 import com.github.tomakehurst.wiremock.client.WireMock._
+import org.apache.pekko.util.ByteString
 import org.mockito.BDDMockito._
+import org.mockito.Mockito.mock
 import play.api.http.Status
-import play.api.libs.ws.WSClient
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-import com.codahale.metrics.MetricRegistry
 import uk.gov.hmrc.bindingtariffrulingfrontend.util.WiremockTestServer
+import uk.gov.hmrc.http.client.HttpClientV2
+
 import java.nio.charset.StandardCharsets
 import scala.collection.immutable.ListSet
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer {
-  val appConfig: AppConfig = mock[AppConfig]
-  val httpClient           = app.injector.instanceOf[AuthenticatedHttpClient]
-  val metrics              = new MetricRegistry
-  val wsClient             = app.injector.instanceOf[WSClient]
-  val maxUriLenght         = 2048L
+
+  val appConfig: AppConfig     = mock(classOf[AppConfig])
+  val httpClient: HttpClientV2 = app.injector.instanceOf[HttpClientV2]
+  val metrics: MetricRegistry  = new MetricRegistry
+  val maxUriLenght: Long       = 2048L
+
   given(appConfig.maxUriLength).willReturn(maxUriLenght)
   given(appConfig.bindingTariffFileStoreUrl).willReturn(wireMockUrl)
-  val connector = new FileStoreConnector(appConfig, httpClient, wsClient, metrics)
 
-  def fromFile(path: String): String = {
-    val url = getClass.getClassLoader.getResource(path)
-    scala.io.Source.fromURL(url, "UTF-8").getLines().mkString
-  }
+  val connector: FileStoreConnector = new FileStoreConnector(appConfig, httpClient, metrics)
 
   "FileStoreConnector.get" should {
     "make no request if there are no attachment IDs" in {
@@ -128,8 +127,8 @@ class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer {
           .downloadFile(s"$wireMockUrl/digital-tariffs-local/b4a5374f-9b47-40be-a509-cc7b349d67d5")
           .flatMap(maybeSource =>
             maybeSource.fold(Future.successful(ByteString.empty)) { source =>
-              source.runFold(ByteString.empty) {
-                case (bytes, nextBytes) => bytes ++ nextBytes
+              source.runFold(ByteString.empty) { case (bytes, nextBytes) =>
+                bytes ++ nextBytes
               }
             }
           )

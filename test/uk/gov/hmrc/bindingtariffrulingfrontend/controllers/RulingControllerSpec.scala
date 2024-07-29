@@ -19,6 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 import java.time.Instant
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
+import org.mockito.Mockito.mock
 import play.api.http.Status
 import play.api.test.Helpers._
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action._
@@ -29,18 +30,19 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class RulingControllerSpec extends ControllerSpec {
 
-  private val rulingService    = mock[RulingService]
-  private val fileStoreService = mock[FileStoreService]
+  private val rulingService    = mock(classOf[RulingService])
+  private val fileStoreService = mock(classOf[FileStoreService])
   private val rulingView       = app.injector.instanceOf[views.html.ruling]
   private val notFoundView     = app.injector.instanceOf[views.html.not_found]
 
   private def controller(
     auth: AuthenticatedAction = SuccessfulAuth(),
-    admin: AdminAction        = AdminEnabled()
+    admin: AdminAction = AdminEnabled()
   ) =
     new RulingController(
       rulingService,
@@ -65,7 +67,7 @@ class RulingControllerSpec extends ControllerSpec {
       status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include(messageApi("ruling.heading", "ref"))
+      bodyOf(result)        should include(messageApi("ruling.heading", "ref"))
     }
 
     "return 404 - when not found" in {
@@ -75,7 +77,7 @@ class RulingControllerSpec extends ControllerSpec {
       status(result)      shouldBe Status.NOT_FOUND
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("not_found-heading")
+      bodyOf(result)        should include("not_found-heading")
     }
   }
 

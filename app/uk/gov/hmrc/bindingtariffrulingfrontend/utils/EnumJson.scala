@@ -24,11 +24,10 @@ object EnumJson {
 
   private def enumReads[E <: Enumeration](`enum`: E): Reads[E#Value] = {
     case JsString(s) =>
-      Try(JsSuccess(enum.withName(s))).recover {
-        case _: NoSuchElementException =>
-          JsError(
-            s"Expected an enumeration of type: '${enum.getClass.getSimpleName}', but it does not contain the name: '$s'"
-          )
+      Try(JsSuccess(enum.withName(s))).recover { case _: NoSuchElementException =>
+        JsError(
+          s"Expected an enumeration of type: '${enum.getClass.getSimpleName}', but it does not contain the name: '$s'"
+        )
       }.get
 
     case _ => JsError("String value is expected")

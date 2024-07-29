@@ -47,13 +47,12 @@ trait RulingRepository {
 
 }
 
-//scalastyle:off magic.number
 @Singleton
 class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit val ec: ExecutionContext)
     extends PlayMongoRepository[Ruling](
       collectionName = "rulings",
       mongoComponent = mongoComponent,
-      domainFormat   = Ruling.Mongo.format,
+      domainFormat = Ruling.Mongo.format,
       indexes = Seq(
         IndexModel(ascending("reference"), IndexOptions().unique(true).background(false).name("reference_Index")),
         IndexModel(
@@ -88,9 +87,9 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
   override def update(ruling: Ruling, upsert: Boolean): Future[Ruling] =
     collection
       .findOneAndReplace(
-        filter      = byReference(ruling.reference),
+        filter = byReference(ruling.reference),
         replacement = ruling,
-        options     = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
+        options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       )
       .toFuture()
 
@@ -130,14 +129,14 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
 
     for {
       results <- withOrWithoutProjectionSearch
-                  .skip((search.pageIndex - 1) * search.pageSize)
-                  .limit(search.pageSize)
-                  .sort(Sorts.orderBy(textScore, descending("effectiveEndDate"), descending("reference")))
-                  .toFuture()
+                   .skip((search.pageIndex - 1) * search.pageSize)
+                   .limit(search.pageSize)
+                   .sort(Sorts.orderBy(textScore, descending("effectiveEndDate"), descending("reference")))
+                   .toFuture()
       count <- collection
-                .withReadConcern(ReadConcern.MAJORITY)
-                .countDocuments(and(allSearches: _*), CountOptions().skip(0))
-                .toFuture()
+                 .withReadConcern(ReadConcern.MAJORITY)
+                 .countDocuments(and(allSearches: _*), CountOptions().skip(0))
+                 .toFuture()
     } yield Paged(results, search.pageIndex, search.pageSize, count)
   }
 

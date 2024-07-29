@@ -34,16 +34,20 @@ class AppConfigTest extends BaseSpec {
   }
 
   "Build report url" in {
-    appConfig("contact-frontend.host" -> "host").reportAProblemPartialUrl shouldBe "host/contact/problem_reports_ajax?service=AdvanceTariffRulings"
+    appConfig(
+      "contact-frontend.host" -> "host"
+    ).reportAProblemPartialUrl shouldBe "host/contact/problem_reports_ajax?service=AdvanceTariffRulings"
   }
 
   "Build report non-json url" in {
-    appConfig("contact-frontend.host" -> "host").reportAProblemNonJSUrl shouldBe "host/contact/problem_reports_nonjs?service=AdvanceTariffRulings"
+    appConfig(
+      "contact-frontend.host" -> "host"
+    ).reportAProblemNonJSUrl shouldBe "host/contact/problem_reports_nonjs?service=AdvanceTariffRulings"
   }
 
   "Build admin enabled" in {
     appConfig("admin-mode" -> "false").adminEnabled shouldBe false
-    appConfig("admin-mode" -> "true").adminEnabled  shouldBe true
+    appConfig("admin-mode" -> "true").adminEnabled shouldBe true
   }
 
   "Build Classification Backend URL" in {
@@ -52,6 +56,14 @@ class AppConfigTest extends BaseSpec {
       "microservice.services.binding-tariff-classification.host"     -> "localhost",
       "microservice.services.binding-tariff-classification.protocol" -> "http"
     ).bindingTariffClassificationUrl shouldBe "http://localhost:8080"
+  }
+
+  "throw exception if no such config" in {
+    intercept[Exception](
+      appConfig(
+        "microservice.services.binding-tariff-classification.port" -> "8080"
+      ).ukGlobalTariffHost
+    ).getMessage shouldBe s"Missing configuration key: uk-global-tariff.host"
   }
 
 }

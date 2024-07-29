@@ -1,13 +1,10 @@
-val appName = "binding-tariff-ruling-frontend"
-
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "2.13.14"
 
-lazy val microservice = (project in file("."))
+lazy val microservice = Project("binding-tariff-ruling-frontend", file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
-    name := appName,
     libraryDependencies ++= AppDependencies(),
     PlayKeys.playDefaultPort := 9586,
     scalacOptions ++= Seq(
@@ -36,4 +33,3 @@ lazy val microservice = (project in file("."))
   .settings(CodeCoverageSettings.settings)
 
 addCommandAlias("scalafmtAll", "all scalafmtSbt scalafmt Test/scalafmt A11y/scalafmt")
-addCommandAlias("scalastyleAll", "all scalastyle Test/scalastyle A11y/scalastyle")

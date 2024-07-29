@@ -27,8 +27,8 @@ class AppConfig @Inject() (val configuration: Configuration) extends ServicesCon
   private lazy val contactHost             = configuration.getOptional[String]("contact-frontend.host").getOrElse("")
   private val contactFormServiceIdentifier = "AdvanceTariffRulings"
 
-  lazy val assetsPrefix: String                   = loadConfig[String]("assets.url") + loadConfig[String]("assets.version")
-  lazy val authorization: String                  = loadConfig[String]("auth.api-token")
+  lazy val assetsPrefix: String  = loadConfig[String]("assets.url") + loadConfig[String]("assets.version")
+  lazy val authorization: String = loadConfig[String]("auth.api-token")
   lazy val bindingTariffClassificationUrl: String = baseUrl("binding-tariff-classification")
   lazy val bindingTariffFileStoreUrl: String      = baseUrl("binding-tariff-filestore")
   lazy val adminEnabled: Boolean                  = getBoolean("admin-mode")

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.views
 import org.mockito.BDDMockito.`given`
+import org.mockito.Mockito.mock
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
@@ -29,7 +30,7 @@ import java.time.Instant
 
 class RulingViewSpec extends ViewSpec {
 
-  override implicit val appConfig: AppConfig = mock[AppConfig]
+  override implicit val appConfig: AppConfig = mock(classOf[AppConfig])
 
   override protected val testMessages: Map[String, Map[String, String]] =
     Map(
@@ -51,15 +52,15 @@ class RulingViewSpec extends ViewSpec {
     )
 
   val ruling: Ruling = Ruling(
-    reference            = "reference",
+    reference = "reference",
     bindingCommodityCode = "bindingCommodityCode",
-    effectiveStartDate   = Instant.now,
-    effectiveEndDate     = Instant.now,
-    justification        = "justification",
-    goodsDescription     = "goodsDescription",
-    keywords             = Set("k1", "k2", "k3"),
-    attachments          = Seq("f1", "f2", "f3"),
-    images               = Seq("id1", "id2")
+    effectiveStartDate = Instant.now,
+    effectiveEndDate = Instant.now,
+    justification = "justification",
+    goodsDescription = "goodsDescription",
+    keywords = Set("k1", "k2", "k3"),
+    attachments = Seq("f1", "f2", "f3"),
+    images = Seq("id1", "id2")
   )
 
   val fileMetaData: Map[String, FileMetadata] = Map(

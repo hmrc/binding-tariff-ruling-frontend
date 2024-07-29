@@ -21,18 +21,18 @@ import java.time.Instant
 import play.api.libs.json.{JsArray, JsString, Json}
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
-class RulingTest extends BaseSpec {
+class RulingSpec extends BaseSpec {
 
   val ruling: Ruling = Ruling(
-    reference            = "reference",
+    reference = "reference",
     bindingCommodityCode = "0011223344",
-    effectiveStartDate   = Instant.EPOCH,
-    effectiveEndDate     = Instant.EPOCH.plusSeconds(1),
-    justification        = "justification",
-    goodsDescription     = "goods-description",
-    keywords             = Set("keyword"),
-    attachments          = Seq("attachment"),
-    images               = Seq("image")
+    effectiveStartDate = Instant.EPOCH,
+    effectiveEndDate = Instant.EPOCH.plusSeconds(1),
+    justification = "justification",
+    goodsDescription = "goods-description",
+    keywords = Set("keyword"),
+    attachments = Seq("attachment"),
+    images = Seq("image")
   )
 
   "Ruling" should {
