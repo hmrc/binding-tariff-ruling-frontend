@@ -31,13 +31,13 @@ class SimpleSearchSpec extends BaseSpec with ScalaCheckPropertyChecks {
       .fold(
         formWithErrors => {
           for (error <- expectedErrors)
-            formWithErrors.errors should contain(FormError(error.key, error.message, error.args))
+            formWithErrors.errors      should contain(FormError(error.key, error.message, error.args))
           formWithErrors.errors.size shouldBe expectedErrors.size
         },
         _ => fail("Expected a validation error when binding the form, but it was bound successfully.")
       )
 
-  def error(key: String, value: String, args: Any*) = Seq(FormError(key, value, args))
+  def error(key: String, value: String, args: Any*): Seq[FormError] = Seq(FormError(key, value, args))
 
   lazy val emptyForm: Map[String, String] = Map[String, String]()
 

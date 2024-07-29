@@ -21,7 +21,6 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 class PaginationUtilTest extends BaseSpec {
 
   "Surrounding Pages" should {
-    // scalastyle:off magic.number
     "return empty" in {
       PaginationUtil.surroundingPages(1, 1, 5) shouldBe Seq(1)
     }
@@ -53,7 +52,6 @@ class PaginationUtilTest extends BaseSpec {
       PaginationUtil.surroundingPages(6, 7, 5) shouldBe Seq(3, 4, 5, 6, 7)
       PaginationUtil.surroundingPages(7, 7, 5) shouldBe Seq(3, 4, 5, 6, 7)
     }
-    // scalastyle:on magic.number
   }
 
 }

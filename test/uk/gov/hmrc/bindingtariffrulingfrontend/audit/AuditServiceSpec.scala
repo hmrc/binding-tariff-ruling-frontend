@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.audit
 
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.{mock, verify}
 
 import java.time.Instant
 import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditPayloadType._
@@ -28,21 +28,21 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class AuditServiceSpec extends BaseSpec {
 
-  private val auditConnector: DefaultAuditConnector = mock[DefaultAuditConnector]
+  private val auditConnector: DefaultAuditConnector = mock(classOf[DefaultAuditConnector])
 
   private val service: AuditService = new AuditService(auditConnector)
 
   "AuditService" should {
 
     val ruling = Ruling(
-      reference            = "reference",
+      reference = "reference",
       bindingCommodityCode = "bindingCommodityCode",
-      effectiveStartDate   = Instant.now,
-      effectiveEndDate     = Instant.now,
-      justification        = "justification",
-      goodsDescription     = "goodsDescription",
-      keywords             = Set("k1", "k2", "k3"),
-      attachments          = Seq("f1", "f2", "f3")
+      effectiveStartDate = Instant.now,
+      effectiveEndDate = Instant.now,
+      justification = "justification",
+      goodsDescription = "goodsDescription",
+      keywords = Set("k1", "k2", "k3"),
+      attachments = Seq("f1", "f2", "f3")
     )
 
     "call the audit connector when a ruling is created" in {

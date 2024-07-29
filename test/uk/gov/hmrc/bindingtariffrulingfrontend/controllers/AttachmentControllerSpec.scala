@@ -21,7 +21,7 @@ import org.apache.pekko.util.ByteString
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
 import org.mockito.Mockito
-import org.mockito.Mockito.{reset, times, verify}
+import org.mockito.Mockito.{mock, reset, times, verify}
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers._
@@ -37,8 +37,8 @@ import scala.concurrent.Future
 
 class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
-  private val fileStoreService            = mock[FileStoreService]
-  override lazy val realConfig: AppConfig = mock[AppConfig]
+  private val fileStoreService            = mock(classOf[FileStoreService])
+  override lazy val realConfig: AppConfig = mock(classOf[AppConfig])
   private val notFoundView                = app.injector.instanceOf[views.html.not_found]
 
   private def controller(): AttachmentController =
@@ -60,10 +60,10 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     val fileId          = "d4897c0a-b92d-4cf7-8990-f40fe158be68"
 
     val metadata = FileMetadata(
-      id        = fileId,
-      fileName  = Some("some.png"),
-      mimeType  = Some("image/png"),
-      url       = Some("http://localhost:4572/digital-tariffs-local/d4897c0a-b92d-4cf7-8990-f40fe158be68"),
+      id = fileId,
+      fileName = Some("some.png"),
+      mimeType = Some("image/png"),
+      url = Some("http://localhost:4572/digital-tariffs-local/d4897c0a-b92d-4cf7-8990-f40fe158be68"),
       published = true
     )
 
@@ -105,7 +105,7 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.NOT_FOUND
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("not_found-heading")
+      bodyOf(result)        should include("not_found-heading")
 
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
       verify(fileStoreService, times(0)).downloadFile(any[String])(any[HeaderCarrier])
@@ -142,7 +142,7 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.NOT_FOUND
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("not_found-heading")
+      bodyOf(result)        should include("not_found-heading")
 
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
       verify(fileStoreService, times(0)).downloadFile(any[String])(any[HeaderCarrier])
@@ -157,7 +157,7 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.NOT_FOUND
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("not_found-heading")
+      bodyOf(result)        should include("not_found-heading")
 
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
       verify(fileStoreService, times(0)).downloadFile(any[String])(any[HeaderCarrier])
@@ -172,7 +172,7 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.NOT_FOUND
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("not_found-heading")
+      bodyOf(result)        should include("not_found-heading")
 
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
       verify(fileStoreService, times(0)).downloadFile(any[String])(any[HeaderCarrier])
@@ -187,7 +187,7 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.NOT_FOUND
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include("not_found-heading")
+      bodyOf(result)        should include("not_found-heading")
 
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
       verify(fileStoreService).downloadFile(refEq(url))(any[HeaderCarrier])

@@ -16,29 +16,28 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
+import com.codahale.metrics.MetricRegistry
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.scaladsl.Source
 import org.apache.pekko.util.ByteString
-import com.codahale.metrics.MetricRegistry
-import javax.inject.{Inject, Singleton}
-import play.api.libs.ws.WSClient
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.metrics.HasMetrics
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FileStoreConnector @Inject() (
   appConfig: AppConfig,
-  http: AuthenticatedHttpClient,
-  ws: WSClient,
+  httpClient: HttpClientV2,
   val metrics: MetricRegistry
-)(implicit mat: Materializer)
-    extends InjectAuthHeader
-    with HasMetrics {
+)(implicit val mat: Materializer)
+    extends HasMetrics
+    with InjectAuthHeader {
 
   implicit val ec: ExecutionContext =
     mat.executionContext
@@ -58,11 +57,12 @@ class FileStoreConnector @Inject() (
 
   def get(attachmentId: String)(implicit headerCarrier: HeaderCarrier): Future[Option[FileMetadata]] =
     withMetricsTimerAsync("get-attachment-metadata") { _ =>
-      http
-        .GET[Option[FileMetadata]](
-          s"${appConfig.bindingTariffFileStoreUrl}/file/$attachmentId",
-          headers = authHeaders(appConfig)
-        )
+      val fullURL = s"${appConfig.bindingTariffFileStoreUrl}/file/$attachmentId"
+
+      httpClient
+        .get(url"$fullURL")
+        .setHeader(authHeaders(appConfig): _*)
+        .execute[Option[FileMetadata]]
         .map(_.filter(_.published))
     }
 
@@ -74,32 +74,31 @@ class FileStoreConnector @Inject() (
         Source(attachmentIds)
           .grouped(BatchSize)
           .mapAsyncUnordered(Runtime.getRuntime.availableProcessors()) { ids =>
-            http.GET[Seq[FileMetadata]](makeQuery(ids), headers = authHeaders(appConfig))
+            httpClient
+              .get(url"${makeQuery(ids)}")
+              .setHeader(authHeaders(appConfig): _*)
+              .execute[Seq[FileMetadata]]
           }
-          .runFold(noMetadata) {
-            case (metadata, newEntries) =>
-              metadata ++ newEntries.filter(_.published).map(entry => entry.id -> entry).toMap
+          .runFold(noMetadata) { case (metadata, newEntries) =>
+            metadata ++ newEntries.filter(_.published).map(entry => entry.id -> entry).toMap
           }
       }
     }
 
-  def downloadFile(url: String)(implicit hc: HeaderCarrier): Future[Option[Source[ByteString, _]]] =
+  def downloadFile(fileURL: String)(implicit hc: HeaderCarrier): Future[Option[Source[ByteString, _]]] =
     withMetricsTimerAsync("download-file") { _ =>
-      lazy val hcConfig = HeaderCarrier.Config.fromConfig(http.configuration)
-
-      val fileStoreResponse = ws
-        .url(url)
-        .withHttpHeaders(hc.withExtraHeaders(http.authHeaders(appConfig): _*).headersForUrl(hcConfig)(url): _*)
-        .get()
-
-      fileStoreResponse.flatMap { response =>
-        if (response.status / 100 == 2) {
-          Future.successful(Some(response.bodyAsSource))
-        } else if (response.status / 100 > 4) {
-          Future.failed(new RuntimeException("Unable to retrieve file from filestore"))
-        } else {
-          Future.successful(None)
+      httpClient
+        .get(url"$fileURL")
+        .setHeader(authHeaders(appConfig): _*)
+        .execute[HttpResponse]
+        .flatMap { response =>
+          if (response.status / 100 == 2) {
+            Future.successful(Some(response.bodyAsSource))
+          } else if (response.status / 100 > 4) {
+            Future.failed(new RuntimeException("Unable to retrieve file from filestore"))
+          } else {
+            Future.successful(None)
+          }
         }
-      }
     }
 }

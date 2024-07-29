@@ -61,15 +61,15 @@ class RulingService @Inject() (
       for {
         existingRuling: ExistingRuling <- repository.get(reference)
         validCase = updatedCase
-          .filter(_.application.`type` == ApplicationType.BTI)
-          .filter(_.status == CaseStatus.COMPLETED)
-          .filter(_.decision.isDefined)
-          .filter(_.decision.flatMap(_.effectiveStartDate).isDefined)
-          .filter(_.decision.flatMap(_.effectiveEndDate).isDefined)
+                      .filter(_.application.`type` == ApplicationType.BTI)
+                      .filter(_.status == CaseStatus.COMPLETED)
+                      .filter(_.decision.isDefined)
+                      .filter(_.decision.flatMap(_.effectiveStartDate).isDefined)
+                      .filter(_.decision.flatMap(_.effectiveEndDate).isDefined)
         fileMetaData <- validCase
-                         .map(_.attachments.map(_.id))
-                         .map(fileStoreService.get(_))
-                         .getOrElse(Future.successful(Map.empty[String, FileMetadata]))
+                          .map(_.attachments.map(_.id))
+                          .map(fileStoreService.get(_))
+                          .getOrElse(Future.successful(Map.empty[String, FileMetadata]))
         updatedRuling: UpdatedRuling = validCase.map(toRuling(_, fileMetaData))
         result: RulingUpdate         = (existingRuling, updatedRuling)
       } yield result
@@ -110,15 +110,15 @@ class RulingService @Inject() (
       .partition(_.isImage)
 
     Ruling(
-      reference            = reference,
+      reference = reference,
       bindingCommodityCode = decision.bindingCommodityCode,
-      effectiveStartDate   = decision.effectiveStartDate.get,
-      effectiveEndDate     = decision.effectiveEndDate.get,
-      justification        = decision.justification,
-      goodsDescription     = decision.goodsDescription,
-      keywords             = keywords,
-      attachments          = attachments.map(_.id),
-      images               = images.map(_.id)
+      effectiveStartDate = decision.effectiveStartDate.get,
+      effectiveEndDate = decision.effectiveEndDate.get,
+      justification = decision.justification,
+      goodsDescription = decision.goodsDescription,
+      keywords = keywords,
+      attachments = attachments.map(_.id),
+      images = images.map(_.id)
     )
   }
 

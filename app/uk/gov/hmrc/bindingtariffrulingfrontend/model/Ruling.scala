@@ -28,13 +28,13 @@ case class Ruling(
   effectiveEndDate: Instant,
   justification: String,
   goodsDescription: String,
-  keywords: Set[String]    = Set.empty,
+  keywords: Set[String] = Set.empty,
   attachments: Seq[String] = Seq.empty,
-  images: Seq[String]      = Seq.empty
+  images: Seq[String] = Seq.empty
 ) {
   lazy val bindingCommodityCodeNgrams: Seq[String] = bindingCommodityCode
-    .scanLeft("") {
-      case (ngram, char) => ngram + char
+    .scanLeft("") { case (ngram, char) =>
+      ngram + char
     }
     .filterNot(_.isEmpty)
 }

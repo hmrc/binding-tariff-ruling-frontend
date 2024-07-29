@@ -75,19 +75,18 @@ object Paged {
           }
         )
       ).map(JsSuccess(_))
-        .recover {
-          case t: Throwable => JsError(t.getMessage)
+        .recover { case t: Throwable =>
+          JsError(t.getMessage)
         }
         .get
 
   implicit def writes[T](implicit fmt: Writes[T]): Paged[T] => JsValue =
-    (paged: Paged[T]) => {
+    (paged: Paged[T]) =>
       Json.obj(
         "results"     -> JsArray(paged.results.map(fmt.writes)),
         "pageIndex"   -> JsNumber(paged.pageIndex),
         "pageSize"    -> JsNumber(paged.pageSize),
         "resultCount" -> JsNumber(paged.resultCount)
       )
-    }
 
 }

@@ -16,6 +16,7 @@
 
 import org.scalacheck.Arbitrary
 import play.api.data.Form
+import play.api.mvc.RequestHeader
 import play.twirl.api.Html
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
@@ -38,8 +39,8 @@ class FrontendAccessibilitySpec extends AutomaticAccessibilitySpec {
   private val fileMetaData: Map[String, FileMetadata] = Map(
     "id1" -> FileMetadata("id1", Some("image1"), None, Some("url"), published = true),
     "id2" -> FileMetadata("id2", Some("image1"), None, Some("url"), published = true),
-    "f1" -> FileMetadata("f1", Some("file1"), None, None),
-    "f2" -> FileMetadata("f2", Some("file2"), None, None)
+    "f1"  -> FileMetadata("f1", Some("file1"), None, None),
+    "f2"  -> FileMetadata("f2", Some("file2"), None, None)
   )
 
   private val ruling: Ruling = Ruling(
@@ -58,13 +59,11 @@ class FrontendAccessibilitySpec extends AutomaticAccessibilitySpec {
 
   override implicit val arbAsciiString: Arbitrary[String] = fixed("/")
 
-  implicit val arbConfig: Arbitrary[AppConfig] = fixed(appConfig)
-
-  implicit val arbPagedRuling: Arbitrary[Paged[Ruling]] = fixed(pagedRuling)
-
+  implicit val arbRequestHeader: Arbitrary[RequestHeader]            = fixed(fakeRequest)
+  implicit val arbConfig: Arbitrary[AppConfig]                       = fixed(appConfig)
+  implicit val arbPagedRuling: Arbitrary[Paged[Ruling]]              = fixed(pagedRuling)
   implicit val arbFileMetaData: Arbitrary[Map[String, FileMetadata]] = fixed(fileMetaData)
-
-  implicit val arbInputSearch: Arbitrary[Form[SimpleSearch]] = fixed(SimpleSearch.form)
+  implicit val arbInputSearch: Arbitrary[Form[SimpleSearch]]         = fixed(SimpleSearch.form)
 
   // This is the package where the page templates are located in your service
   val viewPackageName: String = "uk.gov.hmrc.bindingtariffrulingfrontend.views.html"
@@ -76,11 +75,11 @@ class FrontendAccessibilitySpec extends AutomaticAccessibilitySpec {
   // this partial function wires up the generic render() functions with arbitrary instances of the correct types.
   // Important: there's a known issue with intellij incorrectly displaying warnings here, you should be able to ignore these for now.
   override def renderViewByClass: PartialFunction[Any, Html] = {
-    case error: views.html.error => render(error)
-    case image: views.html.image => render(image)
+    case error: views.html.error        => render(error)
+    case image: views.html.image        => render(image)
     case notFound: views.html.not_found => render(notFound)
-    case rulingView: views.html.ruling => render(rulingView)
-    case search: views.html.search => render(search)
+    case rulingView: views.html.ruling  => render(rulingView)
+    case search: views.html.search      => render(search)
   }
 
   runAccessibilityTests()

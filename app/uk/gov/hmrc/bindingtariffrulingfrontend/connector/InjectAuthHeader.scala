@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.bindingtariffrulingfrontend.connector.model
+package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
-import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
+import uk.gov.hmrc.http.HeaderCarrier
 
-case class FileMetadata(
-  id: String,
-  fileName: Option[String],
-  mimeType: Option[String],
-  url: Option[String] = None,
-  published: Boolean = false
-) {
-  def isImage: Boolean = mimeType.exists(Set("image/png", "image/jpeg", "image/gif"))
+trait InjectAuthHeader {
 
-}
+  def authHeaders(config: AppConfig)(implicit hc: HeaderCarrier): Seq[(String, String)] = {
+    val headerName: String = "X-Api-Token"
 
-object FileMetadata {
-  implicit val outboundFormat: OFormat[FileMetadata] = Json.format[FileMetadata]
+    hc.headers(Seq(headerName)) match {
+      case header @ Seq(_) => header
+      case _               => Seq(headerName -> config.authorization)
+    }
+  }
+
 }

@@ -20,7 +20,7 @@ import play.api.libs.json.{Json, OFormat}
 
 case class Attachment(
   id: String,
-  public: Boolean                 = false,
+  public: Boolean = false,
   shouldPublishToRulings: Boolean = false
 )
 

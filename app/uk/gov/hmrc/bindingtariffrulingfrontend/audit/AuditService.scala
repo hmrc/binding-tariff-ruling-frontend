@@ -31,13 +31,13 @@ class AuditService @Inject() (auditConnector: DefaultAuditConnector)(implicit ec
   def auditRulingCreated(ruling: Ruling)(implicit hc: HeaderCarrier): Unit =
     sendExplicitAuditEvent(
       auditEventType = rulingCreated,
-      auditPayload   = ruling
+      auditPayload = ruling
     )
 
   def auditRulingDeleted(reference: String)(implicit hc: HeaderCarrier): Unit =
     auditConnector.sendExplicitAudit(
       auditType = rulingDeleted,
-      detail    = Map("reference" -> reference)
+      detail = Map("reference" -> reference)
     )
 
   private def sendExplicitAuditEvent(auditEventType: String, auditPayload: Ruling)(implicit hc: HeaderCarrier): Unit =

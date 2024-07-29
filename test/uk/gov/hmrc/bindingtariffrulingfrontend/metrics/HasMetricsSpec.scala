@@ -20,28 +20,22 @@ import com.codahale.metrics.Timer
 import com.codahale.metrics.MetricRegistry
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito
-import org.mockito.Mockito.{times, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{mock, times, verifyNoMoreInteractions, when}
 import org.scalatest.compatible.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, OptionValues}
-import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{MessagesAbstractController, Results}
 import play.api.test.{FakeRequest, Helpers}
 
 import scala.concurrent.Future
 
-class HasMetricsSpec
-    extends AsyncWordSpecLike
-    with Matchers
-    with OptionValues
-    with MockitoSugar
-    with BeforeAndAfterAll {
+class HasMetricsSpec extends AsyncWordSpecLike with Matchers with OptionValues with BeforeAndAfterAll {
 
   trait MockHasMetrics { self: HasMetrics =>
-    val timer: Timer.Context                = mock[Timer.Context]
-    val metrics: MetricRegistry             = mock[MetricRegistry]
-    override val localMetrics: LocalMetrics = mock[LocalMetrics]
+    val timer: Timer.Context                = mock(classOf[Timer.Context])
+    val metrics: MetricRegistry             = mock(classOf[MetricRegistry])
+    override val localMetrics: LocalMetrics = mock(classOf[LocalMetrics])
     when(localMetrics.startTimer(anyString())) thenReturn timer
   }
 
@@ -99,9 +93,8 @@ class HasMetricsSpec
       }
 
       "increment failure counter for a failed future" in withTestMetrics { metrics =>
-        metrics.withMetricsTimerAsync(TestMetric)(_ => Future.failed(new Exception)).recover {
-          case _ =>
-            verifyCompletedWithFailure(TestMetric, metrics)
+        metrics.withMetricsTimerAsync(TestMetric)(_ => Future.failed(new Exception)).recover { case _ =>
+          verifyCompletedWithFailure(TestMetric, metrics)
         }
       }
 

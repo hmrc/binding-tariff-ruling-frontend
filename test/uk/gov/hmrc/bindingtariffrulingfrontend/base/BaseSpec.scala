@@ -18,7 +18,6 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.base
 
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.Materializer
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.{Lang, MessagesApi}
@@ -28,11 +27,12 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.util.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
-trait BaseSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar {
+import scala.io.Source.fromURL
+
+trait BaseSpec extends UnitSpec with GuiceOneAppPerSuite {
 
   override implicit lazy val app: Application = GuiceApplicationBuilder()
     .configure(
-      //turn off metrics
       "metrics.jvm"     -> false,
       "metrics.enabled" -> false
     )
@@ -45,4 +45,12 @@ trait BaseSpec extends UnitSpec with GuiceOneAppPerSuite with MockitoSugar {
   implicit lazy val mat: Materializer                 = app.materializer
   implicit lazy val ac: ActorSystem                   = app.actorSystem
   implicit lazy val lang: Lang                        = mcc.langs.availables.head
+
+  def fromFile(path: String): String = {
+    val url    = getClass.getClassLoader.getResource(path)
+    val source = fromURL(url, "UTF-8")
+    try source.getLines().mkString
+    finally source.close()
+  }
+
 }

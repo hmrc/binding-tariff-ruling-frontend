@@ -18,7 +18,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
-import org.mockito.Mockito.{reset, verify}
+import org.mockito.Mockito.{mock, reset, verify}
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers._
@@ -36,9 +36,9 @@ import scala.concurrent.Future
 
 class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
-  private val appConfig        = mock[AppConfig]
-  private val rulingService    = mock[RulingService]
-  private val fileStoreService = mock[FileStoreService]
+  private val appConfig        = mock(classOf[AppConfig])
+  private val rulingService    = mock(classOf[RulingService])
+  private val fileStoreService = mock(classOf[FileStoreService])
   private val rateLimit        = new RateLimitFilter(appConfig)
   private val searchView       = app.injector.instanceOf[views.html.search]
 
@@ -69,7 +69,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include(messageApi("search.heading"))
+      bodyOf(result)        should include(messageApi("search.heading"))
 
       verify(rulingService).get(SimpleSearch(Some("query"), imagesOnly = false, 1))
       verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
@@ -86,7 +86,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include(messageApi("search.heading"))
+      bodyOf(result)        should include(messageApi("search.heading"))
 
       verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
       verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
@@ -102,7 +102,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include(messageApi("search.heading"))
+      bodyOf(result)        should include(messageApi("search.heading"))
 
       verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
       verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
@@ -151,7 +151,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include(messageApi("search.heading"))
+      bodyOf(result)        should include(messageApi("search.heading"))
 
       verify(rulingService).get(SimpleSearch(Some("query"), imagesOnly = false, 1))
       verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
@@ -168,7 +168,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include(messageApi("search.heading"))
+      bodyOf(result)        should include(messageApi("search.heading"))
 
       verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
       verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])
@@ -192,8 +192,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       status(result)      shouldBe Status.OK
       contentType(result) shouldBe Some("text/html")
       charset(result)     shouldBe Some("utf-8")
-      bodyOf(result)      should include(messageApi("search.heading"))
-      bodyOf(result)      should include(messageApi("Enter a search term"))
+      bodyOf(result)        should include(messageApi("search.heading"))
+      bodyOf(result)        should include(messageApi("Enter a search term"))
 
       verify(rulingService).get(SimpleSearch(None, imagesOnly = false, 1))
       verify(fileStoreService).get(refEq(Paged.empty[Ruling]))(any[HeaderCarrier])

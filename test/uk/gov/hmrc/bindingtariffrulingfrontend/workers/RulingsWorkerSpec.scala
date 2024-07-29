@@ -19,9 +19,8 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.workers
 import org.apache.pekko.Done
 import org.mockito.ArgumentMatchers._
 import org.mockito.BDDMockito._
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.{mock, verify}
 import org.scalatest.BeforeAndAfterAll
-import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
@@ -36,13 +35,12 @@ import java.time.{Instant, LocalDate, ZoneOffset}
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 
-//scalastyle:off magic.number
-class RulingsWorkerSpec extends BaseSpec with MockitoSugar with BeforeAndAfterAll with MongoSupport { self =>
+class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with MongoSupport { self =>
 
-  private val rulingService = mock[RulingService]
-  private val connector     = mock[BindingTariffClassificationConnector]
-  private val appConfig     = mock[AppConfig]
-  private val lockRepo      = mock[MongoLockRepository]
+  private val rulingService = mock(classOf[RulingService])
+  private val connector     = mock(classOf[BindingTariffClassificationConnector])
+  private val appConfig     = mock(classOf[AppConfig])
+  private val lockRepo      = mock(classOf[MongoLockRepository])
 
   val rulingWorker: RulingsWorker = new RulingsWorker(appConfig, connector, rulingService, lockRepo)(ac, mat)
 
@@ -54,24 +52,24 @@ class RulingsWorkerSpec extends BaseSpec with MockitoSugar with BeforeAndAfterAl
   val validDecision: Decision      = Decision("code", Some(startDate), Some(endDate), "justification", "description")
   val publicAttachment: Attachment = Attachment("file-id", public = true, shouldPublishToRulings = true)
   val validCase: Case = Case(
-    reference   = "ref",
-    status      = CaseStatus.CANCELLED,
+    reference = "ref",
+    status = CaseStatus.CANCELLED,
     application = Application(`type` = ApplicationType.BTI),
-    decision    = Some(validDecision),
+    decision = Some(validDecision),
     attachments = Seq(publicAttachment),
-    keywords    = Set("keyword")
+    keywords = Set("keyword")
   )
 
   val pagedNewCases: Paged[Case] = Paged(
     results =
       Seq(validCase.copy(reference = "ref1"), validCase.copy(reference = "ref2"), validCase.copy(reference = "ref3")),
-    pagination  = pagination,
+    pagination = pagination,
     resultCount = 3
   )
 
   val pagedCanceledCases: Paged[Case] = Paged(
-    results     = Seq(validCase.copy(reference = "ref4"), validCase.copy(reference = "ref5")),
-    pagination  = pagination,
+    results = Seq(validCase.copy(reference = "ref4"), validCase.copy(reference = "ref5")),
+    pagination = pagination,
     resultCount = 2
   )
 

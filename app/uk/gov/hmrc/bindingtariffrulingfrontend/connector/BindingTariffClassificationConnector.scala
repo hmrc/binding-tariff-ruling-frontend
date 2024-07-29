@@ -24,8 +24,9 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{ApplicationType,
 import uk.gov.hmrc.bindingtariffrulingfrontend.metrics.HasMetrics
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged.format
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination}
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import java.time.Instant
 import javax.inject.{Inject, Singleton}
@@ -34,10 +35,10 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class BindingTariffClassificationConnector @Inject() (
   appConfig: AppConfig,
-  client: AuthenticatedHttpClient,
+  httpClient: HttpClientV2,
   val metrics: MetricRegistry
-)(
-  implicit ec: ExecutionContext
+)(implicit
+  ec: ExecutionContext
 ) extends HasMetrics
     with InjectAuthHeader {
 
@@ -64,33 +65,43 @@ class BindingTariffClassificationConnector @Inject() (
 
   def get(reference: String)(implicit hc: HeaderCarrier): Future[Option[Case]] =
     withMetricsTimerAsync("get-case") { _ =>
-      val url = s"${appConfig.bindingTariffClassificationUrl}/cases/$reference"
-      client.GET[Option[Case]](url, headers = authHeaders(appConfig))
+      val fullURL = s"${appConfig.bindingTariffClassificationUrl}/cases/$reference"
+      httpClient
+        .get(url"$fullURL")
+        .setHeader(authHeaders(appConfig): _*)
+        .execute[Option[Case]]
     }
 
-  def newApprovedRulings(minDecisionStart: Instant, pagination: Pagination)(
-    implicit hc: HeaderCarrier
+  def newApprovedRulings(minDecisionStart: Instant, pagination: Pagination)(implicit
+    hc: HeaderCarrier
   ): Future[Paged[Case]] =
     withMetricsTimerAsync("get-new-approved-rulings") { _ =>
-      val url = buildQueryUrl(
-        statuses         = completedStatus,
+      val fullURL = buildQueryUrl(
+        statuses = completedStatus,
         minDecisionStart = Some(minDecisionStart),
-        minDecisionEnd   = None,
-        pagination       = pagination
+        minDecisionEnd = None,
+        pagination = pagination
       )
-      client.GET[Paged[Case]](url, headers = authHeaders(appConfig))
+
+      httpClient
+        .get(url"$fullURL")
+        .setHeader(authHeaders(appConfig): _*)
+        .execute[Paged[Case]]
     }
 
-  def newCanceledRulings(minDecisionEnd: Instant, pagination: Pagination)(
-    implicit hc: HeaderCarrier
+  def newCanceledRulings(minDecisionEnd: Instant, pagination: Pagination)(implicit
+    hc: HeaderCarrier
   ): Future[Paged[Case]] =
     withMetricsTimerAsync("get-new-cancelled-rulings") { _ =>
-      val url = buildQueryUrl(
-        statuses         = cancelStatus,
+      val fullURL = buildQueryUrl(
+        statuses = cancelStatus,
         minDecisionStart = None,
-        minDecisionEnd   = Some(minDecisionEnd),
-        pagination       = pagination
+        minDecisionEnd = Some(minDecisionEnd),
+        pagination = pagination
       )
-      client.GET[Paged[Case]](url, headers = authHeaders(appConfig))
+      httpClient
+        .get(url"$fullURL")
+        .setHeader(authHeaders(appConfig): _*)
+        .execute[Paged[Case]]
     }
 }

@@ -22,5 +22,5 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.utils.EnumJson
 object CaseStatus extends Enumeration {
   type CaseStatus = Value
   val DRAFT, NEW, OPEN, SUPPRESSED, REFERRED, REJECTED, CANCELLED, SUSPENDED, COMPLETED, REVOKED, ANNULLED = Value
-  implicit val format: Format[CaseStatus.Value]                                                            = EnumJson.format(CaseStatus)
+  implicit val format: Format[CaseStatus.Value] = EnumJson.format(CaseStatus)
 }

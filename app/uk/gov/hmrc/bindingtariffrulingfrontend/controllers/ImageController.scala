@@ -48,10 +48,9 @@ class ImageController @Inject() (
         fileName <- OptionT.fromOption[Future](meta.fileName)
       } yield Ok(imageView(rulingReference, imageId, fileName))
 
-      fileStoreResponse.getOrElse(NotFound(notFoundView())).recover {
-        case NonFatal(e) =>
-          logger.error("Exception while calling binding-tariff-filestore", e)
-          BadGateway
+      fileStoreResponse.getOrElse(NotFound(notFoundView())).recover { case NonFatal(e) =>
+        logger.error("Exception while calling binding-tariff-filestore", e)
+        BadGateway
       }
     } else {
       Future.successful(Redirect(controllers.routes.Default.redirect()))

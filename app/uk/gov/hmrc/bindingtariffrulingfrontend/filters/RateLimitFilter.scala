@@ -27,7 +27,7 @@ class RateLimitFilter @Inject() (appConfig: AppConfig)(implicit val executionCon
     extends ActionFilter[Request] {
   private val TrueClientIP = "True-Client-IP"
 
-  private lazy val filter = {
+  private lazy val filter =
     new RateLimitActionFilter[Request](
       rateLimiter = new RateLimiter(appConfig.rateLimitBucketSize, appConfig.rateLimitRatePerSecond.toFloat, "IP")
     ) {
@@ -38,7 +38,6 @@ class RateLimitFilter @Inject() (appConfig: AppConfig)(implicit val executionCon
       override def rejectResponse[A](implicit request: Request[A]): Future[Result] =
         Future.successful(Results.TooManyRequests)
     }
-  }
 
   override protected def filter[A](request: Request[A]): Future[Option[Result]] =
     if (appConfig.rateLimiterEnabled) filter.filter(request) else Future.successful(None)

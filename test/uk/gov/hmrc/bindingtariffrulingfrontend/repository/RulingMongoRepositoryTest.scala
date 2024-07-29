@@ -28,7 +28,6 @@ import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 import java.time._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-//scalastyle:off magic.number
 class RulingMongoRepositoryTest
     extends AnyWordSpecLike
     with GuiceOneAppPerSuite
@@ -179,7 +178,7 @@ class RulingMongoRepositoryTest
       givenAnExistingDocument(document2)
 
       await(repository.get(SimpleSearch(Some("FOUNTAIN"), imagesOnly = false, 1, 100))).results shouldBe Seq(document1)
-      await(repository.get(SimpleSearch(Some("lapTOP"), imagesOnly   = false, 1, 100))).results shouldBe Seq(document2)
+      await(repository.get(SimpleSearch(Some("lapTOP"), imagesOnly = false, 1, 100))).results   shouldBe Seq(document2)
     }
 
     "Retrieve Multiple - by Goods Description - word stems" in {
@@ -198,13 +197,13 @@ class RulingMongoRepositoryTest
     "Retrieve One - by Goods Description - images only" in {
       val document1 =
         Ruling(
-          reference            = "ref1",
+          reference = "ref1",
           bindingCommodityCode = "0",
-          effectiveStartDate   = clock.instant(),
-          effectiveEndDate     = tomorrow,
-          justification        = "justification",
-          goodsDescription     = "exacting",
-          images               = Seq("id1, id2")
+          effectiveStartDate = clock.instant(),
+          effectiveEndDate = tomorrow,
+          justification = "justification",
+          goodsDescription = "exacting",
+          images = Seq("id1, id2")
         )
 
       val document2 = Ruling(reference = "ref2", "0", clock.instant(), tomorrow, "justification", "exactly")

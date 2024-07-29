@@ -26,7 +26,6 @@ import java.time.temporal.ChronoUnit
 import java.time.{Duration, Instant, LocalTime}
 import javax.inject.Singleton
 
-//scalastyle:off magic.number
 @Singleton
 class UpdateCanceledRulingsJob @Inject() (rulingsWorker: RulingsWorker) extends ScheduledJob with Logging {
   private implicit val headers: HeaderCarrier = HeaderCarrier()

@@ -19,8 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.model
 import play.api.libs.json.{JsObject, JsResultException, Json}
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
-// scalastyle:off magic.number
-class PagedTest extends BaseSpec {
+class PagedSpec extends BaseSpec {
 
   "Paged" should {
     "map" in {
@@ -40,15 +39,15 @@ class PagedTest extends BaseSpec {
     }
 
     "calculate pageCount" in {
-      Paged.empty.pageCount shouldBe 0
-      Paged(results = Seq(), pageIndex   = 1, pageSize = 1, resultCount = 1).pageCount shouldBe 1
-      Paged(results = Seq(), pageIndex   = 1, pageSize = 1, resultCount = 2).pageCount shouldBe 2
-      Paged(results = Seq(), pageIndex   = 1, pageSize = 2, resultCount = 3).pageCount shouldBe 2
-      Paged(results = Seq(), pageIndex   = 1, pageSize = 10, resultCount = 100).pageCount shouldBe 10
-      Paged(results = Seq(), pageIndex   = 1, pageSize = 1, resultCount = 100).pageCount shouldBe 100
-      Paged(results = Seq(), resultCount = 1).pageCount shouldBe 1
-      Paged(results = Seq(), resultCount = 100).pageCount shouldBe 1
-      Paged(results = Seq(), resultCount = 1000).pageCount shouldBe 10
+      Paged.empty.pageCount                                                             shouldBe 0
+      Paged(results = Seq(), pageIndex = 1, pageSize = 1, resultCount = 1).pageCount    shouldBe 1
+      Paged(results = Seq(), pageIndex = 1, pageSize = 1, resultCount = 2).pageCount    shouldBe 2
+      Paged(results = Seq(), pageIndex = 1, pageSize = 2, resultCount = 3).pageCount    shouldBe 2
+      Paged(results = Seq(), pageIndex = 1, pageSize = 10, resultCount = 100).pageCount shouldBe 10
+      Paged(results = Seq(), pageIndex = 1, pageSize = 1, resultCount = 100).pageCount  shouldBe 100
+      Paged(results = Seq(), resultCount = 1).pageCount                                 shouldBe 1
+      Paged(results = Seq(), resultCount = 100).pageCount                               shouldBe 1
+      Paged(results = Seq(), resultCount = 1000).pageCount                              shouldBe 10
     }
 
     "calculate nonEmpty" in {
@@ -91,4 +90,3 @@ class PagedTest extends BaseSpec {
   private def buildPagedJson(results: Seq[String], pageIndex: Int, pageSize: Int, resultCount: Long): JsObject =
     Json.obj("results" -> results, "pageIndex" -> pageIndex, "pageSize" -> pageSize, "resultCount" -> resultCount)
 }
-// scalastyle:on magic.number
