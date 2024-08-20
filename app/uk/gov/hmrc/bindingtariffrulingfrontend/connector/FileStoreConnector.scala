@@ -90,7 +90,7 @@ class FileStoreConnector @Inject() (
       httpClient
         .get(url"$fileURL")
         .setHeader(authHeaders(appConfig): _*)
-        .execute[HttpResponse]
+        .stream[HttpResponse]
         .flatMap { response =>
           if (response.status / 100 == 2) {
             Future.successful(Some(response.bodyAsSource))
