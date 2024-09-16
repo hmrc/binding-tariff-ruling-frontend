@@ -55,7 +55,7 @@ class RulingsWorker @Inject() (
 
   private val decider: Supervision.Decider = {
     case NonFatal(e) =>
-      logger.error("Skipping RulingsWorker updates due to error", e)
+      logger.error("[RulingsWorker][decider] Skipping RulingsWorker updates due to error", e)
       Supervision.resume
     case _ =>
       Supervision.stop
@@ -68,7 +68,7 @@ class RulingsWorker @Inject() (
       )
       .throttle(10, 1.second)
       .mapAsync(Runtime.getRuntime.availableProcessors()) { c =>
-        logger.info(s"Refreshing ruling with reference: ${c.reference}")
+        logger.info(s"[RulingsWorker][updateNewRulings] Refreshing ruling with reference: ${c.reference}")
         myLock.withRenewedLock {
           rulingService.refresh(c.reference, Some(c))
         }
@@ -83,7 +83,9 @@ class RulingsWorker @Inject() (
       )
       .throttle(10, 1.second)
       .mapAsync(Runtime.getRuntime.availableProcessors()) { c =>
-        logger.info(s"Refreshing cancelled ruling with reference: ${c.reference}")
+        logger.info(
+          s"[RulingsWorker][updateCancelledRulings] Refreshing cancelled ruling with reference: ${c.reference}"
+        )
         myLock.withRenewedLock {
           rulingService.refresh(c.reference, Some(c))
         }
