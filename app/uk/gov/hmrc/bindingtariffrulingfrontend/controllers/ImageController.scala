@@ -49,7 +49,7 @@ class ImageController @Inject() (
       } yield Ok(imageView(rulingReference, imageId, fileName))
 
       fileStoreResponse.getOrElse(NotFound(notFoundView())).recover { case NonFatal(e) =>
-        logger.error("Exception while calling binding-tariff-filestore", e)
+        logger.error("[ImageController][get]Exception while calling binding-tariff-filestore", e)
         BadGateway
       }
     } else {

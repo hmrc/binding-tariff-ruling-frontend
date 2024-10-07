@@ -79,18 +79,20 @@ class RulingService @Inject() (
         for {
           _ <- repository.delete(reference)
           _ = auditService.auditRulingDeleted(reference)
-          _ = logger.info(s"Ruling has been deleted for case with reference: $reference")
+          _ = logger.info(s"[RulingService][rulingUpdate] Ruling has been deleted for case with reference: $reference")
         } yield ()
       case (None, Some(u)) =>
         for {
           _ <- repository.update(u, upsert = true)
           _ = auditService.auditRulingCreated(u)
-          _ = logger.info(s"Ruling has been created for case with reference: ${u.reference}")
+          _ = logger.info(
+                s"[RulingService][rulingUpdate] Ruling has been created for case with reference: ${u.reference}"
+              )
         } yield ()
 
       case (Some(_), Some(u)) =>
         repository.update(u, upsert = false).map { _ =>
-          logger.info(s"Ruling has been updated for case with reference: ${u.reference}")
+          logger.info(s"[RulingService][rulingUpdate] Ruling has been updated for case with reference: ${u.reference}")
         }
 
       case _ => Future.successful(())
