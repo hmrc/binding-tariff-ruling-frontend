@@ -32,4 +32,4 @@ lazy val microservice = Project("binding-tariff-ruling-frontend", file("."))
   )
   .settings(CodeCoverageSettings())
 
-addCommandAlias("scalafmtAll", "all scalafmtSbt scalafmt Test/scalafmt A11y/scalafmt")
+addCommandAlias("scalafmtAll", "all scalafmtSbt scalafmt Test/scalafmt")

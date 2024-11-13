@@ -48,20 +48,6 @@ Rulings that have been granted are stored in the backend service  [binding-tarif
 
 This service also features two scheduled jobs which run daily for refreshing the data for newly granted rulings and cancelled rulings. This is to ensure that ruling data is refreshed even in the event that the service was not able to be notified by the [tariff-classification-frontend](https://github.com/hmrc/tariff-classification-frontend).
 
-### Accessibility Tests
-
-#### Prerequisites
-
-Have node installed on your machine
-
-#### Execute tests
-
-To run the tests locally, simply run:
-
-```bash
-sbt clean A11y/test
-```
-
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
