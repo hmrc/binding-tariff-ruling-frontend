@@ -170,3 +170,18 @@ a.button-gray, button.button-gray, .button-gray:visited {
   margin-bottom: 0;
   max-width: none;
 }
+
+@media
+print {
+    .no-print {
+        display: none !important;
+    }
+    .commodity-code {
+        color: #000000;
+    }
+    a > .commodity-code {
+        display: inline-block;
+    }
+}
+
+
