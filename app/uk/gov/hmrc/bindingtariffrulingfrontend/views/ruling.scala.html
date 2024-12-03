@@ -38,7 +38,7 @@
 
 @commodityCodeLink = {
   <a href="@GlobalTariff.link(ruling.bindingCommodityCode)" class="govuk-link" target="_blank">
-    @ruling.bindingCommodityCode @messages("search.results.ruling.commodityCode.newTab")
+    <span class="commodity-code">@ruling.bindingCommodityCode</span> <span class="no-print">@messages("search.results.ruling.commodityCode.newTab")</span>
   </a>
 }
 
