@@ -113,7 +113,7 @@ class RulingViewSpec extends ViewSpec {
 
         "render images with correct href (images toggle on)" in {
 
-          given(appConfig.displayImages) willReturn true
+          when(appConfig.displayImages) willReturn true
 
           val doc = view(viewMethod())
 
@@ -130,7 +130,7 @@ class RulingViewSpec extends ViewSpec {
 
         "do not render images with correct href (images toggle off)" in {
 
-          given(appConfig.displayImages) willReturn false
+          when(appConfig.displayImages) willReturn false
 
           val doc = view(viewMethod())
 

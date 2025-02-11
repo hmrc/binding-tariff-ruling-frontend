@@ -49,8 +49,8 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
   override def beforeAll(): Unit = {
     super.beforeAll()
     Mockito.reset(appConfig)
-    given(appConfig.bindingTariffClassificationUrl).willReturn(wireMockUrl)
-    given(appConfig.authorization).willReturn(xApiToken)
+    when(appConfig.bindingTariffClassificationUrl).willReturn(wireMockUrl)
+    when(appConfig.authorization).willReturn(xApiToken)
   }
 
   "Connector 'GET Case'" should {

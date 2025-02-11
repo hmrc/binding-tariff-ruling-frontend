@@ -47,7 +47,7 @@ class AppConfigTest extends BaseSpec {
 
   "Build admin enabled" in {
     appConfig("admin-mode" -> "false").adminEnabled shouldBe false
-    appConfig("admin-mode" -> "true").adminEnabled shouldBe true
+    appConfig("admin-mode" -> "true").adminEnabled  shouldBe true
   }
 
   "Build Classification Backend URL" in {

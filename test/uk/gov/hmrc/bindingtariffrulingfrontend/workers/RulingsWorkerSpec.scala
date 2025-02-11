@@ -74,24 +74,24 @@ class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with MongoSuppor
   )
 
   override protected def beforeAll(): Unit = {
-    given(lockRepo.refreshExpiry(any[String], any[String], any[Duration]))
+    when(lockRepo.refreshExpiry(any[String], any[String], any[Duration]))
       .willReturn(Future.successful(true))
-    given(lockRepo.takeLock(any[String], any[String], any[Duration]))
+    when(lockRepo.takeLock(any[String], any[String], any[Duration]))
       .willReturn(Future.successful(None))
-    given(lockRepo.releaseLock(any[String], any[String]))
+    when(lockRepo.releaseLock(any[String], any[String]))
       .willReturn(Future.successful(()))
-    given(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
+    when(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
       .willReturn(Future.successful(pagedNewCases))
-    given(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
+    when(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
       .willReturn(Future.successful(pagedCanceledCases))
   }
 
   "updateNewRulings" should {
     "get new rulings from the backend and delegate to the RulingService" in {
-      given(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
+      when(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
         .willReturn(pagedNewCases)
         .willReturn(Future.successful(Paged.empty[Case]))
-      given(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).willReturn(Future.successful(()))
+      when(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).willReturn(Future.successful(()))
 
       await(rulingWorker.updateNewRulings(startDate)) shouldBe Done
       verify(rulingService).refresh(refEq("ref1"), any[Some[Case]])(any[HeaderCarrier])
@@ -103,10 +103,10 @@ class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with MongoSuppor
 
   "updateCanceledRulings" should {
     "get canceled rulings from the backend and delegate to the RulingService" in {
-      given(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
+      when(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
         .willReturn(pagedCanceledCases)
         .willReturn(Future.successful(Paged.empty[Case]))
-      given(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).willReturn(Future.successful(()))
+      when(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).willReturn(Future.successful(()))
 
       await(rulingWorker.updateCancelledRulings(endDate)) shouldBe Done
       verify(rulingService).refresh(refEq("ref4"), any[Some[Case]])(any[HeaderCarrier])

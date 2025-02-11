@@ -53,8 +53,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   "GET /" should {
     "return 200 with a valid query" in {
-      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
-      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+      when(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      when(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
         .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       val result = await(
@@ -77,8 +77,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
     "return 200 with no search query" in {
 
-      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
-      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+      when(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      when(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
         .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       val result = await(controller().get(query = None, images = false, page = 1)(getRequestWithCSRF()))
@@ -93,8 +93,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 200 with an empty search query" in {
-      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
-      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+      when(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      when(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
         .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       val result = await(controller().get(query = Some(""), images = false, page = 1)(getRequestWithCSRF()))
@@ -109,24 +109,24 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 429 when too many requests are made" in {
-      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
-      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+      when(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      when(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
         .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
-      given(appConfig.rateLimiterEnabled) willReturn true
-      given(appConfig.rateLimitBucketSize) willReturn 5
-      given(appConfig.rateLimitRatePerSecond) willReturn 2
+      when(appConfig.rateLimiterEnabled) willReturn true
+      when(appConfig.rateLimitBucketSize) willReturn 5
+      when(appConfig.rateLimitRatePerSecond) willReturn 2
       val results  = for (_ <- 0 until 100) yield controller().get(Some("foo"), images = false, 1)(getRequestWithCSRF())
       val statuses = await(Future.sequence(results)).map(status)
       atLeast(1, statuses) shouldBe Status.TOO_MANY_REQUESTS
     }
 
     "return 200 when rate limiting is disabled" in {
-      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
-      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+      when(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      when(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
         .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
-      given(appConfig.rateLimiterEnabled) willReturn false
+      when(appConfig.rateLimiterEnabled) willReturn false
       val results  = for (_ <- 0 until 100) yield controller().get(Some("foo"), images = false, 1)(getRequestWithCSRF())
       val statuses = await(Future.sequence(results)).map(status)
       all(statuses) shouldBe Status.OK
@@ -135,8 +135,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
   "searchRuling" should {
     "return 200 with a valid query" in {
-      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
-      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+      when(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      when(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
         .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       val result = await(
@@ -159,8 +159,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
     "return 200 with no search query" in {
 
-      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
-      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+      when(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      when(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
         .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       val result = await(controller().get(query = None, images = false, page = 1)(getRequestWithCSRF()))
@@ -176,8 +176,8 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
     "return a form with error when a blank search query is passed" in {
 
-      given(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
-      given(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
+      when(rulingService.get(any[SimpleSearch])) willReturn Future.successful(Paged.empty[Ruling])
+      when(fileStoreService.get(any[Paged[Ruling]])(any[HeaderCarrier]))
         .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       val result = await(

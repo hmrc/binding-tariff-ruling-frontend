@@ -57,10 +57,10 @@ class RulingControllerSpec extends ControllerSpec {
 
   "GET /" should {
     "return 200" in {
-      given(rulingService.get("id")) willReturn Future.successful(
+      when(rulingService.get("id")) willReturn Future.successful(
         Some(Ruling("ref", "code", Instant.now, Instant.now, "justification", "goods description"))
       )
-      given(fileStoreService.get(any[Ruling])(any[HeaderCarrier]))
+      when(fileStoreService.get(any[Ruling])(any[HeaderCarrier]))
         .willReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       val result = await(controller().get("id")(getRequestWithCSRF()))
@@ -71,7 +71,7 @@ class RulingControllerSpec extends ControllerSpec {
     }
 
     "return 404 - when not found" in {
-      given(rulingService.get("id")) willReturn Future.successful(None)
+      when(rulingService.get("id")) willReturn Future.successful(None)
 
       val result = await(controller().get("id")(getRequestWithCSRF()))
       status(result)      shouldBe Status.NOT_FOUND
@@ -83,7 +83,7 @@ class RulingControllerSpec extends ControllerSpec {
 
   "POST /" should {
     "return 202 when authenticated" in {
-      given(rulingService.refresh(refEq("id"))(any[HeaderCarrier])) willReturn Future.successful(())
+      when(rulingService.refresh(refEq("id"))(any[HeaderCarrier])) willReturn Future.successful(())
       val result = await(controller(auth = SuccessfulAuth()).post("id")(postRequestWithCSRF))
       status(result) shouldBe Status.ACCEPTED
     }
@@ -97,7 +97,7 @@ class RulingControllerSpec extends ControllerSpec {
 
   "DELETE /" should {
     "return 204 when authenticated" in {
-      given(rulingService.deleteAll()) willReturn Future.successful(())
+      when(rulingService.deleteAll()) willReturn Future.successful(())
       val result = await(controller(auth = SuccessfulAuth(), admin = AdminEnabled()).deleteAll()(postRequestWithCSRF))
       status(result) shouldBe Status.NO_CONTENT
     }
@@ -116,7 +116,7 @@ class RulingControllerSpec extends ControllerSpec {
 
   "DELETE / $id" should {
     "return 204 when authenticated" in {
-      given(rulingService.delete(refEq("ref"))) willReturn Future.successful(())
+      when(rulingService.delete(refEq("ref"))) willReturn Future.successful(())
       val result = await(controller(auth = SuccessfulAuth(), admin = AdminEnabled()).delete("ref")(postRequestWithCSRF))
       status(result) shouldBe Status.NO_CONTENT
     }

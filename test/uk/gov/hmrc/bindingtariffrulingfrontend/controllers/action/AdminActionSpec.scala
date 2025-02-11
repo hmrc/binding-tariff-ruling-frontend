@@ -36,15 +36,15 @@ class AdminActionSpec extends BaseSpec {
 
   "Authenticated Action" should {
     "Filter authenticated if enabled" in {
-      given(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      given(config.adminEnabled) willReturn true
+      when(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
+      when(config.adminEnabled) willReturn true
 
       await(action.invokeBlock(FakeRequest(), block)) shouldBe Results.Ok
     }
 
     "not allow authenticated action if disabled" in {
-      given(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      given(config.adminEnabled) willReturn false
+      when(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
+      when(config.adminEnabled) willReturn false
 
       status(await(action.invokeBlock(FakeRequest(), block))) shouldBe FORBIDDEN
     }

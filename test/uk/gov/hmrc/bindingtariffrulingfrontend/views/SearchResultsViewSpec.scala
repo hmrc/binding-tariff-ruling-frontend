@@ -90,7 +90,7 @@ class SearchResultsViewSpec extends ViewSpec {
 
     "render images with correct href (toggle images on)" in {
 
-      given(appConfig.displayImages) willReturn true
+      when(appConfig.displayImages) willReturn true
 
       val doc = view(searchResultsView(None, pagedRuling, fileMetaData))
 
@@ -107,7 +107,7 @@ class SearchResultsViewSpec extends ViewSpec {
 
     "render images with correct href (toggle images off)" in {
 
-      given(appConfig.displayImages) willReturn false
+      when(appConfig.displayImages) willReturn false
 
       val doc = view(searchResultsView(None, pagedRuling, fileMetaData))
 

@@ -34,15 +34,15 @@ class AuthenticatedActionTest extends BaseSpec {
 
   "Authenticated Action" should {
     "Filter unauthenticated" in {
-      given(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      given(config.authorization) willReturn "password"
+      when(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
+      when(config.authorization) willReturn "password"
 
       await(action.invokeBlock(FakeRequest(), block)) shouldBe Results.Forbidden
     }
 
     "Filter authenticated" in {
-      given(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      given(config.authorization) willReturn "password"
+      when(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
+      when(config.authorization) willReturn "password"
 
       await(action.invokeBlock(FakeRequest().withHeaders("X-Api-Token" -> "password"), block)) shouldBe Results.Ok
     }
