@@ -40,8 +40,9 @@ class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer {
   val metrics: MetricRegistry  = new MetricRegistry
   val maxUriLenght: Long       = 2048L
 
-  given(appConfig.maxUriLength).willReturn(maxUriLenght)
-  given(appConfig.bindingTariffFileStoreUrl).willReturn(wireMockUrl)
+  when(appConfig.maxUriLength).willReturn(maxUriLenght)
+  when(appConfig.bindingTariffFileStoreUrl).willReturn(wireMockUrl)
+  
 
   val connector: FileStoreConnector = new FileStoreConnector(appConfig, httpClient, metrics)
 
