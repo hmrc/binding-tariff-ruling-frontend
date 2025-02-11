@@ -25,7 +25,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.metrics.HasMetrics
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
