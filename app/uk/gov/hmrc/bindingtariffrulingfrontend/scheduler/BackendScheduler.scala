@@ -43,10 +43,7 @@ class BackendScheduler @Inject() (
       .withIdentity(s"${job.jobName} trigger")
       .startNow()
       .withSchedule(
-        job.schedule.fold(
-          duration => simpleSchedule().withIntervalInSeconds(duration.getSeconds.toInt),
-          localTime => dailyAtHourAndMinute(localTime.getHour, localTime.getMinute)
-        )
+        dailyAtHourAndMinute(job.schedule.getHour, job.schedule.getMinute)
       )
       .forJob(jobDetails)
       .build()

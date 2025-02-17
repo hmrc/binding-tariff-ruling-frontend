@@ -24,5 +24,5 @@ trait ScheduledJob extends Job {
 
   def jobName: String
 
-  def schedule: Either[Duration, LocalTime]
+  def schedule: LocalTime
 }

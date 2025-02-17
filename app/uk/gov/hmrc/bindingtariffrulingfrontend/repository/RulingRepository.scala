@@ -23,6 +23,11 @@ import org.mongodb.scala.bson.{BsonArray, BsonDocument}
 import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.Indexes.{ascending, compoundIndex, descending}
 import org.mongodb.scala.model._
+import org.mongodb.scala.SingleObservableFuture
+import org.mongodb.scala.gridfs.SingleObservableFuture
+import org.mongodb.scala.ObservableFuture
+import org.mongodb.scala.gridfs.ObservableFuture
+
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.mongo.MongoComponent
@@ -80,8 +85,8 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
     )
     with RulingRepository {
 
-  //ATAR is holding data for long period of time, now it is set to 3 years but other ATAR services don't have the
-  //the index so we'll skip this one as well, as this index should be implemented the same way in all other ATAR services
+  // ATAR is holding data for long period of time, now it is set to 3 years but other ATAR services don't have the
+  // the index so we'll skip this one as well, as this index should be implemented the same way in all other ATAR services
   override lazy val requiresTtlIndex: Boolean = false
 
   override def update(ruling: Ruling, upsert: Boolean): Future[Ruling] =
