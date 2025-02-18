@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
 
-import org.mockito.ArgumentMatchers._
-import org.mockito.BDDMockito._
-import org.mockito.Mockito.mock
+import org.mockito.ArgumentMatchers.*
+import org.mockito.BDDMockito.*
+import org.mockito.Mockito.{mock, when}
 import play.api.mvc.{Request, Result, Results}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
@@ -34,15 +34,15 @@ class AuthenticatedActionTest extends BaseSpec {
 
   "Authenticated Action" should {
     "Filter unauthenticated" in {
-      when(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      when(config.authorization) willReturn "password"
+      when(block.apply(any[Request[_]])).thenReturn(Future.successful(Results.Ok))
+      when(config.authorization).thenReturn("password")
 
       await(action.invokeBlock(FakeRequest(), block)) shouldBe Results.Forbidden
     }
 
     "Filter authenticated" in {
-      when(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      when(config.authorization) willReturn "password"
+      when(block.apply(any[Request[_]])).thenReturn(Future.successful(Results.Ok))
+      when(config.authorization).thenReturn("password")
 
       await(action.invokeBlock(FakeRequest().withHeaders("X-Api-Token" -> "password"), block)) shouldBe Results.Ok
     }

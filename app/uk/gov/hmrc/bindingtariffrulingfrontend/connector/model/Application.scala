@@ -17,7 +17,7 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector.model
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType.ApplicationType
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType
 
 case class Application(
   `type`: ApplicationType

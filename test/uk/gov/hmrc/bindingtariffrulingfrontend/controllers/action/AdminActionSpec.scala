@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
 
-import org.mockito.ArgumentMatchers._
-import org.mockito.BDDMockito._
-import org.mockito.Mockito.mock
+import org.mockito.ArgumentMatchers.*
+import org.mockito.BDDMockito.*
+import org.mockito.Mockito.{mock, when}
 import play.api.http.Status.FORBIDDEN
 import play.api.mvc.{Request, Result, Results}
 import play.api.test.FakeRequest
@@ -36,15 +36,15 @@ class AdminActionSpec extends BaseSpec {
 
   "Authenticated Action" should {
     "Filter authenticated if enabled" in {
-      when(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      when(config.adminEnabled) willReturn true
+      when(block.apply(any[Request[_]])).thenReturn(Future.successful(Results.Ok))
+      when(config.adminEnabled).thenReturn(true)
 
       await(action.invokeBlock(FakeRequest(), block)) shouldBe Results.Ok
     }
 
     "not allow authenticated action if disabled" in {
-      when(block.apply(any[Request[_]])) willReturn Future.successful(Results.Ok)
-      when(config.adminEnabled) willReturn false
+      when(block.apply(any[Request[_]])).thenReturn(Future.successful(Results.Ok))
+      when(config.adminEnabled).thenReturn(false)
 
       status(await(action.invokeBlock(FakeRequest(), block))) shouldBe FORBIDDEN
     }

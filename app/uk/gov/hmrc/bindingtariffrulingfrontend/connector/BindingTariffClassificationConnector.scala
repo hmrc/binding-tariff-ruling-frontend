@@ -18,7 +18,6 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
 import com.codahale.metrics.MetricRegistry
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType.ApplicationType
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.CaseStatus._
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{ApplicationType, Case}
 import uk.gov.hmrc.bindingtariffrulingfrontend.metrics.HasMetrics

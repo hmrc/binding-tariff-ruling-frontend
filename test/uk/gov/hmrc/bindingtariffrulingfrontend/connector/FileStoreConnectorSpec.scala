@@ -17,10 +17,10 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
 import com.codahale.metrics.MetricRegistry
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.apache.pekko.util.ByteString
-import org.mockito.BDDMockito._
-import org.mockito.Mockito.mock
+import org.mockito.BDDMockito.*
+import org.mockito.Mockito.{mock, when}
 import play.api.http.Status
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
@@ -40,8 +40,8 @@ class FileStoreConnectorSpec extends BaseSpec with WiremockTestServer {
   val metrics: MetricRegistry  = new MetricRegistry
   val maxUriLenght: Long       = 2048L
 
-  when(appConfig.maxUriLength).willReturn(maxUriLenght)
-  when(appConfig.bindingTariffFileStoreUrl).willReturn(wireMockUrl)
+  when(appConfig.maxUriLength).thenReturn(maxUriLenght)
+  when(appConfig.bindingTariffFileStoreUrl).thenReturn(wireMockUrl)
 
   val connector: FileStoreConnector = new FileStoreConnector(appConfig, httpClient, metrics)
 
