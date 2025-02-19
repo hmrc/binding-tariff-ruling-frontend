@@ -44,10 +44,9 @@ class SimpleSearchSpec extends BaseSpec with ScalaCheckPropertyChecks {
   def fieldThatBindsValidData(form: Form[_], fieldName: String, validDataGenerator: Gen[String]): Unit =
     "must bind valid data" in {
 
-      forAll(validDataGenerator -> "validDataItem") {
-        dataItem: String =>
-          val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
-          result.value.get shouldBe dataItem
+      forAll(validDataGenerator -> "validDataItem") { (dataItem: String) =>
+        val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
+        result.value.get shouldBe dataItem
       }
     }
 
