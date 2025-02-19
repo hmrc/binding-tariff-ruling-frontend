@@ -73,9 +73,8 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       val url     = metadata.url.get
       val pngData = "png data".getBytes(StandardCharsets.UTF_8)
       when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(Some(metadata)))
-      when(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier])).thenReturn(Future.successful(
-        Some(Source.single(ByteString(pngData))))
-      )
+      when(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(Source.single(ByteString(pngData)))))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result) shouldBe Status.SEE_OTHER
@@ -85,14 +84,13 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       val url     = metadata.url.get
       val pngData = "png data".getBytes(StandardCharsets.UTF_8)
       when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(Some(metadata)))
-      when(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier])).thenReturn(Future.successful(
-        Some(Source.single(ByteString(pngData))))
-      )
+      when(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(Source.single(ByteString(pngData)))))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)         shouldBe Status.OK
       contentType(result)    shouldBe Some("image/png")
-      contentAsBytes(result) shouldBe pngData
+      contentAsBytes(result) shouldBe ByteString(pngData)
 
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
       verify(fileStoreService).downloadFile(refEq(url))(any[HeaderCarrier])
@@ -125,7 +123,7 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       val url = metadata.url.get
       when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(Some(metadata)))
       when(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier])).thenReturn(Future.failed(new Exception))
-      val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF())))
+      val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result) shouldBe Status.BAD_GATEWAY
 
@@ -134,9 +132,8 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 404 when the file metadata contains no url" in {
-      when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(
-        Some(metadata.copy(url = None)))
-      )
+      when(fileStoreService.get(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(metadata.copy(url = None))))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.NOT_FOUND
@@ -149,9 +146,8 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 404 when the file metadata contains no filename" in {
-      when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(
-        Some(metadata.copy(fileName = None)))
-      )
+      when(fileStoreService.get(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(metadata.copy(fileName = None))))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.NOT_FOUND
@@ -164,9 +160,8 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 404 when the file metadata contains no mime type" in {
-      when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(
-        Some(metadata.copy(mimeType = None)))
-      )
+      when(fileStoreService.get(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(metadata.copy(mimeType = None))))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.NOT_FOUND

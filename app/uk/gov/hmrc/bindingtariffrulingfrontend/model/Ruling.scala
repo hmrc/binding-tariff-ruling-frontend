@@ -17,8 +17,8 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
 import java.time.Instant
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
+import play.api.libs.json.*
+import play.api.libs.functional.syntax.*
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 case class Ruling(

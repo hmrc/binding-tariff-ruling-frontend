@@ -18,7 +18,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.views
 
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
-import org.scalatest.matchers._
+import org.scalatest.matchers.*
 
 object ViewMatchers {
 

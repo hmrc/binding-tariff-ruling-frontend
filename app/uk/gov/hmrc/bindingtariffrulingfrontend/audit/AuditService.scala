@@ -26,7 +26,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class AuditService @Inject() (auditConnector: DefaultAuditConnector)(implicit ec: ExecutionContext) {
 
-  import AuditPayloadType._
+  import AuditPayloadType.*
 
   def auditRulingCreated(ruling: Ruling)(implicit hc: HeaderCarrier): Unit =
     sendExplicitAuditEvent(

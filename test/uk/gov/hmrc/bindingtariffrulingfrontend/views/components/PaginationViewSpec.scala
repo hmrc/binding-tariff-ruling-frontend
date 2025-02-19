@@ -24,7 +24,7 @@ import org.mockito.Mockito.mock
 import org.scalatest.BeforeAndAfterEach
 import play.api.mvc.Call
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
-import uk.gov.hmrc.bindingtariffrulingfrontend.views.ViewMatchers._
+import uk.gov.hmrc.bindingtariffrulingfrontend.views.ViewMatchers.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.ViewSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.pagination
 

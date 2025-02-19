@@ -30,7 +30,7 @@ import uk.gov.hmrc.mongo.lock.{MongoLockRepository, TimePeriodLockService}
 
 import java.time.Instant
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 

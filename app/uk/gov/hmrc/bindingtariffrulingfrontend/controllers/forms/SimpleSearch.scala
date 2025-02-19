@@ -17,11 +17,11 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms
 
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Pagination
 import play.api.data.FormError
 import play.api.data.format.Formatter
-import SimpleSearch._
+import SimpleSearch.*
 
 case class SimpleSearch(
   query: Option[String],

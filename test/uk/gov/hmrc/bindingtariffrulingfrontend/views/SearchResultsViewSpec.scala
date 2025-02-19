@@ -22,7 +22,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.utils.Dates
-import uk.gov.hmrc.bindingtariffrulingfrontend.views.ViewMatchers._
+import uk.gov.hmrc.bindingtariffrulingfrontend.views.ViewMatchers.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.search_results
 
 import java.time.Instant

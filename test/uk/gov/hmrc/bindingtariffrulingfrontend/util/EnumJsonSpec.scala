@@ -32,7 +32,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.util
  * limitations under the License.
  */
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType.BTI
 

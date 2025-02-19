@@ -18,7 +18,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.metrics
 
 import com.codahale.metrics.Timer
 import com.codahale.metrics.MetricRegistry
-import org.mockito.ArgumentMatchers._
+import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito
 import org.mockito.Mockito.{mock, times, verifyNoMoreInteractions, when}
 import org.scalatest.compatible.Assertion
@@ -32,11 +32,11 @@ import scala.concurrent.Future
 
 class HasMetricsSpec extends AsyncWordSpecLike with Matchers with OptionValues with BeforeAndAfterAll {
 
-  trait MockHasMetrics { self: HasMetrics =>
+  trait 2MockHasMetrics { self: HasMetrics =>
     val timer: Timer.Context                = mock(classOf[Timer.Context])
     val metrics: MetricRegistry             = mock(classOf[MetricRegistry])
     override val localMetrics: LocalMetrics = mock(classOf[LocalMetrics])
-    when(localMetrics.startTimer(anyString())) thenReturn timer
+    when(localMetrics.startTimer(anyString())).thenReturn(timer)
   }
 
   class TestHasMetrics extends HasMetrics with MockHasMetrics

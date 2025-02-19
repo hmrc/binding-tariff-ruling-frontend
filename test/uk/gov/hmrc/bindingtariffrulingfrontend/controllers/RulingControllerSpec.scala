@@ -57,9 +57,11 @@ class RulingControllerSpec extends ControllerSpec {
 
   "GET /" should {
     "return 200" in {
-      when(rulingService.get("id")).thenReturn(Future.successful(
-        Some(Ruling("ref", "code", Instant.now, Instant.now, "justification", "goods description"))
-      ))
+      when(rulingService.get("id")).thenReturn(
+        Future.successful(
+          Some(Ruling("ref", "code", Instant.now, Instant.now, "justification", "goods description"))
+        )
+      )
       when(fileStoreService.get(any[Ruling])(any[HeaderCarrier]))
         .thenReturn(Future.successful(Map.empty[String, FileMetadata]))
 

@@ -20,9 +20,9 @@ import com.google.inject.ImplementedBy
 import org.mongodb.scala.ReadConcern
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.bson.{BsonArray, BsonDocument}
-import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.Filters.*
 import org.mongodb.scala.model.Indexes.{ascending, compoundIndex, descending}
-import org.mongodb.scala.model._
+import org.mongodb.scala.model.*
 import org.mongodb.scala.SingleObservableFuture
 import org.mongodb.scala.gridfs.SingleObservableFuture
 import org.mongodb.scala.ObservableFuture

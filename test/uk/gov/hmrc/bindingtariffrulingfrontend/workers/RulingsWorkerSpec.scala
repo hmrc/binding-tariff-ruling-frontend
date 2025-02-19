@@ -17,14 +17,14 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.workers
 
 import org.apache.pekko.Done
-import org.mockito.ArgumentMatchers._
-import org.mockito.BDDMockito._
+import org.mockito.ArgumentMatchers.*
+import org.mockito.BDDMockito.*
 import org.mockito.Mockito.{mock, verify}
 import org.scalatest.BeforeAndAfterAll
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination, SimplePagination}
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import uk.gov.hmrc.http.HeaderCarrier

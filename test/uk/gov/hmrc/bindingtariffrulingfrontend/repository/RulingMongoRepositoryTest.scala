@@ -20,12 +20,12 @@ import org.mongodb.scala.{MongoCollection, ReadConcern}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
-import java.time._
+import java.time.*
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class RulingMongoRepositoryTest
