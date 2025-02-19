@@ -20,7 +20,7 @@ import org.mockito.BDDMockito.given
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.mock
+import org.mockito.Mockito.{mock, when}
 import org.scalatest.BeforeAndAfterEach
 import play.api.mvc.Call
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged
@@ -38,7 +38,7 @@ class PaginationViewSpec extends ViewSpec with BeforeAndAfterEach {
       (invocation: InvocationOnMock) => Call(method = "GET", url = "/page=" + invocation.getArgument(0))
 
     super.beforeEach()
-    when(goToPage.apply(ArgumentMatchers.any[Int])) will returnThePage
+    when(goToPage.apply(ArgumentMatchers.any[Int])).thenReturn(returnThePage)
   }
 
   "Pagination" should {

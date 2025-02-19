@@ -1,5 +1,5 @@
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "3.5.2"
+ThisBuild / scalaVersion := "3.4.2"
 
 lazy val microservice = Project("binding-tariff-ruling-frontend", file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)

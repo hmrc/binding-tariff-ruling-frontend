@@ -17,7 +17,7 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.views
 
 import org.mockito.BDDMockito.`given`
-import org.mockito.Mockito.mock
+import org.mockito.Mockito.{mock, when}
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
@@ -90,7 +90,7 @@ class SearchResultsViewSpec extends ViewSpec {
 
     "render images with correct href (toggle images on)" in {
 
-      when(appConfig.displayImages) willReturn true
+      when(appConfig.displayImages).thenReturn(true)
 
       val doc = view(searchResultsView(None, pagedRuling, fileMetaData))
 
@@ -107,7 +107,7 @@ class SearchResultsViewSpec extends ViewSpec {
 
     "render images with correct href (toggle images off)" in {
 
-      when(appConfig.displayImages) willReturn false
+      when(appConfig.displayImages).thenReturn(false)
 
       val doc = view(searchResultsView(None, pagedRuling, fileMetaData))
 

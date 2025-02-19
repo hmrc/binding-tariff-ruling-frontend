@@ -19,7 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.workers
 import org.apache.pekko.Done
 import org.mockito.ArgumentMatchers.*
 import org.mockito.BDDMockito.*
-import org.mockito.Mockito.{mock, verify}
+import org.mockito.Mockito.{mock, verify, when}
 import org.scalatest.BeforeAndAfterAll
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
@@ -75,23 +75,23 @@ class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with MongoSuppor
 
   override protected def beforeAll(): Unit = {
     when(lockRepo.refreshExpiry(any[String], any[String], any[Duration]))
-      .willReturn(Future.successful(true))
+      .thenReturn(Future.successful(true))
     when(lockRepo.takeLock(any[String], any[String], any[Duration]))
-      .willReturn(Future.successful(None))
+      .thenReturn(Future.successful(None))
     when(lockRepo.releaseLock(any[String], any[String]))
-      .willReturn(Future.successful(()))
+      .thenReturn(Future.successful(()))
     when(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-      .willReturn(Future.successful(pagedNewCases))
+      .thenReturn(Future.successful(pagedNewCases))
     when(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-      .willReturn(Future.successful(pagedCanceledCases))
+      .thenReturn(Future.successful(pagedCanceledCases))
   }
 
   "updateNewRulings" should {
     "get new rulings from the backend and delegate to the RulingService" in {
       when(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-        .willReturn(pagedNewCases)
-        .willReturn(Future.successful(Paged.empty[Case]))
-      when(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).willReturn(Future.successful(()))
+        .thenReturn(pagedNewCases)
+        .thenReturn(Future.successful(Paged.empty[Case]))
+      when(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).thenReturn(Future.successful(()))
 
       await(rulingWorker.updateNewRulings(startDate)) shouldBe Done
       verify(rulingService).refresh(refEq("ref1"), any[Some[Case]])(any[HeaderCarrier])
@@ -104,9 +104,9 @@ class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with MongoSuppor
   "updateCanceledRulings" should {
     "get canceled rulings from the backend and delegate to the RulingService" in {
       when(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-        .willReturn(pagedCanceledCases)
-        .willReturn(Future.successful(Paged.empty[Case]))
-      when(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).willReturn(Future.successful(()))
+        .thenReturn(pagedCanceledCases)
+        .thenReturn(Future.successful(Paged.empty[Case]))
+      when(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).thenReturn(Future.successful(()))
 
       await(rulingWorker.updateCancelledRulings(endDate)) shouldBe Done
       verify(rulingService).refresh(refEq("ref4"), any[Some[Case]])(any[HeaderCarrier])

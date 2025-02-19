@@ -58,7 +58,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
   "Service DELETE ALL" should {
 
     "delegate to repository" in {
-      when(repository.deleteAll()) willReturn Future.successful(())
+      when(repository.deleteAll()).thenReturn(Future.successful(()))
       await(service.deleteAll()) shouldBe ((): Unit)
       verifyNoInteractions(auditService)
     }
@@ -67,7 +67,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
   "Service DELETE" should {
 
     "delegate to repository" in {
-      when(repository.delete(refEq("ref"))) willReturn Future.successful(())
+      when(repository.delete(refEq("ref"))).thenReturn(Future.successful(()))
       await(service.delete("ref")) shouldBe ((): Unit)
       verifyNoInteractions(auditService)
     }
@@ -76,7 +76,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
   "Service GET by reference" should {
 
     "delegate to repository" in {
-      when(repository.get("id")) willReturn Future.successful(None)
+      when(repository.get("id")).thenReturn(Future.successful(None))
       await(service.get("id")) shouldBe None
       verifyNoInteractions(auditService)
     }
@@ -86,7 +86,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     val search = SimpleSearch(Some("query"), imagesOnly = false, 1, 1)
 
     "delegate to repository" in {
-      when(repository.get(search)) willReturn Future.successful(Paged.empty[Ruling])
+      when(repository.get(search)).thenReturn(Future.successful(Paged.empty[Ruling]))
       await(service.get(search)) shouldBe Paged.empty[Ruling]
       verifyNoInteractions(auditService)
     }
@@ -180,8 +180,8 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     )
 
     "do nothing when case doesn't exist in repository or connector" in {
-      when(repository.get("ref")) willReturn Future.successful(None)
-      when(connector.get("ref")) willReturn Future.successful(None)
+      when(repository.get("ref")).thenReturn(Future.successful(None))
+      when(connector.get("ref")).thenReturn(Future.successful(None))
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
@@ -190,10 +190,10 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     }
 
     "create new ruling" in {
-      when(repository.get("ref")) willReturn Future.successful(None)
-      when(connector.get("ref")) willReturn Future.successful(Some(validCase))
-      when(repository.update(any[Ruling], any[Boolean])) will returnTheRuling
-      when(fileStoreService.get(attachments.map(_.id))).willReturn(fileMetadata)
+      when(repository.get("ref")).thenReturn(Future.successful(None))
+      when(connector.get("ref")).thenReturn(Future.successful(Some(validCase)))
+      when(repository.update(any[Ruling], any[Boolean])).thenReturn(returnTheRuling)
+      when(fileStoreService.get(attachments.map(_.id))).thenReturn(fileMetadata)
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
@@ -218,10 +218,10 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
     "update existing ruling" in {
       val existing = Ruling("ref", "old", Instant.now, Instant.now, "old", "old", Set("old"), Seq("old"))
-      when(repository.get("ref")) willReturn Future.successful(Some(existing))
-      when(connector.get("ref")) willReturn Future.successful(Some(validCase))
-      when(repository.update(any[Ruling], any[Boolean])) will returnTheRuling
-      when(fileStoreService.get(attachments.map(_.id))).willReturn(fileMetadata)
+      when(repository.get("ref")).thenReturn(Future.successful(Some(existing)))
+      when(connector.get("ref")).thenReturn(Future.successful(Some(validCase)))
+      when(repository.update(any[Ruling], any[Boolean])).thenReturn(returnTheRuling)
+      when(fileStoreService.get(attachments.map(_.id))).thenReturn(fileMetadata)
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
@@ -245,9 +245,9 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
     "delete existing ruling" in {
       val existing = Ruling("ref", "old", Instant.now, Instant.now, "old", "old", Set("old"), Seq("old"))
-      when(repository.get("ref")) willReturn Future.successful(Some(existing))
-      when(connector.get("ref")) willReturn Future.successful(None)
-      when(repository.delete("ref")) willReturn Future.successful(())
+      when(repository.get("ref")).thenReturn(Future.successful(Some(existing)))
+      when(connector.get("ref")).thenReturn(Future.successful(None))
+      when(repository.delete("ref")).thenReturn(Future.successful(()))
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
@@ -258,8 +258,8 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     }
 
     "filter cases not COMPLETED" in {
-      when(repository.get("ref")) willReturn Future.successful(None)
-      when(connector.get("ref")) willReturn Future.successful(Some(validCase.copy(status = CaseStatus.OPEN)))
+      when(repository.get("ref")).thenReturn(Future.successful(None))
+      when(connector.get("ref")).thenReturn(Future.successful(Some(validCase.copy(status = CaseStatus.OPEN))))
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
@@ -268,9 +268,11 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     }
 
     "filter cases not BTT" in {
-      when(repository.get("ref")) willReturn Future.successful(None)
-      when(connector.get("ref")) willReturn Future.successful(
-        Some(validCase.copy(application = Application(`type` = ApplicationType.LIABILITY_ORDER)))
+      when(repository.get("ref")).thenReturn(Future.successful(None))
+      when(connector.get("ref")).thenReturn(
+        Future.successful(
+          Some(validCase.copy(application = Application(`type` = ApplicationType.LIABILITY_ORDER)))
+        )
       )
 
       await(service.refresh("ref")) shouldBe ((): Unit)
@@ -280,8 +282,8 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     }
 
     "filter cases without Decision" in {
-      when(repository.get("ref")) willReturn Future.successful(None)
-      when(connector.get("ref")) willReturn Future.successful(Some(validCase.copy(decision = None)))
+      when(repository.get("ref")).thenReturn(Future.successful(None))
+      when(connector.get("ref")).thenReturn(Future.successful(Some(validCase.copy(decision = None))))
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
@@ -290,9 +292,11 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     }
 
     "filter cases without Decision Start Date" in {
-      when(repository.get("ref")) willReturn Future.successful(None)
-      when(connector.get("ref")) willReturn Future.successful(
-        Some(validCase.copy(decision = Some(validDecision.copy(effectiveStartDate = None))))
+      when(repository.get("ref")).thenReturn(Future.successful(None))
+      when(connector.get("ref")).thenReturn(
+        Future.successful(
+          Some(validCase.copy(decision = Some(validDecision.copy(effectiveStartDate = None))))
+        )
       )
 
       await(service.refresh("ref")) shouldBe ((): Unit)
@@ -302,9 +306,11 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     }
 
     "filter cases without Decision End Date" in {
-      when(repository.get("ref")) willReturn Future.successful(None)
-      when(connector.get("ref")) willReturn Future.successful(
-        Some(validCase.copy(decision = Some(validDecision.copy(effectiveEndDate = None))))
+      when(repository.get("ref")).thenReturn(Future.successful(None))
+      when(connector.get("ref")).thenReturn(
+        Future.successful(
+          Some(validCase.copy(decision = Some(validDecision.copy(effectiveEndDate = None))))
+        )
       )
 
       await(service.refresh("ref")) shouldBe ((): Unit)
