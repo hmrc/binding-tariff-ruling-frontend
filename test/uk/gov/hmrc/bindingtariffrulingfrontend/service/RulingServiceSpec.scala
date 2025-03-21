@@ -193,7 +193,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       when(repository.get("ref")).thenReturn(Future.successful(None))
       when(connector.get("ref")).thenReturn(Future.successful(Some(validCase)))
 
-      when(repository.update(any[Ruling](), any[Boolean]())).thenAnswer(returnTheRuling)
+      when(repository.update(any[Ruling](), any[Boolean]())).thenReturn(Future.successful(true))
 
       when(fileStoreService.get(attachments.map(_.id))).thenReturn(Future.successful(fileMetadata))
 
@@ -223,7 +223,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       when(repository.get("ref")).thenReturn(Future.successful(Some(existing)))
       when(connector.get("ref")).thenReturn(Future.successful(Some(validCase)))
 
-      when(repository.update(any[Ruling](), any[Boolean]())).thenAnswer(returnTheRuling)
+      when(repository.update(any[Ruling](), any[Boolean]())).thenReturn(Future.successful(true))
 
       when(fileStoreService.get(attachments.map(_.id))).thenReturn(Future.successful(fileMetadata))
 
@@ -330,7 +330,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     }
 
     def returnTheRuling: Answer[Future[Ruling]] =
-      (invocation: InvocationOnMock) => Future.successful(invocation.getArgument(0))
+      (invocation: InvocationOnMock) => await(Future.successful(invocation.getArgument(0)))
 
   }
 

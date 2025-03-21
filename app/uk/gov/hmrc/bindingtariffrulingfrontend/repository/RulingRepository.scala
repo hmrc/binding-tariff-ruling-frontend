@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @ImplementedBy(classOf[RulingMongoRepository])
 trait RulingRepository {
 
-  def update(ruling: Ruling, upsert: Boolean): Future[Ruling]
+  def update(ruling: Ruling, upsert: Boolean): Future[Boolean]
 
   def get(id: String): Future[Option[Ruling]]
 
@@ -89,7 +89,7 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
   // the index so we'll skip this one as well, as this index should be implemented the same way in all other ATAR services
   override lazy val requiresTtlIndex: Boolean = false
 
-  override def update(ruling: Ruling, upsert: Boolean): Future[Ruling] =
+  override def update(ruling: Ruling, upsert: Boolean): Future[Boolean] =
     collection
       .findOneAndReplace(
         filter = byReference(ruling.reference),
@@ -97,6 +97,7 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
         options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       )
       .toFuture()
+      .map(_ => true)
 
   override def get(reference: String): Future[Option[Ruling]] =
     collection.find(byReference(reference)).first().toFutureOption()

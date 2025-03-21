@@ -71,7 +71,7 @@ class RulingMongoRepositoryTest
 
       val update = document.copy(bindingCommodityCode = "code")
 
-      await(repository.update(update, upsert = false)) shouldBe update
+      await(repository.update(update, upsert = false)) shouldBe true
     }
   }
 

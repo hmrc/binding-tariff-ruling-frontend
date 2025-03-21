@@ -21,8 +21,8 @@ import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.{Materializer, Supervision}
 import org.mockito.ArgumentMatchers.*
 import org.mockito.BDDMockito.*
-import org.mockito.Mockito.{mock, times, verify, when}
-import org.scalatest.BeforeAndAfterAll
+import org.mockito.Mockito.{mock, reset, times, verify, when}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
@@ -38,7 +38,7 @@ import java.time.{Instant, LocalDate, ZoneOffset}
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 
-class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with MongoSupport { self =>
+class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with BeforeAndAfterEach with MongoSupport { self =>
 
   private val rulingService = mock(classOf[RulingService])
   private val connector     = mock(classOf[BindingTariffClassificationConnector])
@@ -83,10 +83,15 @@ class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with MongoSuppor
       .thenReturn(Future.successful(None))
     when(lockRepo.releaseLock(any[String], any[String]))
       .thenReturn(Future.successful(()))
-    when(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(pagedNewCases))
-    when(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(pagedCanceledCases))
+//    when(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
+//      .thenReturn(Future.successful(pagedNewCases))
+//    when(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
+//      .thenReturn(Future.successful(pagedCanceledCases))
+  }
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(connector)
   }
 
   "updateNewRulings" should {

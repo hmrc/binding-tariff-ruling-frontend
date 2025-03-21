@@ -28,7 +28,7 @@
     <ul class="moj-pagination__list">
       @if(pager.pageIndex > 1) {
         <li id="@id-page_back" class="moj-pagination__item  moj-pagination__item--prev">
-          <a href="@onChange(pager.pageIndex - 1)" class="moj-pagination__link" href="">
+          <a href="@onChange(pager.pageIndex - 1).url" class="moj-pagination__link">
             Previous<span class="govuk-visually-hidden"> set of pages</span>
           </a>
         </li>
@@ -42,7 +42,7 @@
           </li>
         } else {
           <li id="@id-page_@pageIndex" class="moj-pagination__item">
-            <a class="moj-pagination__link" aria-describedby="page-pagination" href="@onChange(pageIndex)">
+            <a class="moj-pagination__link" aria-describedby="page-pagination" href="@onChange(pageIndex).url">
               @pageIndex
             </a>
           </li>
@@ -51,7 +51,7 @@
 
       @if(pager.pageIndex < pager.pageCount) {
         <li id="@id-page_next" class="moj-pagination__item  moj-pagination__item--next">
-          <a href="@onChange(pager.pageIndex + 1)" aria-describedby="page-pagination" class="moj-pagination__link" href="">
+          <a href="@onChange(pager.pageIndex + 1).url" aria-describedby="page-pagination" class="moj-pagination__link">
             Next<span class="govuk-visually-hidden"> set of pages</span>
           </a>
         </li>
