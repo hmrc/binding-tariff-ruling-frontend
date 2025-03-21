@@ -33,12 +33,12 @@ class PaginationViewSpec extends ViewSpec with BeforeAndAfterEach {
   private val goToPage: Int => Call = mock(classOf[Int => Call])
 
   override def beforeEach(): Unit = {
-
-    def returnThePage: Answer[Call] =
-      (invocation: InvocationOnMock) => Call(method = "GET", url = "/page=" + invocation.getArgument(0))
-
     super.beforeEach()
-    when(goToPage.apply(ArgumentMatchers.any[Int])).thenReturn(returnThePage)
+
+    when(goToPage.apply(ArgumentMatchers.any[Int])).thenAnswer { invocation =>
+      val page = invocation.getArgument[Int](0)
+      Call(method = "GET", url = s"/page=$page")
+    }
   }
 
   "Pagination" should {

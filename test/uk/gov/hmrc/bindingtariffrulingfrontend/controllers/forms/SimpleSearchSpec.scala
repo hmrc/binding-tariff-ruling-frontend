@@ -87,4 +87,16 @@ class SimpleSearchSpec extends BaseSpec with ScalaCheckPropertyChecks {
     )
   }
 
+  "SimpleSearch.form" should {
+    "unbind Option[String] values correctly" in {
+      val searchWithValue = SimpleSearch(Some("test query"), false, 1)
+      val mapWithValue    = SimpleSearch.form.fill(searchWithValue).data
+      mapWithValue("query") shouldBe "test query"
+
+      val searchWithNone = SimpleSearch(None, false, 1)
+      val mapWithNone    = SimpleSearch.form.fill(searchWithNone).data
+      mapWithNone("query") shouldBe ""
+    }
+  }
+
 }

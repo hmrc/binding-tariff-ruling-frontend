@@ -49,8 +49,17 @@ object Ruling {
 
     implicit val formatInstant: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-    implicit val rulingReads: Reads[Ruling] =
-      Json.using[Json.WithDefaultValues].format[Ruling]
+    implicit val rulingReads: Reads[Ruling] = (
+      (JsPath \ "reference").read[String] and
+        (JsPath \ "bindingCommodityCode").read[String] and
+        (JsPath \ "effectiveStartDate").read[Instant] and
+        (JsPath \ "effectiveEndDate").read[Instant] and
+        (JsPath \ "justification").read[String] and
+        (JsPath \ "goodsDescription").read[String] and
+        (JsPath \ "keywords").readWithDefault[Set[String]](Set.empty) and
+        (JsPath \ "attachments").readWithDefault[Seq[String]](Seq.empty) and
+        (JsPath \ "images").readWithDefault[Seq[String]](Seq.empty)
+    )(Ruling.apply _)
 
     implicit val rulingWrites: OWrites[Ruling] = (
       (__ \ "reference").write[String] and

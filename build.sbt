@@ -1,5 +1,5 @@
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "3.4.2"
+ThisBuild / scalaVersion := "3.5.2"
 
 lazy val microservice = Project("binding-tariff-ruling-frontend", file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
@@ -7,10 +7,11 @@ lazy val microservice = Project("binding-tariff-ruling-frontend", file("."))
   .settings(
     libraryDependencies ++= AppDependencies(),
     PlayKeys.playDefaultPort := 9586,
-    scalacOptions ++= Seq(
+    scalacOptions ++= List(
       "-feature",
-      "-Wconf:src=routes/.*:s",
-      "-Wconf:cat=unused-imports&src=html/.*:s"
+      "-Wconf:msg=unused import&src=conf/.*:s",
+      "-Wconf:msg=unused import&src=views/.*:s",
+      "-Wconf:src=routes/.*:s"
     )
   )
   .settings(

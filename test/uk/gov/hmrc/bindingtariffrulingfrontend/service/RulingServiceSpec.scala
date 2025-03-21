@@ -192,8 +192,10 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
     "create new ruling" in {
       when(repository.get("ref")).thenReturn(Future.successful(None))
       when(connector.get("ref")).thenReturn(Future.successful(Some(validCase)))
-      when(repository.update(any[Ruling], any[Boolean])).thenReturn(returnTheRuling)
-      when(fileStoreService.get(attachments.map(_.id))).thenReturn(fileMetadata)
+
+      when(repository.update(any[Ruling](), any[Boolean]())).thenAnswer(returnTheRuling)
+
+      when(fileStoreService.get(attachments.map(_.id))).thenReturn(Future.successful(fileMetadata))
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
@@ -220,8 +222,10 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       val existing = Ruling("ref", "old", Instant.now, Instant.now, "old", "old", Set("old"), Seq("old"))
       when(repository.get("ref")).thenReturn(Future.successful(Some(existing)))
       when(connector.get("ref")).thenReturn(Future.successful(Some(validCase)))
-      when(repository.update(any[Ruling], any[Boolean])).thenReturn(returnTheRuling)
-      when(fileStoreService.get(attachments.map(_.id))).thenReturn(fileMetadata)
+
+      when(repository.update(any[Ruling](), any[Boolean]())).thenAnswer(returnTheRuling)
+
+      when(fileStoreService.get(attachments.map(_.id))).thenReturn(Future.successful(fileMetadata))
 
       await(service.refresh("ref")) shouldBe ((): Unit)
 
@@ -321,7 +325,7 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
 
     def theRulingUpdated: Ruling = {
       val captor = ArgumentCaptor.forClass(classOf[Ruling])
-      verify(repository).update(captor.capture(), anyBoolean())
+      verify(repository).update(captor.capture(), any[Boolean]())
       captor.getValue
     }
 

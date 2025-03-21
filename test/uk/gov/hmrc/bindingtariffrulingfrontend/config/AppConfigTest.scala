@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.config
 
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.Configuration
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
@@ -24,6 +26,42 @@ class AppConfigTest extends BaseSpec {
   private def appConfig(pairs: (String, String)*): AppConfig = {
     val config = Configuration.from(pairs.map(e => e._1 -> e._2).toMap)
     new AppConfig(config)
+  }
+
+  "load configuration values correctly" in {
+    // Create mock configuration
+    val configuration = mock[Configuration]
+
+    // Set up mock to return specific values for different config paths
+    when(configuration.getOptional[String]("contact-frontend.host")).thenReturn(Some("test-host"))
+    when(configuration.getOptional[String]("assets.url")).thenReturn(Some("test-assets-url"))
+    when(configuration.getOptional[String]("assets.version")).thenReturn(Some("test-version"))
+    when(configuration.getOptional[String]("auth.api-token")).thenReturn(Some("test-token"))
+    when(configuration.getOptional[Boolean]("admin-mode")).thenReturn(Some(true))
+    when(configuration.getOptional[String]("uk-global-tariff.host")).thenReturn(Some("test-ugt-host"))
+    when(configuration.getOptional[String]("urls.helpMakeGovUkBetterUrl")).thenReturn(Some("test-help-url"))
+    when(configuration.getOptional[Boolean]("toggle.displayResearchBanner")).thenReturn(Some(true))
+    when(configuration.getOptional[Boolean]("toggle.displayImages")).thenReturn(Some(false))
+    when(configuration.getOptional[Int]("filters.rateLimit.bucketSize")).thenReturn(Some(10))
+    when(configuration.getOptional[Int]("filters.rateLimit.ratePerSecond")).thenReturn(Some(5))
+    when(configuration.getOptional[Boolean]("filters.rateLimit.enabled")).thenReturn(Some(true))
+
+    // Create AppConfig with mock configuration
+    val config = new AppConfig(configuration)
+
+    // Verify the values were loaded correctly
+    config.assetsPrefix              shouldBe "test-assets-urltest-version"
+    config.authorization             shouldBe "test-token"
+    config.adminEnabled              shouldBe true
+    config.ukGlobalTariffHost        shouldBe "test-ugt-host"
+    config.helpMakeGovUkBetterUrl    shouldBe "test-help-url"
+    config.displayMakeGovUkBetterUrl shouldBe true
+    config.displayImages             shouldBe false
+    config.reportAProblemPartialUrl  shouldBe "test-host/contact/problem_reports_ajax?service=AdvanceTariffRulings"
+    config.reportAProblemNonJSUrl    shouldBe "test-host/contact/problem_reports_nonjs?service=AdvanceTariffRulings"
+    config.rateLimitBucketSize       shouldBe 10
+    config.rateLimitRatePerSecond    shouldBe 5
+    config.rateLimiterEnabled        shouldBe true
   }
 
   "Build assets prefix" in {
