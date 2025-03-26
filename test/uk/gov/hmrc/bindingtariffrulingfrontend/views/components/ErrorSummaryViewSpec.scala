@@ -27,20 +27,15 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.error_summa
 class ErrorSummaryViewSpec extends BaseSpec {
   "error_summary template" should {
     "not render error summary when form has no errors" in {
-      // Create a form with no errors
       val form = Form(single("test" -> text())).bind(Map("test" -> "value"))
 
-      // Get the messagesApi and create Messages
       val messagesApi                 = app.injector.instanceOf[MessagesApi]
       implicit val messages: Messages = messagesApi.preferred(Seq(Lang("en")))
 
-      // Get the template
       val errorSummary = app.injector.instanceOf[error_summary]
 
-      // Render the template
       val html = errorSummary(form).toString()
 
-      // Should be effectively empty (might contain whitespace)
       html.trim shouldBe ""
     }
 
@@ -55,9 +50,8 @@ class ErrorSummaryViewSpec extends BaseSpec {
       val errorSummary = app.injector.instanceOf[error_summary]
       val html         = errorSummary(form).toString()
 
-      // Parse the HTML to extract text only
       val doc: Document       = Jsoup.parse(html)
-      val textContent: String = doc.text() // Extract only the visible text
+      val textContent: String = doc.text()
 
       textContent should include("There's a problem This field is required")
     }
@@ -70,19 +64,15 @@ class ErrorSummaryViewSpec extends BaseSpec {
 
       val errorSummary = app.injector.instanceOf[error_summary]
 
-      // Explicitly call render to ensure coverage
       val html = errorSummary.render(form, messages).toString()
 
-      // Extract only text from the rendered HTML
       val doc: Document       = Jsoup.parse(html)
       var textContent: String = doc.text()
 
-      // Normalize apostrophes to prevent encoding issues
       textContent = textContent.replace("’", "'")
 
-      // Verify expected text is present
-      textContent should include("There's a problem") // Matches HTML-rendered text
-      textContent should include("This field is required") // Matches actual error message
+      textContent should include("There's a problem")
+      textContent should include("This field is required")
     }
 
     "call template helper methods f and ref" in {
@@ -93,11 +83,9 @@ class ErrorSummaryViewSpec extends BaseSpec {
 
       val errorSummary = app.injector.instanceOf[error_summary]
 
-      // Ensure `f` behaves as expected
       val functionCall = errorSummary.f
       functionCall(form)(messages) shouldBe errorSummary.apply(form)(messages)
 
-      // Ensure `ref` behaves as expected
       val refCall = errorSummary.ref
       refCall shouldBe errorSummary
     }

@@ -20,10 +20,9 @@ import org.apache.pekko.Done
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.stream.{Materializer, Supervision}
 import org.mockito.ArgumentMatchers.*
-import org.mockito.BDDMockito.*
-import org.mockito.Mockito.{mock, reset, times, verify, when}
+import org.mockito.Mockito.{mock, reset, verify, when}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.Json
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
@@ -83,10 +82,6 @@ class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with BeforeAndAf
       .thenReturn(Future.successful(None))
     when(lockRepo.releaseLock(any[String], any[String]))
       .thenReturn(Future.successful(()))
-//    when(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-//      .thenReturn(Future.successful(pagedNewCases))
-//    when(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-//      .thenReturn(Future.successful(pagedCanceledCases))
   }
 
   override protected def beforeEach(): Unit = {
@@ -137,7 +132,6 @@ class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with BeforeAndAf
 
   "RulingsWorker decider" should {
     "handle NonFatal exceptions by resuming" in {
-      // Create mocks
       implicit val system   = ActorSystem("test-system")
       implicit val mat      = Materializer(system)
       val mockAppConfig     = mock(classOf[AppConfig])
@@ -145,7 +139,6 @@ class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with BeforeAndAf
       val mockRulingService = mock(classOf[RulingService])
       val mockMongoLockRepo = mock(classOf[MongoLockRepository])
 
-      // Create the worker
       val worker = new RulingsWorker(
         mockAppConfig,
         mockConnector,
@@ -153,22 +146,18 @@ class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with BeforeAndAf
         mockMongoLockRepo
       )
 
-      // Access the decider function using reflection
       val deciderField = worker.getClass.getDeclaredField("decider")
       deciderField.setAccessible(true)
       val decider = deciderField.get(worker).asInstanceOf[Supervision.Decider]
 
-      // Test NonFatal exception case
       val nonFatalException = new RuntimeException("Test exception")
       val nonFatalResult    = decider(nonFatalException)
       nonFatalResult shouldBe Supervision.Resume
 
-      // Test fatal exception case
       val fatalException = new OutOfMemoryError("Test OOM")
       val fatalResult    = decider(fatalException)
       fatalResult shouldBe Supervision.Stop
 
-      // Cleanup
       system.terminate()
     }
   }

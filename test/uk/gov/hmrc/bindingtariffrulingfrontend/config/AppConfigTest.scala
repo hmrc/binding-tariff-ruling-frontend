@@ -29,10 +29,8 @@ class AppConfigTest extends BaseSpec {
   }
 
   "load configuration values correctly" in {
-    // Create mock configuration
     val configuration = mock[Configuration]
 
-    // Set up mock to return specific values for different config paths
     when(configuration.getOptional[String]("contact-frontend.host")).thenReturn(Some("test-host"))
     when(configuration.getOptional[String]("assets.url")).thenReturn(Some("test-assets-url"))
     when(configuration.getOptional[String]("assets.version")).thenReturn(Some("test-version"))
@@ -46,10 +44,8 @@ class AppConfigTest extends BaseSpec {
     when(configuration.getOptional[Int]("filters.rateLimit.ratePerSecond")).thenReturn(Some(5))
     when(configuration.getOptional[Boolean]("filters.rateLimit.enabled")).thenReturn(Some(true))
 
-    // Create AppConfig with mock configuration
     val config = new AppConfig(configuration)
 
-    // Verify the values were loaded correctly
     config.assetsPrefix              shouldBe "test-assets-urltest-version"
     config.authorization             shouldBe "test-token"
     config.adminEnabled              shouldBe true

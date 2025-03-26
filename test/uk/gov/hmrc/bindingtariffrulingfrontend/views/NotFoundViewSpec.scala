@@ -47,10 +47,8 @@ class NotFoundViewSpec extends BaseSpec {
 
       doc.title() should startWith("Page not found")
 
-      // Check the heading
       doc.select("h1#not_found-heading").text() mustBe messages("site.notfound.heading")
 
-      // Check the content messages
       textContent should include(messages("site.notfound.checkcorrect"))
       textContent should include(messages("site.notfound.checkcomplete"))
     }

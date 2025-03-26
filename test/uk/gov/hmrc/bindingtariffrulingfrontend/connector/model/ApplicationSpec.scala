@@ -27,7 +27,7 @@ class ApplicationSpec extends BaseSpec {
     "correctly serialize to JSON" in {
       val appInstance = Application(`type` = ApplicationType.BTI)
 
-      val expectedJson = Json.obj("type" -> "BTI") // Ensure this matches ApplicationType serialization
+      val expectedJson = Json.obj("type" -> "BTI")
 
       val jsonResult = Json.toJson(appInstance)
 
@@ -35,7 +35,7 @@ class ApplicationSpec extends BaseSpec {
     }
 
     "correctly deserialize from JSON" in {
-      val json = Json.obj("type" -> "BTI") // Ensure this matches ApplicationType format
+      val json = Json.obj("type" -> "BTI")
 
       val expectedInstance = Application(`type` = ApplicationType.BTI)
 
@@ -63,7 +63,7 @@ class ApplicationSpec extends BaseSpec {
 
       val expectedJson = Json.obj("type" -> "BTI")
 
-      val jsonResult = Json.toJson(appInstance)(Application.outboundFormat) // ✅ Explicitly using outboundFormat
+      val jsonResult = Json.toJson(appInstance)(Application.outboundFormat)
 
       jsonResult mustBe expectedJson
     }
@@ -73,7 +73,7 @@ class ApplicationSpec extends BaseSpec {
 
       val expectedInstance = Application(`type` = ApplicationType.BTI)
 
-      val result = json.as[Application](Application.outboundFormat) // ✅ Explicitly using outboundFormat
+      val result = json.as[Application](Application.outboundFormat)
 
       result mustBe expectedInstance
     }
@@ -82,7 +82,7 @@ class ApplicationSpec extends BaseSpec {
       val invalidJson = Json.obj("type" -> "INVALID_TYPE")
 
       intercept[JsResultException] {
-        invalidJson.as[Application](Application.outboundFormat) // ✅ Explicitly using outboundFormat
+        invalidJson.as[Application](Application.outboundFormat)
       }
     }
 

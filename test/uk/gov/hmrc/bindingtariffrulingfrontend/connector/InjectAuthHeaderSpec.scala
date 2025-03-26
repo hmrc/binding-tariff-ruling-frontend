@@ -23,49 +23,38 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class InjectAuthHeaderSpec extends BaseSpec {
 
-  // Create a class that extends the trait for testing
   class TestInjectAuthHeader extends InjectAuthHeader
 
   "InjectAuthHeader" should {
     "use existing header when found by headers method" in {
-      // Setup
       val testClass  = new TestInjectAuthHeader()
       val mockConfig = mock(classOf[AppConfig])
 
-      // Create a mock HeaderCarrier instead of a real one
       val mockHeaderCarrier = mock(classOf[HeaderCarrier])
 
-      // Set up the mock to return what we want for the headers method
       when(mockHeaderCarrier.headers(Seq("X-Api-Token")))
         .thenReturn(Seq("X-Api-Token" -> "existing-token"))
 
-      // Use the mocked HeaderCarrier
       implicit val hc = mockHeaderCarrier
 
-      // Execute
       val result = testClass.authHeaders(mockConfig)
 
-      // Verify
       result shouldBe Seq("X-Api-Token" -> "existing-token")
       verifyNoInteractions(mockConfig)
     }
 
     "use config authorization when header is not present" in {
-      // Setup
       val testClass   = new TestInjectAuthHeader()
       val mockConfig  = mock(classOf[AppConfig])
       val configToken = "config-token"
       when(mockConfig.authorization).thenReturn(configToken)
 
-      // Create a mock HeaderCarrier
       val mockHeaderCarrier = mock(classOf[HeaderCarrier])
       when(mockHeaderCarrier.headers(Seq("X-Api-Token"))).thenReturn(Seq.empty)
       implicit val hc = mockHeaderCarrier
 
-      // Execute
       val result = testClass.authHeaders(mockConfig)
 
-      // Verify
       result shouldBe Seq("X-Api-Token" -> configToken)
       verify(mockConfig).authorization
     }

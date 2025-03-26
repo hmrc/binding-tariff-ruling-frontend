@@ -23,7 +23,6 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{Application, App
 class CaseJsonFormatSpec extends BaseSpec {
   "Case.format" should {
     "convert Case to and from JSON" in {
-      // Create a sample Case
       val sampleCase = Case(
         reference = "test-reference",
         status = CaseStatus.COMPLETED,
@@ -33,20 +32,15 @@ class CaseJsonFormatSpec extends BaseSpec {
         keywords = Set.empty
       )
 
-      // Use the formatter directly
       val formatter = Case.format
 
-      // Convert to JSON
       val json = formatter.writes(sampleCase)
 
-      // Verify JSON has expected fields
       (json \ "reference").as[String] shouldBe "test-reference"
       (json \ "status").as[String]    shouldBe "COMPLETED"
 
-      // Convert back to Case
       val caseFromJson = formatter.reads(json).get
 
-      // Verify round-trip works
       caseFromJson shouldBe sampleCase
     }
   }

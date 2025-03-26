@@ -24,12 +24,6 @@ enum ApplicationType {
 
 object ApplicationType {
   implicit val format: Format[ApplicationType] = new Format[ApplicationType] {
-    /*def writes: Writes[ApplicationType] = Writes {
-      case BTI             => JsString("BTI")
-      case LIABILITY_ORDER => JsString("LIABILITY_ORDER")
-      case CORRESPONDENCE  => JsString("CORRESPONDENCE")
-      case MISCELLANEOUS   => JsString("MISCELLANEOUS")
-    }*/
 
     def writes(applicationType: ApplicationType): JsValue = applicationType match
       case BTI             => JsString("BTI")

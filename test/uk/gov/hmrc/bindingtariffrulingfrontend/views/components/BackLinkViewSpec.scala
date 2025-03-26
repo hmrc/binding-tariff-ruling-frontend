@@ -18,16 +18,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.views.components
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.BDDMockito.given
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.{mock, when}
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import play.api.i18n.{DefaultMessagesApi, Lang, Messages, MessagesApi, MessagesImpl}
-import uk.gov.hmrc.bindingtariffrulingfrontend.views.ViewSpec
+import play.api.i18n.{Messages, MessagesApi}
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.components.back_link
 import uk.gov.hmrc.govukfrontend.views.html.components.GovukBackLink
@@ -45,11 +36,9 @@ class BackLinkViewSpec extends BaseSpec {
 
       val html = backLinkView().toString()
 
-      // Extract only visible text from the HTML
       val doc: Document       = Jsoup.parse(html)
       val textContent: String = doc.text()
 
-      // Verify expected text is present
       textContent should include("Back")
     }
 
@@ -63,7 +52,7 @@ class BackLinkViewSpec extends BaseSpec {
       val renderHtml   = backLinkView.render(messages).toString()
       val expectedHtml = backLinkView.apply()(messages).toString()
 
-      renderHtml shouldBe expectedHtml // Ensures `render` is covered
+      renderHtml shouldBe expectedHtml
     }
 
     "call template helper methods f and ref" in {
@@ -73,7 +62,6 @@ class BackLinkViewSpec extends BaseSpec {
       val govukBackLink = app.injector.instanceOf[GovukBackLink]
       val backLinkView  = new back_link(govukBackLink)
 
-      // Call `f` and compare actual rendered HTML instead of objects
       val functionCallHtml = backLinkView.f()(messages).toString()
       val expectedHtml     = backLinkView.apply()(messages).toString()
 

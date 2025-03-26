@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
-import org.scalatest.matchers.must.Matchers.mustBe
-
 import java.time.Instant
 import play.api.libs.json.{JsArray, JsError, JsNull, JsString, JsSuccess, Json}
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
@@ -85,7 +83,6 @@ class RulingSpec extends BaseSpec {
     }
 
     "exercise Mongo formatter with default values" in {
-      // Create a sample ruling
       val ruling = Ruling(
         reference = "test-ref",
         bindingCommodityCode = "code123",
@@ -98,18 +95,14 @@ class RulingSpec extends BaseSpec {
         images = Seq("image1")
       )
 
-      // Directly access the Mongo formatters
       val mongoReads  = Ruling.Mongo.rulingReads
       val mongoWrites = Ruling.Mongo.rulingWrites
 
-      // Test writes
       val json = mongoWrites.writes(ruling)
 
-      // Test reads
       val rulingFromJson = mongoReads.reads(json).get
       rulingFromJson shouldBe ruling
 
-      // Test with missing fields (to exercise default values)
       val jsonWithMissingFields = Json.obj(
         "reference"            -> "test-ref",
         "bindingCommodityCode" -> "code123",
@@ -117,7 +110,6 @@ class RulingSpec extends BaseSpec {
         "effectiveEndDate"     -> Json.obj("$date" -> Json.obj("$numberLong" -> "1000")),
         "justification"        -> "test justification",
         "goodsDescription"     -> "test description"
-        // Deliberately omitting keywords, attachments, images
       )
 
       val rulingWithDefaults = mongoReads.reads(jsonWithMissingFields).get
@@ -166,7 +158,6 @@ class RulingSpec extends BaseSpec {
       "error when required fields are missing" in {
         val incompleteJson = Json.obj(
           "reference" -> "reference"
-          // Missing other required fields
         )
         incompleteJson.validate[Ruling](Ruling.REST.format) shouldBe a[JsError]
       }
@@ -174,10 +165,8 @@ class RulingSpec extends BaseSpec {
 
     "Mongo.rulingReads" should {
       "handle apply operation" in {
-        // Get direct reference to the formatter
         val formatter = Ruling.Mongo.rulingReads
 
-        // Create test JSON
         val json = Json.obj(
           "reference"            -> "test-ref",
           "bindingCommodityCode" -> "1234",
@@ -187,13 +176,11 @@ class RulingSpec extends BaseSpec {
           "goodsDescription"     -> "test desc"
         )
 
-        // Test "apply" operation by directly using reads method
         val result = formatter.reads(json)
         result.isSuccess shouldBe true
       }
 
       "handle writes operation" in {
-        // For testing writes, we need a complete format
         val fullFormat = Ruling.Mongo.format
 
         val testRuling = ruling.copy(
@@ -201,10 +188,8 @@ class RulingSpec extends BaseSpec {
           keywords = Set("key1", "key2")
         )
 
-        // Write to JSON - tests the "writes" operation
         val json = fullFormat.writes(testRuling)
 
-        // Verify fields were written correctly
         (json \ "reference").as[String]            shouldBe "test-writes"
         (json \ "bindingCommodityCode").as[String] shouldBe "0011223344"
       }
@@ -213,11 +198,9 @@ class RulingSpec extends BaseSpec {
         val formatter  = Ruling.Mongo.rulingReads
         val fullFormat = Ruling.Mongo.format
 
-        // Create ruling and convert to JSON
         val testRuling = ruling.copy(reference = "test-refI")
         val json       = fullFormat.writes(testRuling)
 
-        // Read back and verify reference
         val result = formatter.reads(json)
         result.isSuccess     shouldBe true
         result.get.reference shouldBe "test-refI"
@@ -226,11 +209,9 @@ class RulingSpec extends BaseSpec {
       "handle arrow operation" in {
         val fullFormat = Ruling.Mongo.format
 
-        // Create ruling and convert to JSON
         val testRuling = ruling.copy(reference = "test-arrow")
         val json       = fullFormat.writes(testRuling)
 
-        // Test arrow operation by accessing fields
         (json \ "reference").as[String]            shouldBe "test-arrow"
         (json \ "bindingCommodityCode").as[String] shouldBe "0011223344"
       }
@@ -238,7 +219,6 @@ class RulingSpec extends BaseSpec {
       "handle newBuilder operation" in {
         val formatter = Ruling.Mongo.rulingReads
 
-        // Build JSON from scratch
         val builderJson = Json.obj(
           "reference"            -> "builder-test",
           "bindingCommodityCode" -> "5678",
@@ -248,7 +228,6 @@ class RulingSpec extends BaseSpec {
           "goodsDescription"     -> "test description"
         )
 
-        // This tests the newBuilder operations
         val result = formatter.reads(builderJson)
         result.isSuccess     shouldBe true
         result.get.reference shouldBe "builder-test"
@@ -257,7 +236,6 @@ class RulingSpec extends BaseSpec {
       "use default values for missing fields" in {
         val formatter = Ruling.Mongo.rulingReads
 
-        // Create minimal JSON
         val minimalJson = Json.obj(
           "reference"            -> "minimal",
           "bindingCommodityCode" -> "minimal",
@@ -267,7 +245,6 @@ class RulingSpec extends BaseSpec {
           "goodsDescription"     -> "minimal"
         )
 
-        // Test with minimal JSON
         val result = formatter.reads(minimalJson)
         result.isSuccess       shouldBe true
         result.get.keywords    shouldBe Set.empty
@@ -277,11 +254,9 @@ class RulingSpec extends BaseSpec {
     }
 
     "Ruling.Mongo.rulingReads" should {
-      // Get the formatter for testing
       val formatter = Ruling.Mongo.rulingReads
 
       "read JSON with default values" in {
-        // Create JSON with only required fields
         val minimalJson = Json.obj(
           "reference"            -> "default-test",
           "bindingCommodityCode" -> "abc123",
@@ -291,10 +266,8 @@ class RulingSpec extends BaseSpec {
           "goodsDescription"     -> "test description"
         )
 
-        // Parse the JSON
         val result = formatter.reads(minimalJson)
 
-        // Verify success and default values
         result.isSuccess shouldBe true
         val ruling = result.get
         ruling.keywords    shouldBe Set.empty
@@ -303,7 +276,6 @@ class RulingSpec extends BaseSpec {
       }
 
       "handle invalid JSON values" in {
-        // Invalid date format
         val invalidDateJson = Json.obj(
           "reference"            -> "invalid-date",
           "bindingCommodityCode" -> "abc123",
@@ -316,10 +288,8 @@ class RulingSpec extends BaseSpec {
         val dateResult = formatter.reads(invalidDateJson)
         dateResult.isError shouldBe true
 
-        // Missing required field
         val missingFieldJson = Json.obj(
-          "reference" -> "missing-field",
-          // Missing bindingCommodityCode
+          "reference"          -> "missing-field",
           "effectiveStartDate" -> Json.obj("$date" -> Json.obj("$numberLong" -> "0")),
           "effectiveEndDate"   -> Json.obj("$date" -> Json.obj("$numberLong" -> "1000")),
           "justification"      -> "test",
@@ -329,14 +299,12 @@ class RulingSpec extends BaseSpec {
         val missingResult = formatter.reads(missingFieldJson)
         missingResult.isError shouldBe true
 
-        // Completely wrong type (array instead of object)
         val arrayJson   = Json.arr("not", "an", "object")
         val arrayResult = formatter.reads(arrayJson)
         arrayResult.isError shouldBe true
       }
 
       "handle JSON with wrong field types" in {
-        // Wrong field types
         val wrongTypesJson = Json.obj(
           "reference"            -> 12345, // Should be string
           "bindingCommodityCode" -> "abc123",
@@ -349,7 +317,6 @@ class RulingSpec extends BaseSpec {
         val typeResult = formatter.reads(wrongTypesJson)
         typeResult.isError shouldBe true
 
-        // Null values
         val nullValuesJson = Json.obj(
           "reference"            -> "null-test",
           "bindingCommodityCode" -> JsNull, // Null value
@@ -364,7 +331,6 @@ class RulingSpec extends BaseSpec {
       }
 
       "handle JSON with extra fields" in {
-        // JSON with extra fields
         val extraFieldsJson = Json.obj(
           "reference"            -> "extra-fields",
           "bindingCommodityCode" -> "abc123",
