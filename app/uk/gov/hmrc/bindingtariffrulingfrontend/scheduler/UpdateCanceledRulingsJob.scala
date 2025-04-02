@@ -23,7 +23,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.workers.RulingsWorker
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.temporal.ChronoUnit
-import java.time.{Duration, Instant, LocalTime}
+import java.time.{Instant, LocalTime}
 import javax.inject.Singleton
 
 @Singleton

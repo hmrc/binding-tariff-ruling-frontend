@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector.model
 
-import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsValue, Writes}
+import play.api.libs.json.*
 
 enum CaseStatus {
   case DRAFT, NEW, OPEN, SUPPRESSED, REFERRED, REJECTED, CANCELLED, SUSPENDED, COMPLETED, REVOKED, ANNULLED

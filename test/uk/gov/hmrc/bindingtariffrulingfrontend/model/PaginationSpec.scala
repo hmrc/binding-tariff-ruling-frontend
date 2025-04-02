@@ -23,7 +23,6 @@ class PaginationSpec extends BaseSpec {
   "Pagination" when {
     "withPage" should {
       "update pageIndex for SimplePagination" in {
-        print("Running SimplePagination test")
         val pagination    = SimplePagination()
         val newPagination = pagination.withPage(2)
         newPagination.pageIndex should be(2)
@@ -31,7 +30,6 @@ class PaginationSpec extends BaseSpec {
       }
 
       "update pageIndex for NoPagination" in {
-        print("Running NoPagination test")
         val pagination    = NoPagination(1, Integer.MAX_VALUE)
         val newPagination = pagination.withPage(2)
         newPagination.pageIndex should be(2)

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.metrics
 
-import com.codahale.metrics.{Metric, MetricRegistry, Timer}
+import com.codahale.metrics.{MetricRegistry, Timer}
 
 class LocalMetrics(registry: MetricRegistry) {
   def startTimer(metric: String): Timer.Context = registry.timer(s"$metric-timer").time()

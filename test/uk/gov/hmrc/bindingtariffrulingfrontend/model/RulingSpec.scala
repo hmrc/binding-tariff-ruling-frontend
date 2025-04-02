@@ -17,7 +17,7 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
 import java.time.Instant
-import play.api.libs.json.{JsArray, JsError, JsNull, JsString, JsSuccess, Json}
+import play.api.libs.json.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
 class RulingSpec extends BaseSpec {

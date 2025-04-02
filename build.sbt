@@ -7,7 +7,7 @@ lazy val microservice = Project("binding-tariff-ruling-frontend", file("."))
   .settings(
     libraryDependencies ++= AppDependencies(),
     PlayKeys.playDefaultPort := 9586,
-    scalacOptions ++= List(
+    scalacOptions ++= Seq(
       "-feature",
       "-Wconf:msg=unused import&src=conf/.*:s",
       "-Wconf:msg=unused import&src=views/.*:s",

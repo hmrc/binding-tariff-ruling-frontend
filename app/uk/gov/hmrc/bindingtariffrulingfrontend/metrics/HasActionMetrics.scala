@@ -22,18 +22,6 @@ import scala.concurrent.ExecutionContext
 
 trait HasActionMetrics extends HasMetrics { self: MessagesBaseController =>
 
-  /** Execute a [[play.api.mvc.Action]] with a metrics timer. Intended for use in controllers that return HTTP
-    * responses.
-    *
-    * @param metric
-    *   The id of the metric to be collected
-    * @param action
-    *   The action to wrap with metrics collection
-    * @param ec
-    *   The [[scala.concurrent.ExecutionContext]] on which the block of code should run
-    * @return
-    *   an action which captures metrics about the wrapped action
-    */
   def withMetricsTimerAction[A](metric: String)(action: Action[A])(implicit ec: ExecutionContext): Action[A] =
     Action(action.parser).async(request => withMetricsTimerResult(metric)(action(request)))
 }
