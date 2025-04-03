@@ -40,41 +40,38 @@ object CaseStatus {
     }
      */
     def writes(caseStatus: CaseStatus): JsValue = caseStatus match
-      case DRAFT      => JsString("DRAFT")
-      case NEW        => JsString("NEW")
-      case OPEN       => JsString("OPEN")
+      case DRAFT => JsString("DRAFT")
+      case NEW => JsString("NEW")
+      case OPEN => JsString("OPEN")
       case SUPPRESSED => JsString("SUPPRESSED")
-      case REFERRED   => JsString("REFERRED")
-      case REJECTED   => JsString("REJECTED")
-      case CANCELLED  => JsString("CANCELLED")
-      case SUSPENDED  => JsString("SUSPENDED")
-      case COMPLETED  => JsString("COMPLETED")
-      case REVOKED    => JsString("REVOKED")
-      case ANNULLED   => JsString("ANNULLED")
+      case REFERRED => JsString("REFERRED")
+      case REJECTED => JsString("REJECTED")
+      case CANCELLED => JsString("CANCELLED")
+      case SUSPENDED => JsString("SUSPENDED")
+      case COMPLETED => JsString("COMPLETED")
+      case REVOKED => JsString("REVOKED")
+      case ANNULLED => JsString("ANNULLED")
 
-    def reads(json: JsValue): JsResult[CaseStatus] = json match {
+    def reads(json: JsValue): JsResult[CaseStatus] = json match
       case JsString(s) =>
-        try
-          s match {
-            case "DRAFT"      => JsSuccess(CaseStatus.DRAFT)
-            case "NEW"        => JsSuccess(CaseStatus.NEW)
-            case "OPEN"       => JsSuccess(CaseStatus.OPEN)
-            case "SUPPRESSED" => JsSuccess(CaseStatus.SUPPRESSED)
-            case "REFERRED"   => JsSuccess(CaseStatus.REFERRED)
-            case "REJECTED"   => JsSuccess(CaseStatus.REJECTED)
-            case "CANCELLED"  => JsSuccess(CaseStatus.CANCELLED)
-            case "SUSPENDED"  => JsSuccess(CaseStatus.SUSPENDED)
-            case "COMPLETED"  => JsSuccess(CaseStatus.COMPLETED)
-            case "REVOKED"    => JsSuccess(CaseStatus.REVOKED)
-            case "ANNULLED"   => JsSuccess(CaseStatus.ANNULLED)
-            case _            => JsError(s"Unknown value for CaseStatus")
-          }
-        catch {
-          case _: NoSuchElementException =>
-            JsError(s"Unknown value for CaseStatus")
-        }
+        val statusMap = Map(
+          "DRAFT" -> CaseStatus.DRAFT,
+          "NEW" -> CaseStatus.NEW,
+          "OPEN" -> CaseStatus.OPEN,
+          "SUPPRESSED" -> CaseStatus.SUPPRESSED,
+          "REFERRED" -> CaseStatus.REFERRED,
+          "REJECTED" -> CaseStatus.REJECTED,
+          "CANCELLED" -> CaseStatus.CANCELLED,
+          "SUSPENDED" -> CaseStatus.SUSPENDED,
+          "COMPLETED" -> CaseStatus.COMPLETED,
+          "REVOKED" -> CaseStatus.REVOKED,
+          "ANNULLED" -> CaseStatus.ANNULLED
+        )
+
+        statusMap.get(s) match
+          case Some(status) => JsSuccess(status)
+          case None => JsError(s"Unknown value for CaseStatus: $s")
 
       case _ => JsError("String value expected")
-    }
   }
 }
