@@ -16,9 +16,8 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.model
 
-import play.api.libs.json.Json
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{Application, ApplicationType, Attachment, Case, CaseStatus, Decision}
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{Application, ApplicationType, Case, CaseStatus}
 
 class CaseJsonFormatSpec extends BaseSpec {
   "Case.format" should {

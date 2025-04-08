@@ -17,15 +17,14 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
 
 import org.mockito.ArgumentMatchers.*
-import org.mockito.BDDMockito.*
 import org.mockito.Mockito.{mock, when}
 import play.api.mvc.{Request, Result, Results}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 class AuthenticatedActionTest extends BaseSpec {
 
   private val block  = mock(classOf[Request[_] => Future[Result]])

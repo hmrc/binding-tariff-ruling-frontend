@@ -18,15 +18,14 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.scheduler
 
 import org.apache.pekko.Done
 import org.mockito.ArgumentCaptor
-import org.mockito.Mockito.{doReturn, mock, verify, when}
+import org.mockito.Mockito.{doReturn, mock, verify}
 import org.quartz.JobExecutionContext
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.workers.RulingsWorker
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.time.{Instant, LocalTime}
 import java.time.temporal.ChronoUnit
-import scala.compiletime.ops.any
+import java.time.{Instant, LocalTime}
 import scala.concurrent.Future
 
 class UpdateNewRulingsJobSpec extends BaseSpec {

@@ -44,6 +44,30 @@ class ApplicationSpec extends BaseSpec {
       result mustBe expectedInstance
     }
 
+    "correctly handle all ApplicationType values" in {
+      // Test all enum values
+      val types = Seq(
+        ApplicationType.BTI,
+        ApplicationType.LIABILITY_ORDER,
+        ApplicationType.CORRESPONDENCE,
+        ApplicationType.MISCELLANEOUS
+      )
+
+      for (appType <- types) {
+        val app        = Application(`type` = appType)
+        val json       = Json.toJson(app)
+        val typeString = appType.toString
+
+        // Verify serialization
+        (json \ "type").as[String] mustBe typeString
+
+        // Verify deserialization
+        val jsonObj      = Json.obj("type" -> typeString)
+        val deserialized = jsonObj.as[Application]
+        deserialized.`type` mustBe appType
+      }
+    }
+
     "ensure equality of identical instances" in {
       val app1 = Application(`type` = ApplicationType.BTI)
       val app2 = Application(`type` = ApplicationType.BTI)
@@ -109,6 +133,18 @@ class ApplicationSpec extends BaseSpec {
       val jsonValidation = Json.fromJson[Application](missingFieldJson)(Application.outboundFormat)
 
       jsonValidation.isError mustBe true
+    }
+
+    "handle error cases in ApplicationType Format" in {
+      // Test the JsString(other) => JsError case
+      val unknownTypeJson = Json.parse("""{"type": "UNKNOWN_TYPE"}""")
+      val unknownResult   = Json.fromJson[Application](unknownTypeJson)
+      unknownResult.isError mustBe true
+
+      // Test the _ => JsError case (non-string value)
+      val nonStringJson   = Json.parse("""{"type": 123}""")
+      val nonStringResult = Json.fromJson[Application](nonStringJson)
+      nonStringResult.isError mustBe true
     }
 
   }

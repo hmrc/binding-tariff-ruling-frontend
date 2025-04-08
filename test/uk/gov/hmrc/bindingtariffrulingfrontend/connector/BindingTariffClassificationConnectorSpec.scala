@@ -20,7 +20,6 @@ import com.codahale.metrics.MetricRegistry
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.apache.http.HttpStatus
-import org.mockito.BDDMockito.*
 import org.mockito.Mockito
 import org.mockito.Mockito.{mock, when}
 import play.api.libs.json.Json

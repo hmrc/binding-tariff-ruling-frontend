@@ -17,7 +17,7 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import org.mockito.ArgumentMatchers.*
-import org.mockito.BDDMockito.{willReturn, *}
+import org.mockito.BDDMockito.willReturn
 import org.mockito.Mockito.{mock, reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status

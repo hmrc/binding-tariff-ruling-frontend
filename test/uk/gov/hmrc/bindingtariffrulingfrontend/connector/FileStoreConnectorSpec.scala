@@ -19,7 +19,6 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 import com.codahale.metrics.MetricRegistry
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.apache.pekko.util.ByteString
-import org.mockito.BDDMockito.*
 import org.mockito.Mockito.{mock, when}
 import play.api.http.Status
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec

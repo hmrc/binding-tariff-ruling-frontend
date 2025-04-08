@@ -18,7 +18,6 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.service
 
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.*
-import org.mockito.BDDMockito.given
 import org.mockito.Mockito.*
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
@@ -34,8 +33,8 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.repository.RulingRepository
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import scala.collection.immutable.ListMap
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.language.postfixOps
 
 class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {

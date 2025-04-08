@@ -65,6 +65,8 @@ class BackLinkViewSpec extends BaseSpec {
       val functionCallHtml = backLinkView.f()(messages).toString()
       val expectedHtml     = backLinkView.apply()(messages).toString()
 
+      functionCallHtml shouldBe expectedHtml
+
       val refCall = backLinkView.ref
       refCall shouldBe backLinkView
     }

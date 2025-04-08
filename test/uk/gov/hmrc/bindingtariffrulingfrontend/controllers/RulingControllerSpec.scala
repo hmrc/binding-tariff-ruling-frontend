@@ -16,22 +16,20 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
-import java.time.Instant
 import org.mockito.ArgumentMatchers.*
-import org.mockito.BDDMockito.*
 import org.mockito.Mockito.{mock, when}
 import play.api.http.Status
 import play.api.test.Helpers.*
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-
+import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class RulingControllerSpec extends ControllerSpec {
 

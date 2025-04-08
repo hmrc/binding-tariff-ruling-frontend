@@ -19,9 +19,8 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 import org.apache.pekko.stream.scaladsl.Source
 import org.apache.pekko.util.ByteString
 import org.mockito.ArgumentMatchers.*
-import org.mockito.BDDMockito.*
 import org.mockito.Mockito
-import org.mockito.Mockito.{mock, reset, times, verify, when}
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
 import play.api.test.Helpers.*
