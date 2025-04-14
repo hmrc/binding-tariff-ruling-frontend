@@ -34,7 +34,7 @@
   govukSummaryList: GovukSummaryList,
 )
 
-@(ruling: Ruling, fileMetadata: Map[String, FileMetadata])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(ruling: Ruling, fileMetadata: Map[String, FileMetadata])(implicit request: Request[?], messages: Messages, appConfig: AppConfig)
 
 @commodityCodeLink = {
   <a href="@GlobalTariff.link(ruling.bindingCommodityCode)" class="govuk-link" target="_blank">

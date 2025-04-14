@@ -23,7 +23,7 @@
  govukButton: GovukButton
 )
 
-@(id:String, messageKey:String)(implicit messages: Messages, request:Request[_])
+@(id:String, messageKey:String)(implicit messages: Messages, request:Request[?])
 
 @govukButton(Button(
   classes = "govuk-button--secondary no-print",

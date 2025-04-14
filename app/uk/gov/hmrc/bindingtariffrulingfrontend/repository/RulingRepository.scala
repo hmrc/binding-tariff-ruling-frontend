@@ -19,7 +19,6 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 import com.google.inject.ImplementedBy
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.bson.{BsonArray, BsonDocument}
-import org.mongodb.scala.gridfs.{ObservableFuture, SingleObservableFuture}
 import org.mongodb.scala.model.*
 import org.mongodb.scala.model.Filters.*
 import org.mongodb.scala.model.Indexes.{ascending, compoundIndex, descending}
@@ -115,7 +114,7 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
     val dateFilter  = Seq(Filters.gt("effectiveEndDate", today))
 
     val allSearches: Seq[Bson] = textSearch ++ imageFilter ++ dateFilter
-    val findSearches           = if (allSearches.nonEmpty) and(allSearches: _*) else BsonDocument()
+    val findSearches           = if (allSearches.nonEmpty) and(allSearches*) else BsonDocument()
 
     val textScore = if (search.query.isDefined) Sorts.metaTextScore("score") else BsonDocument()
 
@@ -137,7 +136,7 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
                    .toFuture()
       count <- collection
                  .withReadConcern(ReadConcern.MAJORITY)
-                 .countDocuments(and(allSearches: _*), CountOptions().skip(0))
+                 .countDocuments(and(allSearches*), CountOptions().skip(0))
                  .toFuture()
     } yield Paged(results, search.pageIndex, search.pageSize, count)
   }

@@ -27,7 +27,7 @@
   backLink: back_link
 )
 
-@(reference: String, imageId: String, fileName: String)(implicit request: Request[_], messages: Messages)
+@(reference: String, imageId: String, fileName: String)(implicit request: Request[?], messages: Messages)
 
 @mainTemplate(title = Some(messages("image.title"))) {
   @backLink()

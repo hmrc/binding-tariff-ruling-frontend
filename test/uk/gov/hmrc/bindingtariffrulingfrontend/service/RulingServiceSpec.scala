@@ -19,8 +19,6 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.service
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.*
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.bindingtariffrulingfrontend.audit.AuditService
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
@@ -327,9 +325,6 @@ class RulingServiceSpec extends BaseSpec with BeforeAndAfterEach {
       verify(repository).update(captor.capture(), any[Boolean]())
       captor.getValue
     }
-
-    def returnTheRuling: Answer[Future[Ruling]] =
-      (invocation: InvocationOnMock) => await(Future.successful(invocation.getArgument(0)))
 
   }
 

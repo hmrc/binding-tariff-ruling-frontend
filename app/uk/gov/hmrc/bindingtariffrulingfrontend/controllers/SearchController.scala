@@ -51,7 +51,7 @@ class SearchController @Inject() (
     form: Form[SimpleSearch],
     rulings: Option[Paged[Ruling]],
     fileMetadata: Metadata
-  )(implicit request: Request[_]) =
+  )(implicit request: Request[?]) =
     Future.successful(Ok(search(form, rulings, fileMetadata)))
 
   def get(
@@ -74,7 +74,7 @@ class SearchController @Inject() (
       )
     }
 
-  private def allResultsView(form: Form[SimpleSearch], page: Int)(implicit request: Request[_]): Future[Result] = {
+  private def allResultsView(form: Form[SimpleSearch], page: Int)(implicit request: Request[?]): Future[Result] = {
     val search = SimpleSearch(query = None, imagesOnly = false, pageIndex = page)
 
     for {

@@ -34,7 +34,7 @@ class SearchViewSpec extends ViewSpec {
 
   implicit val timeout: Timeout = Timeout(5.seconds)
 
-  implicit val request: Request[_] = FakeRequest()
+  implicit val request: Request[?] = FakeRequest()
 
   val mainTemplate      = app.injector.instanceOf[main_template]
   val errorSummary      = app.injector.instanceOf[error_summary]

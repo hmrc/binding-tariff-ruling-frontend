@@ -59,7 +59,7 @@ object Ruling {
         (JsPath \ "keywords").readWithDefault[Set[String]](Set.empty) and
         (JsPath \ "attachments").readWithDefault[Seq[String]](Seq.empty) and
         (JsPath \ "images").readWithDefault[Seq[String]](Seq.empty)
-    )(Ruling.apply _)
+    )(Ruling.apply)
 
     implicit val rulingWrites: OWrites[Ruling] = (
       (__ \ "reference").write[String] and

@@ -62,7 +62,7 @@ class FileStoreConnector @Inject() (
 
       httpClient
         .get(url"$fullURL")
-        .setHeader(authHeaders(appConfig): _*)
+        .setHeader(authHeaders(appConfig)*)
         .execute[Option[FileMetadata]]
         .map(_.filter(_.published))
     }
@@ -77,7 +77,7 @@ class FileStoreConnector @Inject() (
           .mapAsyncUnordered(Runtime.getRuntime.availableProcessors()) { ids =>
             httpClient
               .get(url"${makeQuery(ids)}")
-              .setHeader(authHeaders(appConfig): _*)
+              .setHeader(authHeaders(appConfig)*)
               .execute[Seq[FileMetadata]]
           }
           .runFold(noMetadata) { case (metadata, newEntries) =>
@@ -86,11 +86,11 @@ class FileStoreConnector @Inject() (
       }
     }
 
-  def downloadFile(fileURL: String)(implicit hc: HeaderCarrier): Future[Option[Source[ByteString, _]]] =
+  def downloadFile(fileURL: String)(implicit hc: HeaderCarrier): Future[Option[Source[ByteString, ?]]] =
     withMetricsTimerAsync("download-file") { _ =>
       httpClient
         .get(url"$fileURL")
-        .setHeader(authHeaders(appConfig): _*)
+        .setHeader(authHeaders(appConfig)*)
         .stream[HttpResponse]
         .flatMap { response =>
           if (response.status / 100 == 2) {

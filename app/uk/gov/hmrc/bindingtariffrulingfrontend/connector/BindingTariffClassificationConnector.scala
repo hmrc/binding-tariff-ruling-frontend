@@ -67,7 +67,7 @@ class BindingTariffClassificationConnector @Inject() (
       val fullURL = s"${appConfig.bindingTariffClassificationUrl}/cases/$reference"
       httpClient
         .get(url"$fullURL")
-        .setHeader(authHeaders(appConfig): _*)
+        .setHeader(authHeaders(appConfig)*)
         .execute[Option[Case]]
     }
 
@@ -84,7 +84,7 @@ class BindingTariffClassificationConnector @Inject() (
 
       httpClient
         .get(url"$fullURL")
-        .setHeader(authHeaders(appConfig): _*)
+        .setHeader(authHeaders(appConfig)*)
         .execute[Paged[Case]]
     }
 
@@ -100,7 +100,7 @@ class BindingTariffClassificationConnector @Inject() (
       )
       httpClient
         .get(url"$fullURL")
-        .setHeader(authHeaders(appConfig): _*)
+        .setHeader(authHeaders(appConfig)*)
         .execute[Paged[Case]]
     }
 }

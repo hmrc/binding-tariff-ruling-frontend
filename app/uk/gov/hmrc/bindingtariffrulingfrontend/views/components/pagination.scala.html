@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.bindingtariffrulingfrontend.views.components.PaginationUtil
 
 @(id: String = "pagination",
-  pager: Paged[_],
+  pager: Paged[?],
   onChange: Int => Call,
 )(implicit messages: Messages)
 

@@ -24,26 +24,19 @@ enum CaseStatus:
 object CaseStatus:
   given Format[CaseStatus] = Format(
     Reads {
-      case JsString(s) =>
-        val statusMap = Map(
-          "DRAFT"      -> CaseStatus.DRAFT,
-          "NEW"        -> CaseStatus.NEW,
-          "OPEN"       -> CaseStatus.OPEN,
-          "SUPPRESSED" -> CaseStatus.SUPPRESSED,
-          "REFERRED"   -> CaseStatus.REFERRED,
-          "REJECTED"   -> CaseStatus.REJECTED,
-          "CANCELLED"  -> CaseStatus.CANCELLED,
-          "SUSPENDED"  -> CaseStatus.SUSPENDED,
-          "COMPLETED"  -> CaseStatus.COMPLETED,
-          "REVOKED"    -> CaseStatus.REVOKED,
-          "ANNULLED"   -> CaseStatus.ANNULLED
-        )
-
-        statusMap.get(s) match
-          case Some(status) => JsSuccess(status)
-          case None         => JsError(s"Unknown value for CaseStatus: $s")
-
-      case _ => JsError("String value expected")
+      case JsString("DRAFT")      => JsSuccess(CaseStatus.DRAFT)
+      case JsString("NEW")        => JsSuccess(CaseStatus.NEW)
+      case JsString("OPEN")       => JsSuccess(CaseStatus.OPEN)
+      case JsString("SUPPRESSED") => JsSuccess(CaseStatus.SUPPRESSED)
+      case JsString("REFERRED")   => JsSuccess(CaseStatus.REFERRED)
+      case JsString("REJECTED")   => JsSuccess(CaseStatus.REJECTED)
+      case JsString("CANCELLED")  => JsSuccess(CaseStatus.CANCELLED)
+      case JsString("SUSPENDED")  => JsSuccess(CaseStatus.SUSPENDED)
+      case JsString("COMPLETED")  => JsSuccess(CaseStatus.COMPLETED)
+      case JsString("REVOKED")    => JsSuccess(CaseStatus.REVOKED)
+      case JsString("ANNULLED")   => JsSuccess(CaseStatus.ANNULLED)
+      case JsString(other)        => JsError(s"Unknown CaseStatus: $other")
+      case _                      => JsError("String value expected")
     },
     Writes {
       case CaseStatus.DRAFT      => JsString("DRAFT")

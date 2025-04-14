@@ -27,20 +27,20 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 class AuthenticatedActionTest extends BaseSpec {
 
-  private val block  = mock(classOf[Request[_] => Future[Result]])
+  private val block  = mock(classOf[Request[?] => Future[Result]])
   private val config = mock(classOf[AppConfig])
   private val action = new AuthenticatedAction(config)
 
   "Authenticated Action" should {
     "Filter unauthenticated" in {
-      when(block.apply(any[Request[_]])).thenReturn(Future.successful(Results.Ok))
+      when(block.apply(any[Request[?]])).thenReturn(Future.successful(Results.Ok))
       when(config.authorization).thenReturn("password")
 
       await(action.invokeBlock(FakeRequest(), block)) shouldBe Results.Forbidden
     }
 
     "Filter authenticated" in {
-      when(block.apply(any[Request[_]])).thenReturn(Future.successful(Results.Ok))
+      when(block.apply(any[Request[?]])).thenReturn(Future.successful(Results.Ok))
       when(config.authorization).thenReturn("password")
 
       await(action.invokeBlock(FakeRequest().withHeaders("X-Api-Token" -> "password"), block)) shouldBe Results.Ok

@@ -29,20 +29,20 @@ import scala.concurrent.Future
 
 class AdminActionSpec extends BaseSpec {
 
-  private val block  = mock(classOf[Request[_] => Future[Result]])
+  private val block  = mock(classOf[Request[?] => Future[Result]])
   private val config = mock(classOf[AppConfig])
   private val action = new AdminAction(config)
 
   "Authenticated Action" should {
     "Filter authenticated if enabled" in {
-      when(block.apply(any[Request[_]])).thenReturn(Future.successful(Results.Ok))
+      when(block.apply(any[Request[?]])).thenReturn(Future.successful(Results.Ok))
       when(config.adminEnabled).thenReturn(true)
 
       await(action.invokeBlock(FakeRequest(), block)) shouldBe Results.Ok
     }
 
     "not allow authenticated action if disabled" in {
-      when(block.apply(any[Request[_]])).thenReturn(Future.successful(Results.Ok))
+      when(block.apply(any[Request[?]])).thenReturn(Future.successful(Results.Ok))
       when(config.adminEnabled).thenReturn(false)
 
       status(await(action.invokeBlock(FakeRequest(), block))) shouldBe FORBIDDEN

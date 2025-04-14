@@ -21,7 +21,7 @@
   govukErrorSummary: GovukErrorSummary,
 )
 
-@(form: Form[_])(implicit messages: Messages)
+@(form: Form[?])(implicit messages: Messages)
 
 @if(form.errors.nonEmpty) {
   @govukErrorSummary(ErrorSummary(

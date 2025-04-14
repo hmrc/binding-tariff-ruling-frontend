@@ -54,7 +54,7 @@ class NotFoundViewSpec extends BaseSpec {
     }
 
     "render the page correctly using render method" in {
-      implicit val request: Request[_] = FakeRequest()
+      implicit val request: Request[?] = FakeRequest()
       implicit val messages: Messages  = stubMessagesApi().preferred(request)
 
       val renderedHtml = notFoundView.render(request, messages)
@@ -66,7 +66,7 @@ class NotFoundViewSpec extends BaseSpec {
 
     "correctly use f method" in {
       val function                     = notFoundView.f
-      implicit val request: Request[_] = FakeRequest()
+      implicit val request: Request[?] = FakeRequest()
       implicit val messages: Messages  = stubMessagesApi().preferred(request)
 
       val result = function()(request, messages)

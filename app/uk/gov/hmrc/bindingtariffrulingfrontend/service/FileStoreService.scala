@@ -45,6 +45,6 @@ class FileStoreService @Inject() (connector: FileStoreConnector) extends Logging
     get(attachmentIds)
   }
 
-  def downloadFile(url: String)(implicit hc: HeaderCarrier): Future[Option[Source[ByteString, _]]] =
+  def downloadFile(url: String)(implicit hc: HeaderCarrier): Future[Option[Source[ByteString, ?]]] =
     connector.downloadFile(url)
 }
