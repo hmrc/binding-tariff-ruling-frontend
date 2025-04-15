@@ -21,7 +21,7 @@ import org.jsoup.nodes.Document
 import org.scalatest.matchers.must.Matchers.mustBe
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.Request
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import play.api.test.FakeRequest
 import org.apache.pekko.util.Timeout
 import play.api.test.Helpers.{contentAsString, stubMessagesApi}
