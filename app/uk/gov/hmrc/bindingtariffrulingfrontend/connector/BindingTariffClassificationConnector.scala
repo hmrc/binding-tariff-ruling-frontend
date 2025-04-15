@@ -18,13 +18,12 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
 import com.codahale.metrics.MetricRegistry
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType.ApplicationType
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.CaseStatus._
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.CaseStatus.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.{ApplicationType, Case}
 import uk.gov.hmrc.bindingtariffrulingfrontend.metrics.HasMetrics
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Paged.format
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
@@ -68,7 +67,7 @@ class BindingTariffClassificationConnector @Inject() (
       val fullURL = s"${appConfig.bindingTariffClassificationUrl}/cases/$reference"
       httpClient
         .get(url"$fullURL")
-        .setHeader(authHeaders(appConfig): _*)
+        .setHeader(authHeaders(appConfig)*)
         .execute[Option[Case]]
     }
 
@@ -85,7 +84,7 @@ class BindingTariffClassificationConnector @Inject() (
 
       httpClient
         .get(url"$fullURL")
-        .setHeader(authHeaders(appConfig): _*)
+        .setHeader(authHeaders(appConfig)*)
         .execute[Paged[Case]]
     }
 
@@ -101,7 +100,7 @@ class BindingTariffClassificationConnector @Inject() (
       )
       httpClient
         .get(url"$fullURL")
-        .setHeader(authHeaders(appConfig): _*)
+        .setHeader(authHeaders(appConfig)*)
         .execute[Paged[Case]]
     }
 }

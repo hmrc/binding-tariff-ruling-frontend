@@ -18,8 +18,8 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.metrics
 
 import com.codahale.metrics.Timer
 import com.codahale.metrics.MetricRegistry
-import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito
+import org.mockito.ArgumentMatchers.*
+import org.mockito.{InOrder, Mockito}
 import org.mockito.Mockito.{mock, times, verifyNoMoreInteractions, when}
 import org.scalatest.compatible.Assertion
 import org.scalatest.matchers.should.Matchers
@@ -36,7 +36,7 @@ class HasMetricsSpec extends AsyncWordSpecLike with Matchers with OptionValues w
     val timer: Timer.Context                = mock(classOf[Timer.Context])
     val metrics: MetricRegistry             = mock(classOf[MetricRegistry])
     override val localMetrics: LocalMetrics = mock(classOf[LocalMetrics])
-    when(localMetrics.startTimer(anyString())) thenReturn timer
+    when(localMetrics.startTimer(anyString())).thenReturn(timer)
   }
 
   class TestHasMetrics extends HasMetrics with MockHasMetrics
@@ -53,7 +53,7 @@ class HasMetricsSpec extends AsyncWordSpecLike with Matchers with OptionValues w
     test(new TestHasActionMetrics)
 
   def verifyCompletedWithSuccess(metricName: String, metrics: MockHasMetrics): Assertion = {
-    val inOrder = Mockito.inOrder(metrics.localMetrics, metrics.timer)
+    val inOrder: InOrder = Mockito.inOrder(metrics.localMetrics, metrics.timer)
     inOrder.verify(metrics.localMetrics, times(1)).startTimer(metricName)
     inOrder.verify(metrics.localMetrics, times(1)).stopTimer(metrics.timer)
     inOrder.verify(metrics.localMetrics, times(1)).incrementSuccessCounter(metricName)

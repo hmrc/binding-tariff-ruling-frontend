@@ -16,22 +16,20 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
-import java.time.Instant
-import org.mockito.ArgumentMatchers._
-import org.mockito.BDDMockito._
-import org.mockito.Mockito.mock
+import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito.{mock, when}
 import play.api.http.Status
-import play.api.test.Helpers._
-import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
+import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
-
+import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class RulingControllerSpec extends ControllerSpec {
 
@@ -57,11 +55,13 @@ class RulingControllerSpec extends ControllerSpec {
 
   "GET /" should {
     "return 200" in {
-      given(rulingService.get("id")) willReturn Future.successful(
-        Some(Ruling("ref", "code", Instant.now, Instant.now, "justification", "goods description"))
+      when(rulingService.get("id")).thenReturn(
+        Future.successful(
+          Some(Ruling("ref", "code", Instant.now, Instant.now, "justification", "goods description"))
+        )
       )
-      given(fileStoreService.get(any[Ruling])(any[HeaderCarrier]))
-        .willReturn(Future.successful(Map.empty[String, FileMetadata]))
+      when(fileStoreService.get(any[Ruling])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Map.empty[String, FileMetadata]))
 
       val result = await(controller().get("id")(getRequestWithCSRF()))
       status(result)      shouldBe Status.OK
@@ -71,7 +71,7 @@ class RulingControllerSpec extends ControllerSpec {
     }
 
     "return 404 - when not found" in {
-      given(rulingService.get("id")) willReturn Future.successful(None)
+      when(rulingService.get("id")).thenReturn(Future.successful(None))
 
       val result = await(controller().get("id")(getRequestWithCSRF()))
       status(result)      shouldBe Status.NOT_FOUND
@@ -83,7 +83,7 @@ class RulingControllerSpec extends ControllerSpec {
 
   "POST /" should {
     "return 202 when authenticated" in {
-      given(rulingService.refresh(refEq("id"))(any[HeaderCarrier])) willReturn Future.successful(())
+      when(rulingService.refresh(refEq("id"))(any[HeaderCarrier])).thenReturn(Future.successful(()))
       val result = await(controller(auth = SuccessfulAuth()).post("id")(postRequestWithCSRF))
       status(result) shouldBe Status.ACCEPTED
     }
@@ -97,7 +97,7 @@ class RulingControllerSpec extends ControllerSpec {
 
   "DELETE /" should {
     "return 204 when authenticated" in {
-      given(rulingService.deleteAll()) willReturn Future.successful(())
+      when(rulingService.deleteAll()).thenReturn(Future.successful(()))
       val result = await(controller(auth = SuccessfulAuth(), admin = AdminEnabled()).deleteAll()(postRequestWithCSRF))
       status(result) shouldBe Status.NO_CONTENT
     }
@@ -116,7 +116,7 @@ class RulingControllerSpec extends ControllerSpec {
 
   "DELETE / $id" should {
     "return 204 when authenticated" in {
-      given(rulingService.delete(refEq("ref"))) willReturn Future.successful(())
+      when(rulingService.delete(refEq("ref"))).thenReturn(Future.successful(()))
       val result = await(controller(auth = SuccessfulAuth(), admin = AdminEnabled()).delete("ref")(postRequestWithCSRF))
       status(result) shouldBe Status.NO_CONTENT
     }

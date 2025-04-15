@@ -17,12 +17,12 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
 import com.google.inject.ImplementedBy
-import org.mongodb.scala.ReadConcern
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.bson.{BsonArray, BsonDocument}
-import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.*
+import org.mongodb.scala.model.Filters.*
 import org.mongodb.scala.model.Indexes.{ascending, compoundIndex, descending}
-import org.mongodb.scala.model._
+import org.mongodb.scala.{ObservableFuture, ReadConcern, SingleObservableFuture}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.mongo.MongoComponent
@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @ImplementedBy(classOf[RulingMongoRepository])
 trait RulingRepository {
 
-  def update(ruling: Ruling, upsert: Boolean): Future[Ruling]
+  def update(ruling: Ruling, upsert: Boolean): Future[Boolean]
 
   def get(id: String): Future[Option[Ruling]]
 
@@ -80,11 +80,11 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
     )
     with RulingRepository {
 
-  //ATAR is holding data for long period of time, now it is set to 3 years but other ATAR services don't have the
-  //the index so we'll skip this one as well, as this index should be implemented the same way in all other ATAR services
+  // ATAR is holding data for long period of time, now it is set to 3 years but other ATAR services don't have the
+  // the index so we'll skip this one as well, as this index should be implemented the same way in all other ATAR services
   override lazy val requiresTtlIndex: Boolean = false
 
-  override def update(ruling: Ruling, upsert: Boolean): Future[Ruling] =
+  override def update(ruling: Ruling, upsert: Boolean): Future[Boolean] =
     collection
       .findOneAndReplace(
         filter = byReference(ruling.reference),
@@ -92,6 +92,7 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
         options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       )
       .toFuture()
+      .map(_ => true)
 
   override def get(reference: String): Future[Option[Ruling]] =
     collection.find(byReference(reference)).first().toFutureOption()
@@ -113,7 +114,7 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
     val dateFilter  = Seq(Filters.gt("effectiveEndDate", today))
 
     val allSearches: Seq[Bson] = textSearch ++ imageFilter ++ dateFilter
-    val findSearches           = if (allSearches.nonEmpty) and(allSearches: _*) else BsonDocument()
+    val findSearches           = if (allSearches.nonEmpty) and(allSearches*) else BsonDocument()
 
     val textScore = if (search.query.isDefined) Sorts.metaTextScore("score") else BsonDocument()
 
@@ -135,7 +136,7 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
                    .toFuture()
       count <- collection
                  .withReadConcern(ReadConcern.MAJORITY)
-                 .countDocuments(and(allSearches: _*), CountOptions().skip(0))
+                 .countDocuments(and(allSearches*), CountOptions().skip(0))
                  .toFuture()
     } yield Paged(results, search.pageIndex, search.pageSize, count)
   }

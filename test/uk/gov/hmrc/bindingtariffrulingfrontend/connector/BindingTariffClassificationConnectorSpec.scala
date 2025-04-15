@@ -18,15 +18,14 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.connector
 
 import com.codahale.metrics.MetricRegistry
 import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.apache.http.HttpStatus
-import org.mockito.BDDMockito._
 import org.mockito.Mockito
-import org.mockito.Mockito.mock
+import org.mockito.Mockito.{mock, when}
 import play.api.libs.json.Json
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, SimplePagination}
 import uk.gov.hmrc.bindingtariffrulingfrontend.util.WiremockTestServer
 import uk.gov.hmrc.bindingtariffrulingfrontend.utils.CaseQueueBuilder
@@ -49,8 +48,8 @@ class BindingTariffClassificationConnectorSpec extends BaseSpec with WiremockTes
   override def beforeAll(): Unit = {
     super.beforeAll()
     Mockito.reset(appConfig)
-    given(appConfig.bindingTariffClassificationUrl).willReturn(wireMockUrl)
-    given(appConfig.authorization).willReturn(xApiToken)
+    when(appConfig.bindingTariffClassificationUrl).thenReturn(wireMockUrl)
+    when(appConfig.authorization).thenReturn(xApiToken)
   }
 
   "Connector 'GET Case'" should {

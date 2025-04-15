@@ -47,5 +47,19 @@ class PaginationSpec extends BaseSpec {
         newPagination.pageSize  should be(Integer.MAX_VALUE)
       }
     }
+
+    "NoPagination" should {
+      "be created with default values" in {
+        val pagination = NoPagination()
+        pagination.pageIndex shouldBe 1
+        pagination.pageSize  shouldBe Integer.MAX_VALUE
+      }
+
+      "be created with custom values" in {
+        val pagination = NoPagination(2, 100)
+        pagination.pageIndex shouldBe 2
+        pagination.pageSize  shouldBe 100
+      }
+    }
   }
 }

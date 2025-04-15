@@ -17,7 +17,7 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.action
 
 import javax.inject.Inject
-import play.api.mvc._
+import play.api.mvc.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}

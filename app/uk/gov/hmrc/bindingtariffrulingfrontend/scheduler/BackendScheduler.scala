@@ -18,10 +18,9 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.scheduler
 
 import org.quartz.CronScheduleBuilder.dailyAtHourAndMinute
 import org.quartz.JobBuilder.newJob
-import org.quartz.{JobDetail, Scheduler, Trigger}
-import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.TriggerBuilder.newTrigger
 import org.quartz.impl.StdSchedulerFactory
+import org.quartz.{JobDetail, Scheduler, Trigger}
 import play.api.Logging
 import play.api.inject.ApplicationLifecycle
 
@@ -43,10 +42,7 @@ class BackendScheduler @Inject() (
       .withIdentity(s"${job.jobName} trigger")
       .startNow()
       .withSchedule(
-        job.schedule.fold(
-          duration => simpleSchedule().withIntervalInSeconds(duration.getSeconds.toInt),
-          localTime => dailyAtHourAndMinute(localTime.getHour, localTime.getMinute)
-        )
+        dailyAtHourAndMinute(job.schedule.getHour, job.schedule.getMinute)
       )
       .forJob(jobDetails)
       .build()

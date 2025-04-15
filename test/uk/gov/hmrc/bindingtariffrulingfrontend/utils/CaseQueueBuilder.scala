@@ -17,7 +17,6 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.utils
 
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.ApplicationType.ApplicationType
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Pagination
 
 import java.time.Instant

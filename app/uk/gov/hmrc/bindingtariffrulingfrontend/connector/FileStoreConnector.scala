@@ -25,7 +25,8 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.metrics.HasMetrics
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.client.readStreamHttpResponse
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -61,7 +62,7 @@ class FileStoreConnector @Inject() (
 
       httpClient
         .get(url"$fullURL")
-        .setHeader(authHeaders(appConfig): _*)
+        .setHeader(authHeaders(appConfig)*)
         .execute[Option[FileMetadata]]
         .map(_.filter(_.published))
     }
@@ -76,7 +77,7 @@ class FileStoreConnector @Inject() (
           .mapAsyncUnordered(Runtime.getRuntime.availableProcessors()) { ids =>
             httpClient
               .get(url"${makeQuery(ids)}")
-              .setHeader(authHeaders(appConfig): _*)
+              .setHeader(authHeaders(appConfig)*)
               .execute[Seq[FileMetadata]]
           }
           .runFold(noMetadata) { case (metadata, newEntries) =>
@@ -85,11 +86,11 @@ class FileStoreConnector @Inject() (
       }
     }
 
-  def downloadFile(fileURL: String)(implicit hc: HeaderCarrier): Future[Option[Source[ByteString, _]]] =
+  def downloadFile(fileURL: String)(implicit hc: HeaderCarrier): Future[Option[Source[ByteString, ?]]] =
     withMetricsTimerAsync("download-file") { _ =>
       httpClient
         .get(url"$fileURL")
-        .setHeader(authHeaders(appConfig): _*)
+        .setHeader(authHeaders(appConfig)*)
         .stream[HttpResponse]
         .flatMap { response =>
           if (response.status / 100 == 2) {

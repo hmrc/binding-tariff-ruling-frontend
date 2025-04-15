@@ -23,7 +23,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.workers.RulingsWorker
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.temporal.ChronoUnit
-import java.time.{Duration, Instant, LocalTime}
+import java.time.{Instant, LocalTime}
 import javax.inject.Singleton
 
 @Singleton
@@ -32,7 +32,7 @@ class UpdateCanceledRulingsJob @Inject() (rulingsWorker: RulingsWorker) extends 
 
   override def jobName: String = "Update canceled rulings"
 
-  override def schedule: Either[Duration, LocalTime] = Right(LocalTime.of(3, 0))
+  override def schedule: LocalTime = LocalTime.of(3, 0)
 
   override def execute(context: JobExecutionContext): Unit = {
     logger.info(

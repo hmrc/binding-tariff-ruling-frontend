@@ -19,7 +19,7 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 import javax.inject.{Inject, Singleton}
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.mvc._
+import play.api.mvc.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.filters.RateLimitFilter
@@ -51,7 +51,7 @@ class SearchController @Inject() (
     form: Form[SimpleSearch],
     rulings: Option[Paged[Ruling]],
     fileMetadata: Metadata
-  )(implicit request: Request[_]) =
+  )(implicit request: Request[?]) =
     Future.successful(Ok(search(form, rulings, fileMetadata)))
 
   def get(
@@ -74,7 +74,7 @@ class SearchController @Inject() (
       )
     }
 
-  private def allResultsView(form: Form[SimpleSearch], page: Int)(implicit request: Request[_]): Future[Result] = {
+  private def allResultsView(form: Form[SimpleSearch], page: Int)(implicit request: Request[?]): Future[Result] = {
     val search = SimpleSearch(query = None, imagesOnly = false, pageIndex = page)
 
     for {

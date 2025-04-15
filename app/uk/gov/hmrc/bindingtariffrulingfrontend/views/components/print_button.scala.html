@@ -14,8 +14,8 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.hmrcfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.*
 @import views.html.helper.CSPNonce
 @import play.api.mvc.Request
 
@@ -23,7 +23,7 @@
  govukButton: GovukButton
 )
 
-@(id:String, messageKey:String)(implicit messages: Messages, request:Request[_])
+@(id:String, messageKey:String)(implicit messages: Messages, request:Request[?])
 
 @govukButton(Button(
   classes = "govuk-button--secondary no-print",

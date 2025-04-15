@@ -25,7 +25,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
 class SimpleSearchSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
-  def checkForError(form: Form[_], data: Map[String, String], expectedErrors: Seq[FormError]): Assertion =
+  def checkForError(form: Form[?], data: Map[String, String], expectedErrors: Seq[FormError]): Assertion =
     form
       .bind(data)
       .fold(
@@ -41,16 +41,16 @@ class SimpleSearchSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
   lazy val emptyForm: Map[String, String] = Map[String, String]()
 
-  def fieldThatBindsValidData(form: Form[_], fieldName: String, validDataGenerator: Gen[String]): Unit =
+  def fieldThatBindsValidData(form: Form[?], fieldName: String, validDataGenerator: Gen[String]): Unit =
     "must bind valid data" in {
 
-      forAll(validDataGenerator -> "validDataItem") { dataItem: String =>
+      forAll(validDataGenerator -> "validDataItem") { (dataItem: String) =>
         val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
         result.value.get shouldBe dataItem
       }
     }
 
-  def optionalField(form: Form[_], fieldName: String): Unit = {
+  def optionalField(form: Form[?], fieldName: String): Unit = {
 
     "must bind when key is not present at all" in {
 
@@ -85,6 +85,18 @@ class SimpleSearchSpec extends BaseSpec with ScalaCheckPropertyChecks {
       form,
       fieldName
     )
+  }
+
+  "SimpleSearch.form" should {
+    "unbind Option[String] values correctly" in {
+      val searchWithValue = SimpleSearch(Some("test query"), false, 1)
+      val mapWithValue    = SimpleSearch.form.fill(searchWithValue).data
+      mapWithValue("query") shouldBe "test query"
+
+      val searchWithNone = SimpleSearch(None, false, 1)
+      val mapWithNone    = SimpleSearch.form.fill(searchWithNone).data
+      mapWithNone("query") shouldBe ""
+    }
   }
 
 }

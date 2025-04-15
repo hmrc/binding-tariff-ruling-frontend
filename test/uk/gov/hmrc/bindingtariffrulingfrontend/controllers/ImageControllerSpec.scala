@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
-import org.mockito.ArgumentMatchers._
-import org.mockito.BDDMockito._
+import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito
-import org.mockito.Mockito.{mock, reset, verify}
+import org.mockito.Mockito.{mock, reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
@@ -50,7 +49,7 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
   override def beforeEach(): Unit = {
     super.beforeEach()
     Mockito.reset(realConfig)
-    given(realConfig.displayImages).willReturn(true)
+    when(realConfig.displayImages).thenReturn(true)
   }
 
   "GET /" should {
@@ -66,16 +65,16 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     )
 
     "return 303 when given a valid image id (toggle images off)" in {
-      given(realConfig.displayImages).willReturn(false)
+      when(realConfig.displayImages).thenReturn(false)
 
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(Some(metadata))
+      when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(Some(metadata)))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result) shouldBe Status.SEE_OTHER
     }
 
     "return 200 when given a valid image id" in {
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(Some(metadata))
+      when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(Some(metadata)))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.OK
@@ -87,7 +86,7 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 404 when there is no file metadata" in {
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(None)
+      when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(None))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.NOT_FOUND
@@ -99,7 +98,7 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 404 when the filestore service does not respond normally" in {
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.failed(new Exception)
+      when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.failed(new Exception))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result) shouldBe Status.BAD_GATEWAY
@@ -107,9 +106,8 @@ class ImageControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 404 when the file metadata contains no filename" in {
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(
-        Some(metadata.copy(fileName = None))
-      )
+      when(fileStoreService.get(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(metadata.copy(fileName = None))))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.NOT_FOUND

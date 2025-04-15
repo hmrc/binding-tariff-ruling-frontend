@@ -24,7 +24,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.workers.RulingsWorker
 
 class Module extends play.api.inject.Module {
 
-  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = Seq(
+  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[?]] = Seq(
     bind[ScheduledJobs].toProvider[ScheduledJobProvider],
     bind[BackendScheduler].toSelf.eagerly(),
     bind[RulingsWorker].toSelf.eagerly()

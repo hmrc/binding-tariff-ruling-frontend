@@ -16,11 +16,25 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector.model
 
-import play.api.libs.json.Format
-import uk.gov.hmrc.bindingtariffrulingfrontend.utils.EnumJson
+import play.api.libs.json.*
 
-object ApplicationType extends Enumeration {
-  type ApplicationType = Value
-  val BTI, LIABILITY_ORDER, CORRESPONDENCE, MISCELLANEOUS = Value
-  implicit val format: Format[ApplicationType.Value]      = EnumJson.format(ApplicationType)
-}
+enum ApplicationType:
+  case BTI, LIABILITY_ORDER, CORRESPONDENCE, MISCELLANEOUS
+
+object ApplicationType:
+  given Format[ApplicationType] = Format(
+    Reads {
+      case JsString("BTI")             => JsSuccess(ApplicationType.BTI)
+      case JsString("LIABILITY_ORDER") => JsSuccess(ApplicationType.LIABILITY_ORDER)
+      case JsString("CORRESPONDENCE")  => JsSuccess(ApplicationType.CORRESPONDENCE)
+      case JsString("MISCELLANEOUS")   => JsSuccess(ApplicationType.MISCELLANEOUS)
+      case JsString(other)             => JsError(s"Unknown ApplicationType: $other")
+      case _                           => JsError("String value expected")
+    },
+    Writes {
+      case ApplicationType.BTI             => JsString("BTI")
+      case ApplicationType.LIABILITY_ORDER => JsString("LIABILITY_ORDER")
+      case ApplicationType.CORRESPONDENCE  => JsString("CORRESPONDENCE")
+      case ApplicationType.MISCELLANEOUS   => JsString("MISCELLANEOUS")
+    }
+  )

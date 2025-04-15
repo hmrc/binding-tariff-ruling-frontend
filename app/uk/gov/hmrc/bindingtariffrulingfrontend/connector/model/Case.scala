@@ -17,7 +17,6 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.connector.model
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.CaseStatus.CaseStatus
 
 case class Case(
   reference: String,

@@ -18,13 +18,12 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.controllers
 
 import org.apache.pekko.stream.scaladsl.Source
 import org.apache.pekko.util.ByteString
-import org.mockito.ArgumentMatchers._
-import org.mockito.BDDMockito._
+import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito
-import org.mockito.Mockito.{mock, reset, times, verify}
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.FileStoreService
@@ -52,7 +51,7 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
   override def beforeEach(): Unit = {
     super.beforeEach()
     Mockito.reset(realConfig)
-    given(realConfig.displayImages).willReturn(true)
+    when(realConfig.displayImages).thenReturn(true)
   }
 
   "GET /" should {
@@ -68,14 +67,13 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     )
 
     "return 303 when given a valid attachment id (images toggled off)" in {
-      given(realConfig.displayImages).willReturn(false)
+      when(realConfig.displayImages).thenReturn(false)
 
       val url     = metadata.url.get
       val pngData = "png data".getBytes(StandardCharsets.UTF_8)
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(Some(metadata))
-      given(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier])) willReturn Future.successful(
-        Some(Source.single(ByteString(pngData)))
-      )
+      when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(Some(metadata)))
+      when(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(Source.single(ByteString(pngData)))))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result) shouldBe Status.SEE_OTHER
@@ -84,22 +82,21 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     "return 200 when given a valid attachment id" in {
       val url     = metadata.url.get
       val pngData = "png data".getBytes(StandardCharsets.UTF_8)
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(Some(metadata))
-      given(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier])) willReturn Future.successful(
-        Some(Source.single(ByteString(pngData)))
-      )
+      when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(Some(metadata)))
+      when(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(Source.single(ByteString(pngData)))))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)         shouldBe Status.OK
       contentType(result)    shouldBe Some("image/png")
-      contentAsBytes(result) shouldBe pngData
+      contentAsBytes(result) shouldBe ByteString(pngData)
 
       verify(fileStoreService).get(refEq(fileId))(any[HeaderCarrier])
       verify(fileStoreService).downloadFile(refEq(url))(any[HeaderCarrier])
     }
 
     "return 404 when there is no file metadata" in {
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(None)
+      when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(None))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.NOT_FOUND
@@ -112,7 +109,7 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 404 when the filestore service does not respond normally to get" in {
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.failed(new Exception)
+      when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.failed(new Exception))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result) shouldBe Status.BAD_GATEWAY
@@ -123,8 +120,8 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
     "return 404 when the filestore service does not respond normally to downloadFile" in {
       val url = metadata.url.get
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(Some(metadata))
-      given(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier])) willReturn Future.failed(new Exception)
+      when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(Some(metadata)))
+      when(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier])).thenReturn(Future.failed(new Exception))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result) shouldBe Status.BAD_GATEWAY
@@ -134,9 +131,8 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 404 when the file metadata contains no url" in {
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(
-        Some(metadata.copy(url = None))
-      )
+      when(fileStoreService.get(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(metadata.copy(url = None))))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.NOT_FOUND
@@ -149,9 +145,8 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 404 when the file metadata contains no filename" in {
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(
-        Some(metadata.copy(fileName = None))
-      )
+      when(fileStoreService.get(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(metadata.copy(fileName = None))))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.NOT_FOUND
@@ -164,9 +159,8 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
     }
 
     "return 404 when the file metadata contains no mime type" in {
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(
-        Some(metadata.copy(mimeType = None))
-      )
+      when(fileStoreService.get(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(metadata.copy(mimeType = None))))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.NOT_FOUND
@@ -180,8 +174,8 @@ class AttachmentControllerSpec extends ControllerSpec with BeforeAndAfterEach {
 
     "return 404 when the url in file metadata does not return any data" in {
       val url = metadata.url.get
-      given(fileStoreService.get(any[String])(any[HeaderCarrier])) willReturn Future.successful(Some(metadata))
-      given(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier])) willReturn Future.successful(None)
+      when(fileStoreService.get(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(Some(metadata)))
+      when(fileStoreService.downloadFile(refEq(url))(any[HeaderCarrier])).thenReturn(Future.successful(None))
       val result = await(controller().get(rulingReference, fileId)(getRequestWithCSRF()))
 
       status(result)      shouldBe Status.NOT_FOUND

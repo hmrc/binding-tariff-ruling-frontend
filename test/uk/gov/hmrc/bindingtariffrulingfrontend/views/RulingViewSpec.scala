@@ -16,14 +16,14 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.views
 import org.mockito.BDDMockito.`given`
-import org.mockito.Mockito.mock
+import org.mockito.Mockito.{mock, when}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.FileMetadata
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.bindingtariffrulingfrontend.utils.Dates
-import uk.gov.hmrc.bindingtariffrulingfrontend.views.ViewMatchers._
+import uk.gov.hmrc.bindingtariffrulingfrontend.views.ViewMatchers.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.views.html.ruling
 
 import java.time.Instant
@@ -113,7 +113,7 @@ class RulingViewSpec extends ViewSpec {
 
         "render images with correct href (images toggle on)" in {
 
-          given(appConfig.displayImages) willReturn true
+          when(appConfig.displayImages).thenReturn(true)
 
           val doc = view(viewMethod())
 
@@ -130,7 +130,7 @@ class RulingViewSpec extends ViewSpec {
 
         "do not render images with correct href (images toggle off)" in {
 
-          given(appConfig.displayImages) willReturn false
+          when(appConfig.displayImages).thenReturn(false)
 
           val doc = view(viewMethod())
 
@@ -168,7 +168,7 @@ class RulingViewSpec extends ViewSpec {
       (".f", viewViaF)
     )
 
-    input.foreach(args => (test _).tupled(args))
+    input.foreach(args => test.tupled(args))
 
   }
 }

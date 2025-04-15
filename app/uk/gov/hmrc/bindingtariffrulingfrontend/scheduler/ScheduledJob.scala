@@ -18,11 +18,11 @@ package uk.gov.hmrc.bindingtariffrulingfrontend.scheduler
 
 import org.quartz.Job
 
-import java.time.{Duration, LocalTime}
+import java.time.LocalTime
 
 trait ScheduledJob extends Job {
 
   def jobName: String
 
-  def schedule: Either[Duration, LocalTime]
+  def schedule: LocalTime
 }

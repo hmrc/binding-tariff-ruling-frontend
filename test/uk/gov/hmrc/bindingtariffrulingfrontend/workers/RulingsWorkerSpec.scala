@@ -17,14 +17,16 @@
 package uk.gov.hmrc.bindingtariffrulingfrontend.workers
 
 import org.apache.pekko.Done
-import org.mockito.ArgumentMatchers._
-import org.mockito.BDDMockito._
-import org.mockito.Mockito.{mock, verify}
-import org.scalatest.BeforeAndAfterAll
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.{Materializer, Supervision}
+import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito.{mock, reset, verify, when}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
+import play.api.libs.json.Json
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.connector.BindingTariffClassificationConnector
-import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model._
+import uk.gov.hmrc.bindingtariffrulingfrontend.connector.model.*
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Pagination, SimplePagination}
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.RulingService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -35,7 +37,7 @@ import java.time.{Instant, LocalDate, ZoneOffset}
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 
-class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with MongoSupport { self =>
+class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with BeforeAndAfterEach with MongoSupport { self =>
 
   private val rulingService = mock(classOf[RulingService])
   private val connector     = mock(classOf[BindingTariffClassificationConnector])
@@ -74,24 +76,25 @@ class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with MongoSuppor
   )
 
   override protected def beforeAll(): Unit = {
-    given(lockRepo.refreshExpiry(any[String], any[String], any[Duration]))
-      .willReturn(Future.successful(true))
-    given(lockRepo.takeLock(any[String], any[String], any[Duration]))
-      .willReturn(Future.successful(None))
-    given(lockRepo.releaseLock(any[String], any[String]))
-      .willReturn(Future.successful(()))
-    given(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-      .willReturn(Future.successful(pagedNewCases))
-    given(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-      .willReturn(Future.successful(pagedCanceledCases))
+    when(lockRepo.refreshExpiry(any[String], any[String], any[Duration]))
+      .thenReturn(Future.successful(true))
+    when(lockRepo.takeLock(any[String], any[String], any[Duration]))
+      .thenReturn(Future.successful(None))
+    when(lockRepo.releaseLock(any[String], any[String]))
+      .thenReturn(Future.successful(()))
+  }
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(connector)
   }
 
   "updateNewRulings" should {
     "get new rulings from the backend and delegate to the RulingService" in {
-      given(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-        .willReturn(pagedNewCases)
-        .willReturn(Future.successful(Paged.empty[Case]))
-      given(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).willReturn(Future.successful(()))
+      when(connector.newApprovedRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(pagedNewCases))
+        .thenReturn(Future.successful(Paged.empty[Case]))
+      when(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).thenReturn(Future.successful(()))
 
       await(rulingWorker.updateNewRulings(startDate)) shouldBe Done
       verify(rulingService).refresh(refEq("ref1"), any[Some[Case]])(any[HeaderCarrier])
@@ -103,14 +106,59 @@ class RulingsWorkerSpec extends BaseSpec with BeforeAndAfterAll with MongoSuppor
 
   "updateCanceledRulings" should {
     "get canceled rulings from the backend and delegate to the RulingService" in {
-      given(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
-        .willReturn(pagedCanceledCases)
-        .willReturn(Future.successful(Paged.empty[Case]))
-      given(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).willReturn(Future.successful(()))
+      when(connector.newCanceledRulings(any[Instant], any[Pagination])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(pagedCanceledCases))
+        .thenReturn(Future.successful(Paged.empty[Case]))
+      when(rulingService.refresh(any[String], any[Some[Case]])(any[HeaderCarrier])).thenReturn(Future.successful(()))
 
       await(rulingWorker.updateCancelledRulings(endDate)) shouldBe Done
       verify(rulingService).refresh(refEq("ref4"), any[Some[Case]])(any[HeaderCarrier])
       verify(rulingService).refresh(refEq("ref5"), any[Some[Case]])(any[HeaderCarrier])
+    }
+  }
+
+  "Case object" should {
+    "serialize and deserialize using JSON formatter" in {
+      val json = Json.toJson(validCase)(Case.format)
+
+      (json \ "reference").as[String] shouldBe validCase.reference
+      (json \ "status").as[String]    shouldBe validCase.status.toString
+
+      val caseFromJson = json.as[Case](Case.format)
+
+      caseFromJson shouldBe validCase
+    }
+  }
+
+  "RulingsWorker decider" should {
+    "handle NonFatal exceptions by resuming" in {
+      implicit val system   = ActorSystem("test-system")
+      implicit val mat      = Materializer(system)
+      val mockAppConfig     = mock(classOf[AppConfig])
+      val mockConnector     = mock(classOf[BindingTariffClassificationConnector])
+      val mockRulingService = mock(classOf[RulingService])
+      val mockMongoLockRepo = mock(classOf[MongoLockRepository])
+
+      val worker = new RulingsWorker(
+        mockAppConfig,
+        mockConnector,
+        mockRulingService,
+        mockMongoLockRepo
+      )
+
+      val deciderField = worker.getClass.getDeclaredField("decider")
+      deciderField.setAccessible(true)
+      val decider = deciderField.get(worker).asInstanceOf[Supervision.Decider]
+
+      val nonFatalException = new RuntimeException("Test exception")
+      val nonFatalResult    = decider(nonFatalException)
+      nonFatalResult shouldBe Supervision.Resume
+
+      val fatalException = new OutOfMemoryError("Test OOM")
+      val fatalResult    = decider(fatalException)
+      fatalResult shouldBe Supervision.Stop
+
+      system.terminate()
     }
   }
 
