@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.repository
 
-import org.mongodb.scala.{MongoCollection, ReadConcern, SingleObservableFuture}
+import org.mongodb.scala.{MongoCollection, SingleObservableFuture}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.test.Helpers.*
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.Ruling
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
@@ -34,11 +35,10 @@ class RulingMongoRepositoryTest
     with Matchers
     with DefaultPlayMongoRepositorySupport[Ruling] {
 
-  private val clock = Clock.tickSeconds(ZoneOffset.UTC)
+  private val clock     = Clock.tickSeconds(ZoneOffset.UTC)
+  private val appConfig = app.injector.instanceOf[AppConfig]
 
-  override protected val repository: RulingMongoRepository = new RulingMongoRepository(mongoComponent)
-
-  lazy val readConcern: ReadConcern = ReadConcern.MAJORITY
+  override protected val repository: RulingMongoRepository = new RulingMongoRepository(mongoComponent, appConfig)
 
   protected def collection: MongoCollection[Ruling] = repository.collection
 

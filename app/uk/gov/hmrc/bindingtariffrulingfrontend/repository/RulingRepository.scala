@@ -22,7 +22,8 @@ import org.mongodb.scala.bson.{BsonArray, BsonDocument}
 import org.mongodb.scala.model.*
 import org.mongodb.scala.model.Filters.*
 import org.mongodb.scala.model.Indexes.{ascending, compoundIndex, descending}
-import org.mongodb.scala.{ObservableFuture, ReadConcern, SingleObservableFuture}
+import org.mongodb.scala.{ObservableFuture, SingleObservableFuture}
+import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.mongo.MongoComponent
@@ -48,16 +49,17 @@ trait RulingRepository {
 }
 
 @Singleton
-class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit val ec: ExecutionContext)
-    extends PlayMongoRepository[Ruling](
+class RulingMongoRepository @Inject() (mongoComponent: MongoComponent, appConfig: AppConfig)(implicit
+  val ec: ExecutionContext
+) extends PlayMongoRepository[Ruling](
       collectionName = "rulings",
       mongoComponent = mongoComponent,
       domainFormat = Ruling.Mongo.format,
       indexes = Seq(
-        IndexModel(ascending("reference"), IndexOptions().unique(true).background(false).name("reference_Index")),
+        IndexModel(ascending("reference"), IndexOptions().unique(true).name("reference_Index")),
         IndexModel(
           ascending("bindingCommodityCode"),
-          IndexOptions().unique(false).background(false).name("bindingCommodityCode_Index")
+          IndexOptions().unique(false).name("bindingCommodityCode_Index")
         ),
         IndexModel(
           compoundIndex(
@@ -75,8 +77,14 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
             .weights(
               BsonDocument("bindingCommodityCode" -> 10, "bindingCommodityCodeNgrams" -> 10, "keywords" -> 5)
             )
+        ),
+        IndexModel(descending("effectiveEndDate"), IndexOptions().unique(false).name("effectiveEndDate_Index")),
+        IndexModel(
+          descending("images"),
+          IndexOptions().unique(false).name("images_Index")
         )
-      )
+      ),
+      replaceIndexes = appConfig.replaceMongoIndexes
     )
     with RulingRepository {
 
@@ -91,8 +99,8 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
         replacement = ruling,
         options = FindOneAndReplaceOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
       )
-      .toFuture()
-      .map(_ => true)
+      .headOption()
+      .map(rulingOpt => rulingOpt.isDefined)
 
   override def get(reference: String): Future[Option[Ruling]] =
     collection.find(byReference(reference)).first().toFutureOption()
@@ -135,8 +143,7 @@ class RulingMongoRepository @Inject() (mongoComponent: MongoComponent)(implicit 
                    .sort(Sorts.orderBy(textScore, descending("effectiveEndDate"), descending("reference")))
                    .toFuture()
       count <- collection
-                 .withReadConcern(ReadConcern.MAJORITY)
-                 .countDocuments(and(allSearches*), CountOptions().skip(0))
+                 .countDocuments(and(allSearches*))
                  .toFuture()
     } yield Paged(results, search.pageIndex, search.pageSize, count)
   }

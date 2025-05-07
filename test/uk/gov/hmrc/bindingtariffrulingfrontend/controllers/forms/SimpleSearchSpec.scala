@@ -16,14 +16,11 @@
 
 package uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms
 
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen
 import org.scalatest.Assertion
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.data.{Form, FormError}
 import uk.gov.hmrc.bindingtariffrulingfrontend.base.BaseSpec
 
-class SimpleSearchSpec extends BaseSpec with ScalaCheckPropertyChecks {
+class SimpleSearchSpec extends BaseSpec {
 
   def checkForError(form: Form[?], data: Map[String, String], expectedErrors: Seq[FormError]): Assertion =
     form
@@ -41,19 +38,16 @@ class SimpleSearchSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
   lazy val emptyForm: Map[String, String] = Map[String, String]()
 
-  def fieldThatBindsValidData(form: Form[?], fieldName: String, validDataGenerator: Gen[String]): Unit =
+  def testFieldWithValidData(form: Form[?], fieldName: String, validData: Seq[String]): Unit =
     "must bind valid data" in {
-
-      forAll(validDataGenerator -> "validDataItem") { (dataItem: String) =>
+      validData.foreach { dataItem =>
         val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
         result.value.get shouldBe dataItem
       }
     }
 
-  def optionalField(form: Form[?], fieldName: String): Unit = {
-
+  def testOptionalField(form: Form[?], fieldName: String): Unit = {
     "must bind when key is not present at all" in {
-
       val result = form.bind(emptyForm).apply(fieldName)
       result.errors shouldEqual Seq.empty
       result.value shouldBe None
@@ -66,23 +60,21 @@ class SimpleSearchSpec extends BaseSpec with ScalaCheckPropertyChecks {
     }
   }
 
-  def nonEmptyString: Gen[String] =
-    arbitrary[String] suchThat (_.nonEmpty)
-
-  val form: Form[SimpleSearch] = SimpleSearch.form
+  val validPageValues: Seq[String] =
+    Seq("1", "2", "10", "100", "test input", "test input    multiple space", "©ƒ¥†∂ç≈¥ƒ®†ç˙©∆")
 
   ".page" should {
 
     val fieldName = "page"
 
-    behave like fieldThatBindsValidData(
-      form,
+    behave like testFieldWithValidData(
+      SimpleSearch.form,
       fieldName,
-      nonEmptyString
+      validPageValues
     )
 
-    behave like optionalField(
-      form,
+    behave like testOptionalField(
+      SimpleSearch.form,
       fieldName
     )
   }
@@ -98,5 +90,4 @@ class SimpleSearchSpec extends BaseSpec with ScalaCheckPropertyChecks {
       mapWithNone("query") shouldBe ""
     }
   }
-
 }
