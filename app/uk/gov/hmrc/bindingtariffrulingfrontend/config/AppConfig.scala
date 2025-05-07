@@ -48,6 +48,8 @@ class AppConfig @Inject() (val configuration: Configuration) extends ServicesCon
   lazy val rateLimitRatePerSecond: Int = loadConfig[Int]("filters.rateLimit.ratePerSecond")
   lazy val rateLimiterEnabled: Boolean = loadConfig[Boolean]("filters.rateLimit.enabled")
 
+  lazy val replaceMongoIndexes = loadConfig[Boolean]("mongodb.replaceIndexes")
+
   private def loadConfig[A](key: String)(implicit loader: ConfigLoader[A]) =
     configuration.getOptional[A](key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
 }
