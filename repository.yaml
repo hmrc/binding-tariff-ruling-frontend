@@ -1,5 +1,8 @@
+digital-service: ATaR / Advance Tariff Rulings
+description: The frontend for the public Search For Advance Tariff Rulings service, use by importers, exporters and trade consultants to research ATaR rulings that are currently in effect.
 repoVisibility: public_0C3F0CE3E6E6448FAD341E7BFA50FCD333E06A20CFF05FCACE61154DDBBADF71
-digital-service: Digital Tariffs
+type: Service
+service-type: Frontend
 test-repositories:
-  - digital-tariffs-ruling-performance-tests
   - digital-tariffs-acceptance-tests
+  - digital-tariffs-ruling-performance-tests
