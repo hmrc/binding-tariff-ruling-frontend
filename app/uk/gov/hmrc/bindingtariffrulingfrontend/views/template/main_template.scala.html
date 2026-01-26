@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.bindingtariffrulingfrontend.config.AppConfig
 @import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.routes
-@import uk.gov.hmrc.govukfrontend.views.html.components.{Header => _, _}
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.*
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.*
 @import views.html.helper.CSPNonce
@@ -24,7 +24,7 @@
 @this(
   config: AppConfig,
   govukTemplate: GovukTemplate,
-  hmrcHeader: HmrcHeader,
+  hmrcStandardHeader: HmrcStandardHeader,
   hmrcHead: HmrcHead,
   hmrcScripts: HmrcScripts,
   hmrcStandardFooter: HmrcStandardFooter,
@@ -53,12 +53,13 @@
 }
 
 @headerBlock = {
-  @hmrcHeader(Header(
-    homepageUrl = "https://www.gov.uk",
+  @hmrcStandardHeader(
     serviceName = Some(messages("service.name")),
-    serviceUrl = routes.SearchController.get().path,
-    userResearchBanner = userResearchBanner
-  ))
+    serviceUrl = Some(routes.SearchController.get().path),
+    userResearchBanner = userResearchBanner,
+    displayHmrcBanner = false,
+    isWelshTranslationAvailable = false
+  )
 }
 
 @contentBlock = {
@@ -77,4 +78,3 @@
   mainClasses = Some("govuk-main-wrapper--auto-spacing"),
   footerBlock = hmrcStandardFooter()
 )(contentBlock)
-
