@@ -107,7 +107,6 @@
         ))
 
         @govukButton(Button(
-          element = Some("a"),
           href = Some(routes.RulingController.get(result.reference).url),
           content = Text(messages("search.results.ruling.view", result.reference))
         ))
