@@ -31,3 +31,5 @@ tmp
 bin
 .bsp/
 project/.bloop/
+/.metals
+/.vscode

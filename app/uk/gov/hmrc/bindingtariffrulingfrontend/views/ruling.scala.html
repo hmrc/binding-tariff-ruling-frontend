@@ -29,11 +29,19 @@
   mainTemplate: main_template,
   backLink: back_link,
   printButton: print_button,
-  hmrcPageHeading: HmrcPageHeading,
   govukSummaryList: GovukSummaryList,
 )
 
 @(ruling: Ruling, fileMetadata: Map[String, FileMetadata])(implicit request: Request[?], messages: Messages, appConfig: AppConfig)
+
+@pageHeading = {
+  <h1 class="govuk-heading-xl">
+    <span class="govuk-caption-xl">
+      <span class="govuk-visually-hidden">This section is </span>@messages("site.heading.secondary")
+    </span>
+    @messages("ruling.heading", ruling.reference)
+  </h1>
+}
 
 @commodityCodeLink = {
   <a href="@GlobalTariff.link(ruling.bindingCommodityCode)" class="govuk-link" target="_blank">
@@ -87,10 +95,7 @@
 
   @backLink()
 
-  @hmrcPageHeading(PageHeading(
-    messages("ruling.heading", ruling.reference),
-    section = Some(messages("site.heading.secondary"))
-  ))
+  @pageHeading
 
   @printButton("print-ruling-button", "ruling.printRuling")
 
