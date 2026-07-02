@@ -36,7 +36,9 @@
 
 @pageHeading = {
   <h1 class="govuk-heading-xl">
-    <span class="govuk-caption-xl">@messages("site.heading.secondary")</span>
+    <span class="govuk-caption-xl">
+      <span class="govuk-visually-hidden">This section is </span>@messages("site.heading.secondary")
+    </span>
     @messages("ruling.heading", ruling.reference)
   </h1>
 }
