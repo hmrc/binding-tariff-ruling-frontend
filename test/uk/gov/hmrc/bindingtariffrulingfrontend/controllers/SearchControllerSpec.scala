@@ -141,9 +141,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       val result = await(
         controller()
           .get(query = Some("query"), images = false, page = 1)(
-            getRequestWithCSRF().withFormUrlEncodedBody(
-              "query" -> "query"
-            )
+            getRequestWithCSRF("/?query=query")
           )
       )
 
@@ -182,9 +180,7 @@ class SearchControllerSpec extends ControllerSpec with BeforeAndAfterEach {
       val result = await(
         controller()
           .get(query = Some(""), images = false, page = 1)(
-            getRequestWithCSRF().withFormUrlEncodedBody(
-              "query" -> ""
-            )
+            getRequestWithCSRF("/?query=")
           )
       )
 

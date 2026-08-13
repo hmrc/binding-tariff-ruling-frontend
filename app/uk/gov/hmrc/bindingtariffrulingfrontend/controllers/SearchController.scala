@@ -27,7 +27,7 @@ import uk.gov.hmrc.bindingtariffrulingfrontend.model.{Paged, Ruling}
 import uk.gov.hmrc.bindingtariffrulingfrontend.controllers.forms.SimpleSearch
 import uk.gov.hmrc.bindingtariffrulingfrontend.service.{FileStoreService, RulingService}
 import uk.gov.hmrc.bindingtariffrulingfrontend.views
-import uk.gov.hmrc.play.bootstrap.controller.WithUnsafeDefaultFormBinding
+import uk.gov.hmrc.play.bootstrap.controller.WithUrlEncodedOnlyFormBinding
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,7 +43,7 @@ class SearchController @Inject() (
 )(implicit ec: ExecutionContext)
     extends FrontendController(mcc)
     with I18nSupport
-    with WithUnsafeDefaultFormBinding {
+    with WithUrlEncodedOnlyFormBinding {
 
   type Metadata = Map[String, FileMetadata]
 
