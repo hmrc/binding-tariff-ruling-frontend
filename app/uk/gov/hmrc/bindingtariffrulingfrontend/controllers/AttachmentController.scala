@@ -55,7 +55,7 @@ class AttachmentController @Inject() (
         )
 
       fileStoreResponse.getOrElse(NotFound(notFoundView())).recover { case NonFatal(e) =>
-        logger.error("[AttachmentController][get] Exception while calling binding-tariff-filestore", e)
+        logger.error("Exception getting attachment when calling binding-tariff-filestore", e)
         BadGateway
       }
     } else {

@@ -36,7 +36,7 @@ class UpdateCanceledRulingsJob @Inject() (rulingsWorker: RulingsWorker) extends 
 
   override def execute(context: JobExecutionContext): Unit = {
     logger.info(
-      s"[UpdateCanceledRulingsJob][execute] Backend scheduler for updateCanceledRulingsJob started at ${Instant.now}"
+      s"Backend scheduler for updateCanceledRulingsJob started at ${Instant.now}"
     )
     rulingsWorker.updateCancelledRulings(Instant.now().minus(12, ChronoUnit.HOURS))
   }
